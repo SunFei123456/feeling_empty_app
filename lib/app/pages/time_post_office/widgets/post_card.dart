@@ -15,6 +15,7 @@ class PostCard extends StatelessWidget {
   final String type;
   final String category;
   final String createdAt;
+  final bool isTop;
 
   const PostCard({
     Key? key,
@@ -28,6 +29,7 @@ class PostCard extends StatelessWidget {
     required this.category,
     required this.createdAt,
     required this.letterContent,
+    this.isTop = false,
   }) : super(key: key);
 
   @override
@@ -47,6 +49,110 @@ class PostCard extends StatelessWidget {
         'isLocked': isLocked,
         'createdAt': createdAt,
       })),
+      onLongPress: () {
+        Get.bottomSheet(
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 删除选项
+                ListTile(
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: Colors.red[400],
+                  ),
+                  title: Text(
+                    '删除',
+                    style: TextStyle(
+                      color: Colors.red[400],
+                    ),
+                  ),
+                  onTap: () {
+                    Get.back();
+                    Get.dialog(
+                      AlertDialog(
+                        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                        title: Text(
+                          '确认删除',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        content: Text(
+                          '确定要删除这封信吗？删除后无法恢复。',
+                          style: TextStyle(
+                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: Text(
+                              '取消',
+                              style: TextStyle(
+                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // TODO: 处理删除逻辑
+                              Get.back();
+                              Get.snackbar(
+                                '提示',
+                                '删除成功',
+                                backgroundColor: Colors.green[100],
+                                colorText: Colors.green[900],
+                                icon: const Icon(Icons.check_circle, color: Colors.green),
+                              );
+                            },
+                            child: Text(
+                              '删除',
+                              style: TextStyle(
+                                color: Colors.red[400],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                // 置顶选项
+                ListTile(
+                  leading: const Icon(Icons.push_pin_outlined),
+                  title: Text(
+                    isTop ? '取消置顶' : '置顶',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  onTap: () {
+                    Get.back();
+                    // TODO: 处理置顶逻辑
+                    Get.snackbar(
+                      '提示',
+                      isTop ? '已取消置顶' : '已置顶',
+                      backgroundColor: Colors.green[100],
+                      colorText: Colors.green[900],
+                      icon: const Icon(Icons.check_circle, color: Colors.green),
+                    );
+                  },
+                ),
+                // 底部安全区域
+                SizedBox(height: MediaQuery.of(context).padding.bottom),
+              ],
+            ),
+          ),
+        );
+      },
       child: Card(
         elevation: 2,
         shadowColor: isDark ? Colors.black26 : Colors.black12,

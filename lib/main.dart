@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:getx_study/app/pages/bottle/view.dart';
-import 'package:getx_study/app/pages/not_found.dart';
+import 'package:getx_study/app/pages/views/not_found.dart';
 import 'package:getx_study/app/pages/profile/views/profile_page.dart';
 import 'package:getx_study/app/pages/setting/controller.dart';
 import 'package:getx_study/app/pages/setting/view.dart';

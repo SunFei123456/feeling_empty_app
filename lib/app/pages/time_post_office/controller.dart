@@ -11,6 +11,18 @@ class TimePostOfficeController extends GetxController {
 
   void loadPosts() {
     posts.value = [
+  //       final String title;
+  // final String author;
+  // final String? imageUrl;
+  // final String content;
+  // final String letterContent;
+  // final bool isLocked;
+  // final String unlockTime;
+  // final String type;
+  // final String category;
+  // final String createdAt;
+  // final bool isTop;
+
       {
         'title': '今天的心情',
         'author': '小明',

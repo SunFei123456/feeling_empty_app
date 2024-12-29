@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
-import 'package:record/record.dart' show AudioRecorder;
-import 'package:audioplayers/audioplayers.dart';
 
-enum ContentType { text, image, audio }
+enum LetterType { text, image, audio }
 
 class WriteLetterContentPage extends StatefulWidget {
   final String title;
   final String preContent;
   final String tag;
   final Color themeColor;
+  final Map<String, dynamic>? initialContent;
+  final bool readOnly;
 
   const WriteLetterContentPage({
     Key? key,
@@ -22,6 +24,8 @@ class WriteLetterContentPage extends StatefulWidget {
     required this.preContent,
     required this.tag,
     required this.themeColor,
+    this.initialContent,
+    this.readOnly = false,
   }) : super(key: key);
 
   @override
@@ -30,298 +34,220 @@ class WriteLetterContentPage extends StatefulWidget {
 
 class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
   final _letterController = TextEditingController();
-  final _scrollController = ScrollController();
+  LetterType _selectedType = LetterType.text;
   DateTime? _selectedDate;
-  ContentType _selectedType = ContentType.text;
   
   // 图片相关
   final _imagePicker = ImagePicker();
-  List<XFile> _selectedImages = [];
+  XFile? _selectedImage;
   
   // 录音相关
   final _audioRecorder = AudioRecorder();
+  final _audioPlayer = AudioPlayer();
   String? _recordedFilePath;
   bool _isRecording = false;
+  bool _isPlaying = false;
   Duration _recordDuration = Duration.zero;
   Timer? _recordTimer;
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 如果有初始内容，加载它
+    if (widget.initialContent != null) {
+      _letterController.text = widget.initialContent!['content'] ?? '';
+      _selectedType = _getTypeFromString(widget.initialContent!['type']);
+      _selectedDate = DateTime.parse(widget.initialContent!['unlockTime']);
+      
+      // 加载媒体内容
+      if (widget.initialContent!['media'] != null) {
+        if (_selectedType == LetterType.image) {
+          _selectedImage = XFile(widget.initialContent!['media']);
+        } else if (_selectedType == LetterType.audio) {
+          _recordedFilePath = widget.initialContent!['media'];
+        }
+      }
+    }
+  }
+
+  // 添加辅助方法来转换类型
+  LetterType _getTypeFromString(String? type) {
+    switch (type) {
+      case 'image':
+        return LetterType.image;
+      case 'audio':
+        return LetterType.audio;
+      default:
+        return LetterType.text;
+    }
+  }
 
   @override
   void dispose() {
     _letterController.dispose();
-    _scrollController.dispose();
-    _recordTimer?.cancel();
     _audioRecorder.dispose();
     _audioPlayer.dispose();
+    _recordTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.black,
+          '写信内容',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
             fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          // 背景装饰
-          Positioned(
-            left: -100,
-            bottom: -50,
-            child: Transform.rotate(
-              angle: -0.2,
-              child: Icon(
-                Icons.favorite,
-                size: 200,
-                color: widget.themeColor.withOpacity(0.1),
+        actions: [
+          if (!widget.readOnly)  // 只在编辑模式显示完成按钮
+            TextButton(
+              onPressed: _handleSubmit,
+              child: Text(
+                '完成',
+                style: TextStyle(
+                  color: widget.themeColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          SingleChildScrollView(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 信件预览卡片
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: widget.themeColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '信件预览',
-                        style: TextStyle(
-                          color: widget.themeColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const Divider(),
-                      Text(
-                        widget.preContent,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: widget.themeColor.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          widget.tag,
-                          style: TextStyle(
-                            color: widget.themeColor,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 内容类型选择器
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '选择内容类型',
-                        style: TextStyle(
-                          color: widget.themeColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildTypeOption(
-                            type: ContentType.text,
-                            icon: Icons.text_fields,
-                            label: '文字',
-                          ),
-                          const SizedBox(width: 12),
-                          _buildTypeOption(
-                            type: ContentType.image,
-                            icon: Icons.image,
-                            label: '图片',
-                          ),
-                          const SizedBox(width: 12),
-                          _buildTypeOption(
-                            type: ContentType.audio,
-                            icon: Icons.mic,
-                            label: '录音',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // 根据选择的类型显示不同的编辑区域
-                _buildContentEditor(),
-                const SizedBox(height: 24),
-                // 开启时间选择
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '选择开启时间',
-                        style: TextStyle(
-                          color: widget.themeColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      InkWell(
-                        onTap: _selectDate,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: widget.themeColor.withOpacity(0.3),
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                color: widget.themeColor,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                _selectedDate == null
-                                    ? '选择日期'
-                                    : '${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}',
-                                style: TextStyle(
-                                  color: _selectedDate == null
-                                      ? Colors.grey
-                                      : Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: _handleSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: widget.themeColor,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 类型选择
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
               ),
-            ),
-            child: const Text(
-              '完成并投递信件',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              child: Row(
+                children: [
+                  _buildTypeButton(
+                    type: LetterType.text,
+                    icon: Icons.text_fields,
+                    label: '文字',
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTypeButton(
+                    type: LetterType.image,
+                    icon: Icons.image,
+                    label: '图文',
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTypeButton(
+                    type: LetterType.audio,
+                    icon: Icons.mic,
+                    label: '音文',
+                    isDark: isDark,
+                  ),
+                ],
               ),
             ),
-          ),
+            const SizedBox(height: 20),
+            // 内容编辑区
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+                ),
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _letterController,
+                    maxLines: 8,
+                    maxLength: 500,
+                    readOnly: widget.readOnly,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: widget.readOnly ? '' : '写下你想对未来说的话...',
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.grey[600] : Colors.grey[400],
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                  if (_selectedType != LetterType.text) ...[
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    _buildMediaSection(isDark),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // 开启时间选择
+            _buildDateSelector(isDark),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTypeOption({
-    required ContentType type,
+  Widget _buildTypeButton({
+    required LetterType type,
     required IconData icon,
     required String label,
+    required bool isDark,
   }) {
     final isSelected = _selectedType == type;
     return Expanded(
       child: InkWell(
-        onTap: () => setState(() => _selectedType = type),
+        onTap: widget.readOnly ? null : () => setState(() => _selectedType = type),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? widget.themeColor.withOpacity(0.1) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? widget.themeColor : Colors.grey.withOpacity(0.3),
-              width: isSelected ? 2 : 1,
-            ),
+            color: isSelected
+                ? widget.themeColor.withOpacity(isDark ? 0.2 : 0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             children: [
               Icon(
                 icon,
-                color: isSelected ? widget.themeColor : Colors.grey,
-                size: 28,
+                color: isSelected
+                    ? widget.themeColor
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? widget.themeColor : Colors.grey,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 12,
+                  color: isSelected
+                      ? widget.themeColor
+                      : (isDark ? Colors.grey[400] : Colors.grey[600]),
                 ),
               ),
             ],
@@ -331,165 +257,78 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
     );
   }
 
-  Widget _buildContentEditor() {
+  Widget _buildMediaSection(bool isDark) {
     switch (_selectedType) {
-      case ContentType.text:
-        return _buildTextEditor();
-      case ContentType.image:
-        return _buildImageEditor();
-      case ContentType.audio:
-        return _buildAudioEditor();
+      case LetterType.image:
+        return _buildImageSection(isDark);
+      case LetterType.audio:
+        return _buildAudioSection(isDark);
+      default:
+        return const SizedBox();
     }
   }
 
-  Widget _buildTextEditor() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '信件内容',
-            style: TextStyle(
-              color: widget.themeColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+  Widget _buildImageSection(bool isDark) {
+    if (_selectedImage == null) {
+      return InkWell(
+        onTap: _pickImage,
+        child: Container(
+          width: double.infinity,
+          height: 120,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[800] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
             ),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _letterController,
-            maxLines: 10,
-            decoration: InputDecoration(
-              hintText: '亲爱的未来...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  color: widget.themeColor.withOpacity(0.3),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_photo_alternate_outlined,
+                size: 32,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '添加图片',
+                style: TextStyle(
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
                 ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  color: widget.themeColor,
-                  width: 2,
-                ),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageEditor() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '选择图片',
-            style: TextStyle(
-              color: widget.themeColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 16),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-            ),
-            itemCount: _selectedImages.length + 1,
-            itemBuilder: (context, index) {
-              if (index == _selectedImages.length) {
-                return _buildAddImageButton();
-              }
-              return _buildImagePreview(_selectedImages[index]);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddImageButton() {
-    return InkWell(
-      onTap: _pickImage,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.grey[300]!,
-            width: 1,
+            ],
           ),
         ),
-        child: Icon(
-          Icons.add_photo_alternate_outlined,
-          color: widget.themeColor,
-          size: 32,
-        ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildImagePreview(XFile image) {
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            image: DecorationImage(
-              image: FileImage(File(image.path)),
-              fit: BoxFit.cover,
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.file(
+            File(_selectedImage!.path),
+            width: double.infinity,
+            height: 200,
+            fit: BoxFit.cover,
           ),
         ),
         Positioned(
-          top: 4,
-          right: 4,
+          top: 8,
+          right: 8,
           child: InkWell(
-            onTap: () => setState(() => _selectedImages.remove(image)),
+            onTap: () => setState(() => _selectedImage = null),
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.black54,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.close,
                 color: Colors.white,
-                size: 16,
+                size: 20,
               ),
             ),
           ),
@@ -498,77 +337,157 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
     );
   }
 
-  Widget _buildAudioEditor() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 10,
+  Widget _buildAudioSection(bool isDark) {
+    return Column(
+      children: [
+        if (_recordedFilePath == null)
+          InkWell(
+            onTap: _isRecording ? _stopRecording : _startRecording,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[800] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    _isRecording ? Icons.stop : Icons.mic,
+                    size: 32,
+                    color: _isRecording
+                        ? Colors.red
+                        : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _isRecording ? '点击停止' : '点击录音',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                  if (_isRecording) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _formatDuration(_recordDuration),
+                      style: TextStyle(
+                        color: isDark ? Colors.red[200] : Colors.red,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[800] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: _playRecording,
+                  icon: Icon(
+                    _isPlaying ? Icons.stop : Icons.play_arrow,
+                    color: widget.themeColor,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '录音完成',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => setState(() => _recordedFilePath = null),
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: isDark ? Colors.red[200] : Colors.red,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
+      ],
+    );
+  }
+
+  Widget _buildDateSelector(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '录制语音',
+            '选择开启时间',
             style: TextStyle(
-              color: widget.themeColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black,
             ),
           ),
-          const SizedBox(height: 24),
-          Center(
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: _isRecording ? _stopRecording : _startRecording,
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: _isRecording
-                          ? Colors.red.withOpacity(0.1)
-                          : widget.themeColor.withOpacity(0.1),
-                      shape: BoxShape.circle,
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: widget.readOnly ? null : () async {
+              final DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now().add(const Duration(days: 1)),
+                firstDate: DateTime.now().add(const Duration(days: 1)),
+                lastDate: DateTime.now().add(const Duration(days: 3650)),
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: widget.themeColor,
+                        onPrimary: Colors.white,
+                        onSurface: isDark ? Colors.white : Colors.black,
+                      ),
                     ),
-                    child: Icon(
-                      _isRecording ? Icons.stop : Icons.mic,
-                      color: _isRecording ? Colors.red : widget.themeColor,
-                      size: 48,
-                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (picked != null && picked != _selectedDate) {
+                setState(() => _selectedDate = picked);
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[800] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 20,
+                    color: widget.themeColor,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  _isRecording
-                      ? _formatDuration(_recordDuration)
-                      : _recordedFilePath != null
-                          ? '录音完成'
-                          : '点击开始录音',
-                  style: TextStyle(
-                    color: _isRecording ? Colors.red : Colors.grey[600],
-                    fontSize: 16,
-                  ),
-                ),
-                if (_recordedFilePath != null) ...[
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _playRecording,
-                    icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                    label: Text(_isPlaying ? '停止播放' : '播放录音'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.themeColor,
-                      foregroundColor: Colors.white,
+                  const SizedBox(width: 12),
+                  Text(
+                    _selectedDate == null
+                        ? '选择日期'
+                        : '${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         ],
@@ -582,9 +501,7 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
       imageQuality: 80,
     );
     if (image != null) {
-      setState(() {
-        _selectedImages.add(image);
-      });
+      setState(() => _selectedImage = image);
     }
   }
 
@@ -592,7 +509,7 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
     try {
       if (await _audioRecorder.hasPermission()) {
         final directory = await getTemporaryDirectory();
-        final filePath = '${directory.path}/recorded_audio.m4a';
+        final filePath = '${directory.path}/recorded_letter.m4a';
         await _audioRecorder.start(
           RecordConfig(),
           path: filePath,
@@ -605,6 +522,12 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
       }
     } catch (e) {
       print(e);
+      Get.snackbar(
+        '提示',
+        '录音失败，请检查权限设置',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
     }
   }
 
@@ -621,13 +544,6 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
     }
   }
 
-  void _startTimer() {
-    _recordTimer?.cancel();
-    _recordTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      setState(() => _recordDuration += const Duration(seconds: 1));
-    });
-  }
-
   Future<void> _playRecording() async {
     try {
       if (_isPlaying) {
@@ -637,15 +553,26 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
         await _audioPlayer.play(DeviceFileSource(_recordedFilePath!));
         setState(() => _isPlaying = true);
         
-        // 监听播放完成
         _audioPlayer.onPlayerComplete.listen((event) {
           setState(() => _isPlaying = false);
         });
       }
     } catch (e) {
       print('播放错误: $e');
-      Get.snackbar('提示', '播放失败');
+      Get.snackbar(
+        '提示',
+        '播放失败',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
     }
+  }
+
+  void _startTimer() {
+    _recordTimer?.cancel();
+    _recordTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      setState(() => _recordDuration += const Duration(seconds: 1));
+    });
   }
 
   String _formatDuration(Duration duration) {
@@ -656,68 +583,61 @@ class _WriteLetterContentPageState extends State<WriteLetterContentPage> {
   }
 
   void _handleSubmit() {
-    // 根据不同的内容类型进行验证
-    switch (_selectedType) {
-      case ContentType.text:
     if (_letterController.text.isEmpty) {
-          Get.snackbar('提示', '请输入信件内容');
-          return;
-        }
-        break;
-      case ContentType.image:
-        if (_selectedImages.isEmpty) {
-          Get.snackbar('提示', '请选择至少一张图片');
-          return;
-        }
-        break;
-      case ContentType.audio:
-        if (_recordedFilePath == null) {
-          Get.snackbar('提示', '请录制语音');
+      Get.snackbar(
+        '提示',
+        '请输入信件内容',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
       return;
     }
-        break;
+
+    if (_selectedType == LetterType.image && _selectedImage == null) {
+      Get.snackbar(
+        '提示',
+        '请选择图片',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
+      return;
+    }
+
+    if (_selectedType == LetterType.audio && _recordedFilePath == null) {
+      Get.snackbar(
+        '提示',
+        '请录制语音',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
+      return;
     }
 
     if (_selectedDate == null) {
-      Get.snackbar('提示', '请选择开启时间');
+      Get.snackbar(
+        '提示',
+        '请选择开启时间',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[900],
+      );
       return;
     }
 
     // 返回结果
     Get.back(result: {
-      'type': _selectedType.toString(),
-      'content': _selectedType == ContentType.text
-          ? _letterController.text
-          : _selectedType == ContentType.image
-              ? _selectedImages
-              : _recordedFilePath,
-      'unlockTime': _selectedDate,
+      'type': _selectedType == LetterType.text 
+          ? 'text'
+          : _selectedType == LetterType.image
+              ? 'image'
+              : 'audio',
+      'content': _letterController.text,
+      'media': _selectedType == LetterType.image
+          ? _selectedImage?.path
+          : _recordedFilePath,
+      'unlockTime': _selectedDate!.toIso8601String(),
+      'title': widget.title,
+      'preContent': widget.preContent,
+      'tag': widget.tag,
     });
-  }
-
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().add(const Duration(days: 1)),
-      firstDate: DateTime.now().add(const Duration(days: 1)),
-      lastDate: DateTime.now().add(const Duration(days: 3650)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: widget.themeColor,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
   }
 } 
