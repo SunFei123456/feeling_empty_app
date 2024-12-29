@@ -1,6 +1,13 @@
 import 'package:get/get.dart';
 import 'package:getx_study/app/pages/home/index.dart';
+import 'package:getx_study/app/pages/login/index.dart';
+import 'package:getx_study/app/pages/profile/views/profile_page.dart';
 import 'package:getx_study/app/pages/setting/view.dart';
+import 'package:getx_study/app/pages/square/index.dart';
+import 'package:getx_study/app/pages/time_post_office/controller.dart';
+import 'package:getx_study/app/pages/time_post_office/view.dart';
+import 'package:getx_study/main.dart';
+
 
 /// 路由管理类
 class AppRoute {
@@ -19,12 +26,15 @@ class AppRoute {
   /// 是否需要认证
   final bool? needAuth;
 
+  final Bindings? binding;
+
   const AppRoute({
     required this.name,
     required this.page,
     this.transition,
     this.middlewares,
     this.needAuth,
+    this.binding,
   });
 
   GetPage toGetPage() {
@@ -33,6 +43,7 @@ class AppRoute {
       page: page,
       transition: transition ?? Transition.rightToLeft,
       middlewares: middlewares,
+      binding: binding,
     );
   }
 }
@@ -41,15 +52,26 @@ class AppRoute {
 class AppRoutes {
   /// 定义路由名称常量
   static const home = '/';
+  static const square = '/square';
   static const login = '/login';
   static const profile = '/profile';
   static const setting = '/setting';
+  static const TIME_POST_OFFICE = '/time_post_office';
   
-  /// 路由表
+  /// 路由
   static final routes = <AppRoute>[
     AppRoute(
+      name: login,
+      page: () => const LoginPage(),
+      transition: Transition.fadeIn,
+    ),
+    AppRoute(
       name: home,
-      page: () => const HomePage(),
+      page: () => const MyHomePage(),
+    ),
+    AppRoute(
+      name: square,
+      page: () => const SquarePage(),
     ),
     // AppRoute(
     //   name: login,
@@ -64,6 +86,17 @@ class AppRoutes {
     AppRoute(
       name: setting,
       page: () => const SettingPage(),
+    ),
+    AppRoute(
+      name: '/profile',
+      page: () => const ProfilePage(),
+    ),
+    AppRoute(
+      name: TIME_POST_OFFICE,
+      page: () => const TimePostOfficePage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<TimePostOfficeController>(() => TimePostOfficeController());
+      }),
     ),
   ];
 
@@ -91,4 +124,6 @@ class AppRoutes {
   static void back<T>({T? result}) {
     Get.back<T>(result: result);
   }
+
+  static const INITIAL = '/login'; // 设置初始路由为登录页
 }
