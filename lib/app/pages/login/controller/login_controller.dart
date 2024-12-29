@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-import 'package:getx_study/app/core/services/api_service.dart';
-import 'package:getx_study/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 
 class LoginController extends GetxController {
-  
   Future<void> login(String username, String password) async {
     try {
       final response = await BaseApiService.dio.post<Map<String, dynamic>>(
@@ -22,4 +21,4 @@ class LoginController extends GetxController {
       Get.snackbar('Error', e.toString());
     }
   }
-} 
+}

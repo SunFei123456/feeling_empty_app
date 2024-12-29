@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/time_post_office/views/write_letter_page.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
 import './controller.dart';
 import './widgets/post_list.dart';
 
@@ -36,7 +36,7 @@ class _TimePostOfficePageState extends State<TimePostOfficePage>
   @override
   Widget build(BuildContext context) {
     if (!mounted) return const SizedBox();
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(

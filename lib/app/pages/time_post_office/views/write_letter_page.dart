@@ -4,7 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/time_post_office/views/write_letter_content_page.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_content_page.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -48,7 +48,7 @@ class _WriteLetterPageState extends State<WriteLetterPage> {
 
   // 在 _WriteLetterPageState 类中添加状态
   bool _hasWrittenLetter = false;
-  Map<String, dynamic>? _letterContent;  // 存储信件内容
+  Map<String, dynamic>? _letterContent; // 存储信件内容
 
   @override
   void dispose() {
@@ -330,21 +330,23 @@ class _WriteLetterPageState extends State<WriteLetterPage> {
                             if (_hasWrittenLetter) {
                               // 查看已写的信封
                               Get.to(() => WriteLetterContentPage(
-                                title: _titleController.text,
-                                preContent: _contentController.text,
-                                tag: _selectedTag ?? '其他',
-                                themeColor: _themeColors[_selectedColorIndex],
-                                initialContent: _letterContent,  // 传递已有内容
-                                readOnly: true,  // 添加只读模式
-                              ));
+                                    title: _titleController.text,
+                                    preContent: _contentController.text,
+                                    tag: _selectedTag ?? '其他',
+                                    themeColor:
+                                        _themeColors[_selectedColorIndex],
+                                    initialContent: _letterContent, // 传递已有内容
+                                    readOnly: true, // 添加只读模式
+                                  ));
                             } else {
                               // 编写新信封
                               Get.to(() => WriteLetterContentPage(
-                                title: _titleController.text,
-                                preContent: _contentController.text,
-                                tag: _selectedTag ?? '其他',
-                                themeColor: _themeColors[_selectedColorIndex],
-                              ))?.then((result) {
+                                    title: _titleController.text,
+                                    preContent: _contentController.text,
+                                    tag: _selectedTag ?? '其他',
+                                    themeColor:
+                                        _themeColors[_selectedColorIndex],
+                                  ))?.then((result) {
                                 if (result != null) {
                                   setState(() {
                                     _hasWrittenLetter = true;
@@ -354,7 +356,9 @@ class _WriteLetterPageState extends State<WriteLetterPage> {
                               });
                             }
                           },
-                          icon: Icon(_hasWrittenLetter ? Icons.visibility : Icons.edit),
+                          icon: Icon(_hasWrittenLetter
+                              ? Icons.visibility
+                              : Icons.edit),
                           label: Text(_hasWrittenLetter ? '查看信封' : '开始编写'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _themeColors[_selectedColorIndex],

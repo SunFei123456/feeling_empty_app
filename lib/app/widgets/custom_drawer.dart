@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/setting/controller.dart';
+import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
 
 class CustomDrawer extends StatelessWidget {
   final SettingController settingController;

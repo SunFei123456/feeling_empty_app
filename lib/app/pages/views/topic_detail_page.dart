@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'dart:math';
 
-import 'package:getx_study/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicName;
@@ -242,7 +242,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
         final bottleData = {
           'title': '${widget.topicName}下的作品 ${index + 1}',
           'subtitle': '这是一段关于${widget.topicName}的故事...',
-          'time': isHotTab 
+          'time': isHotTab
               ? '${Random().nextInt(30) + 1}天前'
               : '2024-03-${10 + index}',
           'location': '来自未知的海域',
@@ -257,7 +257,8 @@ class _TopicDetailPageState extends State<TopicDetailPage>
     );
   }
 
-  Widget _buildBottleCard(BuildContext context, Map<String, String> bottleData) {
+  Widget _buildBottleCard(
+      BuildContext context, Map<String, String> bottleData) {
     return GestureDetector(
       onTap: () {
         Get.to(

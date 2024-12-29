@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/bottle/view.dart';
-import 'package:getx_study/app/pages/views/not_found.dart';
-import 'package:getx_study/app/pages/profile/views/profile_page.dart';
-import 'package:getx_study/app/pages/setting/controller.dart';
-import 'package:getx_study/app/pages/setting/view.dart';
-import 'package:getx_study/app/pages/square/index.dart';
-import 'package:getx_study/app/router/index.dart';
-import 'package:getx_study/app/core/translations/translations.dart';
-import 'package:getx_study/app/core/services/storage_service.dart';
-import 'package:getx_study/app/core/services/app_service.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
+import 'package:fangkong_xinsheng/app/pages/views/not_found.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
+import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
+import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
+import 'package:fangkong_xinsheng/app/pages/square/index.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/core/translations/translations.dart';
+import 'package:fangkong_xinsheng/app/core/services/storage_service.dart';
+import 'package:fangkong_xinsheng/app/core/services/app_service.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-import 'package:getx_study/app/pages/time_post_office/view.dart';
-import 'package:getx_study/app/pages/time_post_office/controller.dart';
-import 'package:getx_study/app/pages/publish/view.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
+import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

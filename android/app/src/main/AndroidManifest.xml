@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     
     <application
-        android:label="getx_study"
+        android:label="放空心声"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

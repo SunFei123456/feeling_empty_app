@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:getx_study/app/pages/setting/controller.dart';
-import 'package:getx_study/app/widgets/custom_drawer.dart';
+import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
+import 'package:fangkong_xinsheng/app/widgets/custom_drawer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -103,8 +103,10 @@ class _ProfilePageState extends State<ProfilePage>
                                     barrierDismissible: true,
                                     barrierLabel: '',
                                     barrierColor: Colors.black54,
-                                    transitionDuration: const Duration(milliseconds: 300),
-                                    pageBuilder: (context, animation, secondaryAnimation) {
+                                    transitionDuration:
+                                        const Duration(milliseconds: 300),
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
                                       return SlideTransition(
                                         position: Tween<Offset>(
                                           begin: const Offset(1, 0),

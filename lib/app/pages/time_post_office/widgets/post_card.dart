@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/time_post_office/views/post_detail_page.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/views/post_detail_page.dart';
 
 class PostCard extends StatelessWidget {
   final String title;
@@ -35,20 +35,20 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
       onTap: () => Get.to(() => PostDetailPage(post: {
-        'title': title,
-        'author': author,
-        'imageUrl': imageUrl,
-        'content': content,
-        'letterContent': letterContent,
-        'type': type,
-        'category': category,
-        'unlockTime': unlockTime,
-        'isLocked': isLocked,
-        'createdAt': createdAt,
-      })),
+            'title': title,
+            'author': author,
+            'imageUrl': imageUrl,
+            'content': content,
+            'letterContent': letterContent,
+            'type': type,
+            'category': category,
+            'unlockTime': unlockTime,
+            'isLocked': isLocked,
+            'createdAt': createdAt,
+          })),
       onLongPress: () {
         Get.bottomSheet(
           Container(
@@ -78,7 +78,8 @@ class PostCard extends StatelessWidget {
                     Get.back();
                     Get.dialog(
                       AlertDialog(
-                        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                        backgroundColor:
+                            isDark ? const Color(0xFF1A1A1A) : Colors.white,
                         title: Text(
                           '确认删除',
                           style: TextStyle(
@@ -97,7 +98,9 @@ class PostCard extends StatelessWidget {
                             child: Text(
                               '取消',
                               style: TextStyle(
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
                               ),
                             ),
                           ),
@@ -110,7 +113,8 @@ class PostCard extends StatelessWidget {
                                 '删除成功',
                                 backgroundColor: Colors.green[100],
                                 colorText: Colors.green[900],
-                                icon: const Icon(Icons.check_circle, color: Colors.green),
+                                icon: const Icon(Icons.check_circle,
+                                    color: Colors.green),
                               );
                             },
                             child: Text(
@@ -232,7 +236,8 @@ class PostCard extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 12,
-                        backgroundColor: isDark ? Colors.blue[900] : Colors.blue[100],
+                        backgroundColor:
+                            isDark ? Colors.blue[900] : Colors.blue[100],
                         child: Text(
                           author[0].toUpperCase(),
                           style: TextStyle(

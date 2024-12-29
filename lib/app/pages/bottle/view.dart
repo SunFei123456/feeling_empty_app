@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:getx_study/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'dart:ui' show lerpDouble;
 
-import 'package:getx_study/app/router/index.dart';
-import 'package:getx_study/app/pages/views/topic_detail_page.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
 
 class BottlePage extends StatelessWidget {
   const BottlePage({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:getx_study/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 
 class SquarePage extends StatefulWidget {
   const SquarePage({Key? key}) : super(key: key);

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import 'package:getx_study/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // 主要内容
               SafeArea(
                 child: SingleChildScrollView(
@@ -111,7 +111,8 @@ class LoginPage extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
           prefixIcon: const Icon(Icons.phone_android),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
     );
@@ -245,7 +246,7 @@ class LoginPage extends StatelessWidget {
 class LoginController extends GetxController {
   final phoneController = TextEditingController(text: 'root');
   final codeController = TextEditingController(text: '123456');
-  
+
   final countdownStr = 'get_code'.tr.obs;
   final canGetCode = true.obs;
   Timer? _timer;

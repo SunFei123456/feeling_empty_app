@@ -1,17 +1,17 @@
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/bottle/view.dart';
-import 'package:getx_study/app/pages/bottle/views/write_bottle_page.dart';
-import 'package:getx_study/app/pages/home/index.dart';
-import 'package:getx_study/app/pages/login/index.dart';
-import 'package:getx_study/app/pages/profile/views/profile_page.dart';
-import 'package:getx_study/app/pages/publish/view.dart';
-import 'package:getx_study/app/pages/setting/view.dart';
-import 'package:getx_study/app/pages/square/index.dart';
-import 'package:getx_study/app/pages/time_post_office/controller.dart';
-import 'package:getx_study/app/pages/time_post_office/view.dart';
-import 'package:getx_study/app/pages/time_post_office/views/write_letter_page.dart';
-import 'package:getx_study/app/pages/views/topic_detail_page.dart';
-import 'package:getx_study/main.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/views/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/home/index.dart';
+import 'package:fangkong_xinsheng/app/pages/login/index.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
+import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
+import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
+import 'package:fangkong_xinsheng/app/pages/square/index.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
+import 'package:fangkong_xinsheng/main.dart';
 
 /// 路由管理类
 class AppRoute {
