@@ -22,6 +22,8 @@
 - 回复漂流瓶（简单对话）
 - 个人中心（查看历史记录）
 
+
+
 进阶功能：
 - 漂流瓶类型（文字、图片、语音）
 - 瓶子保质期（比如7天自动销毁）
@@ -1192,3 +1194,196 @@ dependencies:
 ```
 
 这个封装既保持了代码的简洁性，又提供了足够的功能性和扩展性。你可以根据实际需求继续添加更多功能。
+
+
+## Lottie 动画
+
+
+好的，我们可以使用 Lottie 动画库来实现开锁动画，然后跳转到信封内容页面。
+
+1. 首先在 `pubspec.yaml` 中添加依赖：
+
+```yaml
+dependencies:
+  lottie: ^2.7.0
+```
+
+2. 创建信封内容页面：
+
+```dart:lib/app/pages/time_post_office/views/letter_content_page.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class LetterContentPage extends StatelessWidget {
+  final Map<String, dynamic> post;
+
+  const LetterContentPage({Key? key, required this.post}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          onPressed: () => Get.back(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 信封头部
+              Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.mail_outline, size: 48, color: Colors.blue[700]),
+                    const SizedBox(height: 16),
+                    Text(
+                      '来自过去的信',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[700],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '写于 ${post['createdAt']}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // 信件内容
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.blue[100]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '亲爱的自己：',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue[900],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      post['content'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.8,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            post['author'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            post['createdAt'],
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+3. 修改详情页面中的开启按钮逻辑：
+
+```dart:lib/app/pages/time_post_office/views/post_detail_page.dart
+// 在 PostDetailPage 类中添加
+void _showUnlockAnimation(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 200,
+            height: 200,
+            child: Lottie.asset(
+              'assets/animations/unlock.json',  // 需要添加开锁动画文件
+              repeat: false,
+              onLoaded: (composition) {
+                Future.delayed(composition.duration, () {
+                  Get.back(); // 关闭动画对话框
+                  Get.to(() => LetterContentPage(post: post)); // 跳转到信件内容页
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// 修改开启按钮的 onPressed
+TextButton.icon(
+  onPressed: () => _showUnlockAnimation(context),
+  // ... 其他代码保持不变
+),
+```
+
+4. 下载开锁动画文件并添加到项目：
+- 在项目根目录创建 `assets/animations` 文件夹
+- 从 [LottieFiles](https://lottiefiles.com/) 下载一个开锁动画，命名为 `unlock.json`
+- 在 `pubspec.yaml` 中添加资源：
+
+```yaml:lib/app/pages/time_post_office/views/post_detail_page.dart
+flutter:
+  assets:
+    - assets/animations/
+```
+
+主要功能：
+1. 使用 Lottie 动画展示开锁效果
+2. 动画结束后自动跳转到信件内容页
+3. 信件内容页面采用优雅的信件样式设计
+4. 包含完整的信件格式（称谓、正文、署名、日期）
+
+需要我调整任何部分吗？
+

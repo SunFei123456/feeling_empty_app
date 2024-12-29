@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "getx_study",
+            "name": "放空心声",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "getx_study (profile mode)",
+            "name": "放空心声 (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "getx_study (release mode)",
+            "name": "放空心声 (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

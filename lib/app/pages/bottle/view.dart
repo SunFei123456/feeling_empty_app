@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'dart:ui' show lerpDouble;
 
+import 'package:getx_study/app/router/index.dart';
+
 class BottlePage extends StatelessWidget {
   const BottlePage({Key? key}) : super(key: key);
 
@@ -36,7 +38,7 @@ class BottlePage extends StatelessWidget {
               // 自定义头部
               SliverPersistentHeader(
                 pinned: true,
-                delegate: _BottleHeaderDelegate(),
+                delegate: BottleHeaderDelegate(),
               ),
 
               // 内容区域
@@ -363,7 +365,7 @@ class BottlePage extends StatelessWidget {
   }
 }
 
-class _BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
+class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -389,10 +391,61 @@ class _BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: Align(
         alignment: Alignment.bottomLeft,
         child: Padding(
-          padding: EdgeInsets.only(left: paddingLeft, bottom: 10),
-          child: Text(
-            'bottle_title'.tr,
-            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+          padding: EdgeInsets.only(left: paddingLeft, bottom: 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: paddingLeft, bottom: 0),
+                child: Text(
+                  'bottle_title'.tr,
+                  style: TextStyle(
+                      fontSize: fontSize, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 16, bottom: 5),
+                child: Row(
+                  children: [
+                    const Text(
+                      "Hi~",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 15),
+                    GestureDetector(
+                      onTap: () {
+                        // 点击头像的处理逻辑
+                        AppRoutes.to('/profile');
+                      },
+                      child: Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.blue[100],
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Icon(Icons.person,
+                              size: 20, color: Colors.blue[400]),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
