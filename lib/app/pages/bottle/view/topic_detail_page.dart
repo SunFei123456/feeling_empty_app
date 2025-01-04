@@ -131,7 +131,6 @@ class TopicDetailPage extends StatelessWidget {
             title: bottleData['title']!,
             content: bottleData['subtitle']!,
             time: bottleData['time']!,
-            location: bottleData['location']!,
           ),
           transition: Transition.fadeIn,
         );

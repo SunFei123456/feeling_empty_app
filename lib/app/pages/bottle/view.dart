@@ -273,13 +273,29 @@ class BottlePage extends StatelessWidget {
 
   Widget _buildQuickActions() {
     final actions = [
-      {'icon': Icons.explore, 'label': '探索', 'color': Colors.blue},
-      {'icon': Icons.favorite, 'label': '收藏', 'color': Colors.red},
-      {'icon': Icons.history, 'label': '历史', 'color': Colors.purple},
+      {
+        'icon': Icons.explore,
+        'label': '探索',
+        'color': Colors.blue,
+        'page_url': AppRoutes.VIEW_HISTORY
+      },
+      {
+        'icon': Icons.favorite,
+        'label': '收藏',
+        'color': Colors.red,
+        'page_url': AppRoutes.VIEW_HISTORY
+      },
+      {
+        'icon': Icons.history,
+        'label': '历史',
+        'color': Colors.purple,
+        'page_url': AppRoutes.VIEW_HISTORY
+      },
       {
         'icon': Icons.local_fire_department,
         'label': '热门',
-        'color': Colors.orange
+        'color': Colors.orange,
+        'page_url': AppRoutes.VIEW_HISTORY
       },
     ];
 
@@ -287,7 +303,9 @@ class BottlePage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: actions.map((action) {
         return GestureDetector(
-          onTap: () {},
+          onTap: () {
+            AppRoutes.to(action['page_url'] as String);
+          },
           child: Column(
             children: [
               Container(
@@ -481,7 +499,6 @@ class BottlePage extends StatelessWidget {
                 title: bottleData['title']!,
                 content: bottleData['subtitle']!,
                 time: bottleData['time']!,
-                location: bottleData['location']!,
               ),
               transition: Transition.fadeIn,
             );

@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
@@ -71,6 +72,7 @@ class AppRoutes {
   static const TOPIC = '/topic';
   static const PUBLISH = '/publish';
   static const EDIT_PROFILE = '/edit-profile';
+  static const VIEW_HISTORY = '/view_history';
 
   /// 路由
   static final routes = <AppRoute>[
@@ -138,6 +140,12 @@ class AppRoutes {
     AppRoute(
       name: EDIT_PROFILE,
       page: () => const EditProfilePage(),
+    ),
+
+    // 历史记录页面
+    AppRoute(
+      name: VIEW_HISTORY,
+      page: () =>  ViewHistoryPage(),
     ),
   ];
 

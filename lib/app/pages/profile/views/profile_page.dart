@@ -329,7 +329,6 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                 title: bottle.title,
                                 content: bottle.content,
                                 time: bottle.createdAt,
-                                location: '查看次数: ${bottle.views}',
                                 audioUrl: bottle.audioUrl,
                               ),
                               transition: Transition.fadeIn,

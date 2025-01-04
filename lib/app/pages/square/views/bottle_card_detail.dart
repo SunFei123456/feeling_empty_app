@@ -9,7 +9,6 @@ class BottleCardDetail extends StatelessWidget {
   final String title;
   final String content;
   final String time;
-  final String location;
   final String? audioUrl;
 
   const BottleCardDetail({
@@ -18,7 +17,6 @@ class BottleCardDetail extends StatelessWidget {
     required this.title,
     required this.content,
     required this.time,
-    required this.location,
     this.audioUrl,
   }) : super(key: key);
 
@@ -92,13 +90,6 @@ class BottleCardDetail extends StatelessWidget {
                           Icon(Icons.location_on,
                               size: 12, color: Colors.grey[600]),
                           const SizedBox(width: 4),
-                          Text(
-                            location,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 20),

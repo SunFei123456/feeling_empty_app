@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
+import 'package:fangkong_xinsheng/app/pages/views/controller/view_history_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
@@ -14,7 +16,7 @@ class SquarePage extends StatefulWidget {
 class _SquarePageState extends State<SquarePage> {
   final CardSwiperController controller = CardSwiperController();
   final squareController = Get.put(SquareController());
-
+  final viewHistoryController = Get.put(ViewHistoryController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +110,7 @@ class _SquarePageState extends State<SquarePage> {
                             int verticalOffsetPercentage) {
                           final bottle = squareController.bottles[index];
                           return _buildCard(
+                            bottle: bottle,
                             title: bottle.title.isNotEmpty
                                 ? bottle.title
                                 : bottle.mood,
@@ -185,6 +188,7 @@ class _SquarePageState extends State<SquarePage> {
   }
 
   Widget _buildCard({
+    required BottleCardModel bottle,
     required String title,
     required String content,
     required String time,
@@ -200,11 +204,12 @@ class _SquarePageState extends State<SquarePage> {
             title: title,
             content: content,
             time: time,
-            location: location,
             audioUrl: audioUrl,
           ),
           transition: Transition.cupertino,
         );
+        // 创建浏览历史记录
+        viewHistoryController.createViewHistory(bottle.id);
       },
       child: Container(
         clipBehavior: Clip.antiAlias,

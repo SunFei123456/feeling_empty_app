@@ -267,7 +267,6 @@ class _TopicDetailPageState extends State<TopicDetailPage>
             title: bottleData['title']!,
             content: bottleData['subtitle']!,
             time: bottleData['time']!,
-            location: bottleData['location']!,
           ),
           transition: Transition.fadeIn,
         );
