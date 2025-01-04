@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -19,6 +21,7 @@ class WriteBottlePage extends StatefulWidget {
 
 class _WriteBottlePageState extends State<WriteBottlePage> {
   final _contentController = TextEditingController();
+  final _titleController = TextEditingController();
   BottleType _selectedType = BottleType.text;
   
   // 图片相关
@@ -37,9 +40,11 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   String? _selectedTopic;
   final TextEditingController _customTopicController = TextEditingController();
   bool _isAddingCustomTopic = false;
+  bool _isPublic = true;
 
   @override
   void dispose() {
+    _titleController.dispose();
     _contentController.dispose();
     _audioRecorder.dispose();
     _audioPlayer.dispose();
@@ -92,6 +97,31 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: '给漂流瓶起个标题吧...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+                maxLength: 30,
+              ),
+            ),
+            const SizedBox(height: 16),
             // 类型选择
             Container(
               padding: const EdgeInsets.all(16),
@@ -166,6 +196,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
             const SizedBox(height: 20),
             // 话题选择
             _buildTopicSelector(isDark),
+            const SizedBox(height: 20),
+            _buildPublicSwitch(isDark),
           ],
         ),
       ),
@@ -379,14 +411,14 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
 
   Widget _buildMoodTags(bool isDark) {
     final List<Map<String, dynamic>> moods = [
-      {'emoji': '😊', 'label': '开心', 'color': Colors.yellow},
-      {'emoji': '😢', 'label': '难过', 'color': Colors.blue},
-      {'emoji': '🤔', 'label': '思考', 'color': Colors.purple},
-      {'emoji': '😠', 'label': '生气', 'color': Colors.red},
-      {'emoji': '🥳', 'label': '期待', 'color': Colors.orange},
-      {'emoji': '😴', 'label': '疲惫', 'color': Colors.grey},
-      {'emoji': '🥰', 'label': '喜欢', 'color': Colors.pink},
-      {'emoji': '😮', 'label': '惊讶', 'color': Colors.green},
+      {'emoji': '😊', 'label': '开心', 'value': BottleMood.happy.name, 'color': Colors.yellow},
+      {'emoji': '😢', 'label': '难过', 'value': BottleMood.sad.name, 'color': Colors.blue},
+      {'emoji': '🤔', 'label': '思考', 'value': BottleMood.thinking.name, 'color': Colors.purple},
+      {'emoji': '😠', 'label': '生气', 'value': BottleMood.angry.name, 'color': Colors.red},
+      {'emoji': '🥳', 'label': '期待', 'value': BottleMood.excited.name, 'color': Colors.orange},
+      {'emoji': '😴', 'label': '疲惫', 'value': BottleMood.tired.name, 'color': Colors.grey},
+      {'emoji': '🥰', 'label': '喜欢', 'value': BottleMood.love.name, 'color': Colors.pink},
+      {'emoji': '😮', 'label': '惊讶', 'value': BottleMood.surprised.name, 'color': Colors.green},
     ];
 
     return Column(
@@ -701,29 +733,93 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     return '$minutes:$seconds';
   }
 
-  void _handleSubmit() {
-    if (_contentController.text.isEmpty) {
-      Get.snackbar('提示', '请输入内容');
+  void _handleSubmit() async {
+    if (_contentController.text.isEmpty && 
+        _selectedImage == null && 
+        _recordedFilePath == null) {
+      Get.snackbar('提示', '请输入内容或添加媒体文件');
       return;
     }
 
-    if (_selectedType == BottleType.image && _selectedImage == null) {
-      Get.snackbar('提示', '请选择图片');
+    if (_selectedMood == null) {
+      Get.snackbar('提示', '请选择心情');
       return;
     }
 
-    if (_selectedType == BottleType.audio && _recordedFilePath == null) {
-      Get.snackbar('提示', '请录制语音');
-      return;
-    }
+    try {
+      final bottleApi = BottleApiService();
+      String? imageUrl;
+      String? audioUrl;
 
-    // TODO: 处理发布逻辑
-    Get.back(result: {
-      'type': _selectedType.toString(),
-      'content': _contentController.text,
-      'media': _selectedType == BottleType.image
-          ? _selectedImage?.path
-          : _recordedFilePath,
-    });
+      // 上传图片（如果有）
+      if (_selectedImage != null) {
+        final imageResponse = await bottleApi.uploadImage(_selectedImage!.path);
+        if (imageResponse.success) {
+          imageUrl = imageResponse.data;
+        } else {
+          throw Exception('图片上传失败: ${imageResponse.message}');
+        }
+      }
+
+      // 上传音频（如果有）
+      if (_recordedFilePath != null) {
+        final audioResponse = await bottleApi.uploadAudio(_recordedFilePath!);
+        if (audioResponse.success) {
+          audioUrl = audioResponse.data;
+        } else {
+          throw Exception('音频上传失败: ${audioResponse.message}');
+        }
+      }
+
+      // 创建漂流瓶请求
+      final request = CreateBottleRequest(
+        content: _contentController.text.isEmpty ? null : _contentController.text,
+        imageUrl: imageUrl,
+        audioUrl: audioUrl,
+        mood: _selectedMood!,
+        isPublic: _isPublic,
+        topicId: null,
+        title: _titleController.text,
+      );
+
+      // 发送创建请求
+      final response = await bottleApi.createBottle(request);
+      if (response.success) {
+        Get.back();
+        Get.snackbar('成功', '漂流瓶已发布');
+      } else {
+        throw Exception(response.message ?? '发布失败');
+      }
+    } catch (e) {
+      print('发布错误: $e');
+      Get.snackbar('错误', e.toString());
+    }
+  }
+
+  Widget _buildPublicSwitch(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '公开漂流瓶',
+            style: TextStyle(
+              fontSize: 16,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          Switch(
+            value: _isPublic,
+            onChanged: (value) => setState(() => _isPublic = value),
+            activeColor: isDark ? Colors.blue[200] : Colors.blue,
+          ),
+        ],
+      ),
+    );
   }
 } 

@@ -265,7 +265,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
           () => BottleCardDetail(
             imageUrl: bottleData['imageUrl']!,
             title: bottleData['title']!,
-            subtitle: bottleData['subtitle']!,
+            content: bottleData['subtitle']!,
             time: bottleData['time']!,
             location: bottleData['location']!,
           ),

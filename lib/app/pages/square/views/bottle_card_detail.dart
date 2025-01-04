@@ -1,22 +1,25 @@
 import 'dart:ui';
 
+import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BottleCardDetail extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final String subtitle;
+  final String content;
   final String time;
   final String location;
+  final String? audioUrl;
 
   const BottleCardDetail({
     Key? key,
     required this.imageUrl,
     required this.title,
-    required this.subtitle,
+    required this.content,
     required this.time,
     required this.location,
+    this.audioUrl,
   }) : super(key: key);
 
   @override
@@ -81,7 +84,7 @@ class BottleCardDetail extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
                       // 位置信息
                       Row(
@@ -102,7 +105,7 @@ class BottleCardDetail extends StatelessWidget {
 
                       // 正文内容
                       Text(
-                        'KSPO DOME. The Idol Star Athletics Championships (Korean: 아이돌스타 선수권대회) is a South Korean television program which aired for the first time in 2010. The program features celebrities, most notably Korean pop idols singers and groups, which compete in multi-sport events. The show is broadcast by MBC',
+                        content,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[800],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fangkong_xinsheng/app/pages/bottle/views/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart'
     show NotchBottomBarController;

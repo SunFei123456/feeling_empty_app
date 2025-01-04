@@ -1,27 +1,21 @@
 import 'package:get/get.dart';
-import '../http/dio_client.dart';
-import '../utils/web_url.dart';
+import 'package:dio/dio.dart';
+import 'package:fangkong_xinsheng/app/core/http/interceptors.dart';
 
 /// API 服务基类
 class BaseApiService extends GetxService {
-  static final DioClient dio = DioClient(
-    baseUrl: WebUrls.host,
-    connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 15),
-  );
+  static final Dio dio = Dio(BaseOptions(
+    baseUrl: 'http://8.152.194.158:8080/api/v1',
+    connectTimeout: const Duration(seconds: 5),
+    receiveTimeout: const Duration(seconds: 10),
+    sendTimeout: const Duration(seconds: 5),
+  ))..interceptors.addAll([
+      TokenInterceptor(),
+      LogInterceptor(responseBody: true, requestBody: true),
+    ]);
 }
 
-// /// 学习模块 API
-// class StudyApiService extends BaseApiService {
-//   // 获取课程列表
-//   Future<ApiResponse<List<Course>>> getCourseList() async {
-//     final response = await dio.get<Map<String, dynamic>>('/courses');
-//     return ApiResponse.fromJson(
-//       response!,
-//       (json) => (json as List).map((e) => Course.fromJson(e)).toList(),
-//     );
-//   }
-// }
+
 
 // /// 老师模块 API
 // class TeacherApiService extends BaseApiService {

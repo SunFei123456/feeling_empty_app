@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
-import 'package:fangkong_xinsheng/app/pages/bottle/views/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
 import 'package:fangkong_xinsheng/app/pages/home/index.dart';
 import 'package:fangkong_xinsheng/app/pages/login/index.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
@@ -11,6 +11,7 @@ import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart';
 import 'package:fangkong_xinsheng/main.dart';
 
 /// 路由管理类
@@ -69,6 +70,7 @@ class AppRoutes {
   static const HOT_BOTTLE = '/hot_bottle';
   static const TOPIC = '/topic';
   static const PUBLISH = '/publish';
+  static const EDIT_PROFILE = '/edit-profile';
 
   /// 路由
   static final routes = <AppRoute>[
@@ -104,7 +106,7 @@ class AppRoutes {
     // 我的
     AppRoute(
       name: '/profile',
-      page: () => const ProfilePage(),
+      page: () => ProfilePage(),
     ),
 
     // ----------------------------------- 二级页面-----------------------------------
@@ -130,6 +132,12 @@ class AppRoutes {
       binding: BindingsBuilder(() {
         Get.lazyPut<TimePostOfficeController>(() => TimePostOfficeController());
       }),
+    ),
+
+    // 用户信息编辑
+    AppRoute(
+      name: EDIT_PROFILE,
+      page: () => const EditProfilePage(),
     ),
   ];
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
 
 class SquarePage extends StatefulWidget {
   const SquarePage({Key? key}) : super(key: key);
@@ -12,22 +13,7 @@ class SquarePage extends StatefulWidget {
 
 class _SquarePageState extends State<SquarePage> {
   final CardSwiperController controller = CardSwiperController();
-  late final List<Widget> cards;
-
-  @override
-  void initState() {
-    super.initState();
-    cards = List.generate(
-      5,
-      (index) => _buildCard(
-        title: 'Idol Championship in 2022',
-        subtitle: 'Archery Session Moment in 2021',
-        time: '2021.12.25 18:00(KST)',
-        location: 'KSPO DOME',
-        imageUrl: 'https://picsum.photos/500/800?random=$index',
-      ),
-    );
-  }
+  final squareController = Get.put(SquareController());
 
   @override
   Widget build(BuildContext context) {
@@ -100,19 +86,42 @@ class _SquarePageState extends State<SquarePage> {
 
                   // 卡片区域
                   Expanded(
-                    child: CardSwiper(
-                      controller: controller,
-                      cardsCount: cards.length,
-                      isLoop: false,
-                      backCardOffset: const Offset(0, 0),
-                      padding: const EdgeInsets.all(24.0),
-                      cardBuilder: (BuildContext context,
-                          int index,
-                          int horizontalOffsetPercentage,
-                          int verticalOffsetPercentage) {
-                        return cards[index];
-                      },
-                    ),
+                    child: Obx(() {
+                      if (squareController.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      return CardSwiper(
+                        controller: controller,
+                        cardsCount: squareController.bottles.length,
+                        isLoop: false,
+                        backCardOffset: const Offset(25, 25),
+                        padding: const EdgeInsets.all(24.0),
+                        scale: 0.95,
+                        numberOfCardsDisplayed: 3,
+                        onEnd: () {
+                          squareController.fetchRandomBottles();
+                        },
+                        cardBuilder: (BuildContext context,
+                            int index,
+                            int horizontalOffsetPercentage,
+                            int verticalOffsetPercentage) {
+                          final bottle = squareController.bottles[index];
+                          return _buildCard(
+                            title: bottle.title.isNotEmpty
+                                ? bottle.title
+                                : bottle.mood,
+                            content: bottle.content,
+                            time: bottle.createdAt,
+                            location: '查看次数: ${bottle.views}',
+                            imageUrl: bottle.imageUrl.isEmpty
+                                ? 'https://picsum.photos/500/800'
+                                : bottle.imageUrl,
+                            audioUrl: bottle.audioUrl,
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -177,10 +186,11 @@ class _SquarePageState extends State<SquarePage> {
 
   Widget _buildCard({
     required String title,
-    required String subtitle,
+    required String content,
     required String time,
     required String location,
     required String imageUrl,
+    String? audioUrl,
   }) {
     return GestureDetector(
       onTap: () {
@@ -188,9 +198,10 @@ class _SquarePageState extends State<SquarePage> {
           () => BottleCardDetail(
             imageUrl: imageUrl,
             title: title,
-            subtitle: subtitle,
+            content: content,
             time: time,
             location: location,
+            audioUrl: audioUrl,
           ),
           transition: Transition.cupertino,
         );
@@ -210,7 +221,7 @@ class _SquarePageState extends State<SquarePage> {
         ),
         child: Stack(
           children: [
-            // 背景��片
+            // 背景片
             // Hero
             Hero(
               tag: 'bottle_card_image_$imageUrl',
@@ -265,7 +276,7 @@ class _SquarePageState extends State<SquarePage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    subtitle,
+                    content,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -326,5 +337,12 @@ class _SquarePageState extends State<SquarePage> {
         ),
       ),
     );
+  }
+
+  bool _onSwipe(
+      int previousIndex, int? currentIndex, CardSwiperDirection direction) {
+    print(
+        'Card swiped from index $previousIndex to $currentIndex in direction $direction');
+    return true;
   }
 }

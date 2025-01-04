@@ -17,8 +17,8 @@ class DioClient extends GetxService {
 
   DioClient({
     required this.baseUrl,
-    this.connectTimeout = const Duration(seconds: 15),
-    this.receiveTimeout = const Duration(seconds: 15),
+    this.connectTimeout = const Duration(seconds: 60),
+    this.receiveTimeout = const Duration(seconds: 60),
   }) {
     _dio = Dio(
       BaseOptions(

@@ -479,7 +479,7 @@ class BottlePage extends StatelessWidget {
               () => BottleCardDetail(
                 imageUrl: bottleData['imageUrl']!,
                 title: bottleData['title']!,
-                subtitle: bottleData['subtitle']!,
+                content: bottleData['subtitle']!,
                 time: bottleData['time']!,
                 location: bottleData['location']!,
               ),

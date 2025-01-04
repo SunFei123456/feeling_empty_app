@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const SquarePage(),
     const PublishPage(),
     const TimePostOfficePage(),
-    const ProfilePage(),
+     ProfilePage(),
   ];
 
   @override
