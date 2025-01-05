@@ -8,9 +8,26 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 
-class BottlePage extends StatelessWidget {
+class BottlePage extends StatefulWidget {
   const BottlePage({Key? key}) : super(key: key);
+
+  @override
+  State<BottlePage> createState() => _BottlePageState();
+}
+
+class _BottlePageState extends State<BottlePage> {
+  late final ProfileController _profileController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      Get.put(ProfileController());
+    }
+    _profileController = Get.find<ProfileController>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +44,7 @@ class BottlePage extends StatelessWidget {
               // 顶部AppBar
               SliverPersistentHeader(
                 pinned: true,
-                delegate: BottleHeaderDelegate(),
+                delegate: BottleHeaderDelegate(_profileController),
               ),
 
               // 内容区域
@@ -499,6 +516,7 @@ class BottlePage extends StatelessWidget {
                 title: bottleData['title']!,
                 content: bottleData['subtitle']!,
                 time: bottleData['time']!,
+
               ),
               transition: Transition.fadeIn,
             );
@@ -617,6 +635,10 @@ class BottleAnimation extends StatelessWidget {
 }
 
 class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final ProfileController profileController;
+
+  BottleHeaderDelegate(this.profileController);
+
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -691,13 +713,40 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                             ),
                           ],
                         ),
-                        child: ClipOval(
-                          child: Icon(
-                            Icons.person,
-                            size: 20,
-                            color: Colors.blue[400],
-                          ),
-                        ),
+                        child: Obx(() {
+                          final user = profileController.user.value;
+                          return ClipOval(
+                            child: user?.avatar != null && user!.avatar.isNotEmpty
+                                ? Image.network(
+                                    user.avatar,
+                                    width: 46,
+                                    height: 46,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                              : null,
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) => Icon(
+                                      Icons.person,
+                                      size: 20,
+                                      color: Colors.blue[400],
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: 20,
+                                    color: Colors.blue[400],
+                                  ),
+                          );
+                        }),
                       ),
                     ),
                   ],

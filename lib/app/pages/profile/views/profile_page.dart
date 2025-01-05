@@ -120,6 +120,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                         )),
                                         child: CustomDrawer(
                                           settingController: _settingController,
+                                          profileController: _profileController,
                                         ),
                                       );
                                     },

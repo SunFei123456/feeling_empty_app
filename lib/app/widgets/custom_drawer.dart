@@ -1,13 +1,16 @@
+import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
 
 class CustomDrawer extends StatelessWidget {
   final SettingController settingController;
+  final ProfileController profileController;
 
   const CustomDrawer({
     Key? key,
     required this.settingController,
+    required this.profileController,
   }) : super(key: key);
 
   @override
@@ -51,144 +54,146 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    // 顶部用户信息区域
-                    Container(
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top + 20,
-                        bottom: 20,
-                        left: 20,
-                        right: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.blue.withOpacity(0.5),
-                            Colors.purple.withOpacity(0.4),
+                child: Obx(() {
+                  final user = profileController.user.value;
+                  return Column(
+                    children: [
+                      // 顶部用户信息区域
+                      Container(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).padding.top + 20,
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.blue.withOpacity(0.5),
+                              Colors.purple.withOpacity(0.4),
+                            ],
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: NetworkImage(user?.avatar ?? ''),
+                                ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                       Text(
+                                        user?.nickname ?? '',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '@ ${user?.nickname ?? ''}',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.8),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.white),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              const CircleAvatar(
-                                radius: 30,
-                                backgroundImage:
-                                    AssetImage('assets/images/avatar.jpg'),
+                  
+                      // 设置选项列表
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          children: [
+                            // 主题设置
+                            _buildSettingItem(
+                              icon: Icons.dark_mode,
+                              title: 'dark_mode'.tr,
+                              trailing: Switch(
+                                value: settingController.isDarkMode,
+                                onChanged: (_) => settingController.toggleTheme(),
                               ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Tzuyu',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '@tzuyu',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            ),
+                  
+                            // 语言设置
+                            _buildSettingItem(
+                              icon: Icons.language,
+                              title: 'language'.tr,
+                              trailing: DropdownButton<Locale>(
+                                value: settingController.currentLocale,
+                                underline: const SizedBox(),
+                                items: settingController.languages
+                                    .map((lang) => DropdownMenuItem(
+                                          value: lang['locale'] as Locale,
+                                          child: Text(lang['name'] as String),
+                                        ))
+                                    .toList(),
+                                onChanged: (locale) {
+                                  if (locale != null) {
+                                    settingController.updateLocale(locale);
+                                  }
+                                },
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.close,
-                                    color: Colors.white),
-                                onPressed: () => Navigator.pop(context),
+                            ),
+                  
+                            // 版本信息
+                            _buildSettingItem(
+                              icon: Icons.info,
+                              title: 'version'.tr,
+                              trailing: const Text(
+                                '1.0.0',
+                                style: TextStyle(color: Colors.grey),
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                  
+                            const Divider(),
+                  
+                            // 其他选项
+                            _buildSettingItem(
+                              icon: Icons.notifications,
+                              title: '通知设置',
+                              onTap: () {},
+                            ),
+                            _buildSettingItem(
+                              icon: Icons.security,
+                              title: '隐私设置',
+                              onTap: () {},
+                            ),
+                            _buildSettingItem(
+                              icon: Icons.help,
+                              title: '帮助与反馈',
+                              onTap: () {},
+                            ),
+                            _buildSettingItem(
+                              icon: Icons.logout,
+                              title: '退出登录',
+                              textColor: Colors.red,
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-
-                    // 设置选项列表
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        children: [
-                          // 主题设置
-                          _buildSettingItem(
-                            icon: Icons.dark_mode,
-                            title: 'dark_mode'.tr,
-                            trailing: Switch(
-                              value: settingController.isDarkMode,
-                              onChanged: (_) => settingController.toggleTheme(),
-                            ),
-                          ),
-
-                          // 语言设置
-                          _buildSettingItem(
-                            icon: Icons.language,
-                            title: 'language'.tr,
-                            trailing: DropdownButton<Locale>(
-                              value: settingController.currentLocale,
-                              underline: const SizedBox(),
-                              items: settingController.languages
-                                  .map((lang) => DropdownMenuItem(
-                                        value: lang['locale'] as Locale,
-                                        child: Text(lang['name'] as String),
-                                      ))
-                                  .toList(),
-                              onChanged: (locale) {
-                                if (locale != null) {
-                                  settingController.updateLocale(locale);
-                                }
-                              },
-                            ),
-                          ),
-
-                          // 版本信息
-                          _buildSettingItem(
-                            icon: Icons.info,
-                            title: 'version'.tr,
-                            trailing: const Text(
-                              '1.0.0',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-
-                          const Divider(),
-
-                          // 其他选项
-                          _buildSettingItem(
-                            icon: Icons.notifications,
-                            title: '通知设置',
-                            onTap: () {},
-                          ),
-                          _buildSettingItem(
-                            icon: Icons.security,
-                            title: '隐私设置',
-                            onTap: () {},
-                          ),
-                          _buildSettingItem(
-                            icon: Icons.help,
-                            title: '帮助与反馈',
-                            onTap: () {},
-                          ),
-                          _buildSettingItem(
-                            icon: Icons.logout,
-                            title: '退出登录',
-                            textColor: Colors.red,
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                }),
               ),
             ),
           ),
