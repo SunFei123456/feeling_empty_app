@@ -5,6 +5,7 @@ import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
+import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
 
 class BottleCardDetail extends StatelessWidget {
   final String imageUrl;
@@ -109,7 +110,8 @@ class BottleCardDetail extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-
+                      if (audioUrl != null && audioUrl!.isNotEmpty) 
+                        AudioPlayerWidget(audioUrl: audioUrl!),
                       // 互动按钮
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -388,15 +388,33 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    '录音完成',
-                    style: TextStyle(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '录音完成',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        _formatDuration(_recordDuration),
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 IconButton(
-                  onPressed: () => setState(() => _recordedFilePath = null),
+                  onPressed: () {
+                    setState(() {
+                      _recordedFilePath = null;
+                      _recordDuration = Duration.zero;
+                    });
+                  },
                   icon: Icon(
                     Icons.delete_outline,
                     color: isDark ? Colors.red[200] : Colors.red,
@@ -773,7 +791,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
 
       // 创建漂流瓶请求
       final request = CreateBottleRequest(
-        content: _contentController.text.isEmpty ? null : _contentController.text,
+        content: _contentController.text,
         imageUrl: imageUrl,
         audioUrl: audioUrl,
         mood: _selectedMood!,

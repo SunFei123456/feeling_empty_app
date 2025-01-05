@@ -331,6 +331,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                 content: bottle.content,
                                 time: bottle.createdAt,
                                 audioUrl: bottle.audioUrl,
+                                user: bottle.user,
                               ),
                               transition: Transition.fadeIn,
                             );
