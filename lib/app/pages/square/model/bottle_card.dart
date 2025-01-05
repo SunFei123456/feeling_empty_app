@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
+
 class BottleCardModel {
   final int id;
   final String audioUrl;
@@ -7,7 +9,7 @@ class BottleCardModel {
   final String imageUrl;
   final String mood;
   final int topicId;
-  final BottleUserModel user;
+  final UserInfo user;
   final int views;
 
   BottleCardModel({
@@ -33,7 +35,12 @@ class BottleCardModel {
       imageUrl: json['image_url'] as String? ?? '',
       mood: json['mood'] as String? ?? 'unknown',
       topicId: json['topic_id'] as int? ?? 0,
-      user: BottleUserModel.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
+      user: UserInfo(
+        id: (json['user'] as Map<String, dynamic>?)?['id'] as int? ?? json['user_id'] as int? ?? 0,
+        nickname: (json['user'] as Map<String, dynamic>?)?['nickname'] as String? ?? '用户${json['user_id'] ?? 0}',
+        avatar: (json['user'] as Map<String, dynamic>?)?['avatar'] as String? ?? '',
+        sex: (json['user'] as Map<String, dynamic>?)?['sex'] as int? ?? 0,
+      ),
       views: json['views'] as int? ?? 0,
     );
   }
@@ -50,30 +57,6 @@ class BottleCardModel {
       'topic_id': topicId,
       'user': user.toJson(),
       'views': views,
-    };
-  }
-}
-
-class BottleUserModel {
-  final int id;
-  final int sex;
-
-  BottleUserModel({
-    this.id = 0,
-    this.sex = 0,
-  });
-
-  factory BottleUserModel.fromJson(Map<String, dynamic> json) {
-    return BottleUserModel(
-      id: json['id'] as int? ?? 0,
-      sex: json['sex'] as int? ?? 0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'sex': sex,
     };
   }
 } 

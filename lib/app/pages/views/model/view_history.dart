@@ -85,4 +85,13 @@ class UserInfo {
       sex: json['sex'] as int,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nickname': nickname,
+      'avatar': avatar,
+      'sex': sex,
+    };
+  }
 } 

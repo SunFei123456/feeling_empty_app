@@ -206,7 +206,7 @@ class _BottlePageState extends State<BottlePage> {
                   icon: Icons.local_fire_department,
                   title: '热门瓶子',
                   color: Colors.orange,
-                  onTap: () {},
+                  onTap: () => AppRoutes.to(AppRoutes.HOT_BOTTLE),
                 ),
               ],
             ),
@@ -312,7 +312,7 @@ class _BottlePageState extends State<BottlePage> {
         'icon': Icons.local_fire_department,
         'label': '热门',
         'color': Colors.orange,
-        'page_url': AppRoutes.VIEW_HISTORY
+        'page_url': AppRoutes.HOT_BOTTLE
       },
     ];
 

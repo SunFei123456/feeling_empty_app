@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
@@ -146,6 +148,15 @@ class AppRoutes {
     AppRoute(
       name: VIEW_HISTORY,
       page: () =>  ViewHistoryPage(),
+    ),
+
+    // 热门漂流瓶
+    AppRoute(
+      name: HOT_BOTTLE,
+      page: () => const HotBottlesPage(),
+      binding: BindingsBuilder(() {
+        Get.put(BottleController());
+      }),
     ),
   ];
 

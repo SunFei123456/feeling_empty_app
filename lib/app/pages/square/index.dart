@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class SquarePage extends StatefulWidget {
   const SquarePage({Key? key}) : super(key: key);
@@ -205,6 +206,12 @@ class _SquarePageState extends State<SquarePage> {
             content: content,
             time: time,
             audioUrl: audioUrl,
+            user: UserInfo(
+              id: bottle.user.id,
+              sex: bottle.user.sex,
+              nickname: bottle.user.nickname,
+              avatar: bottle.user.avatar,
+            ),
           ),
           transition: Transition.cupertino,
         );

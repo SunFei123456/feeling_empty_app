@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class BottleCardDetail extends StatelessWidget {
   final String imageUrl;
@@ -10,14 +12,17 @@ class BottleCardDetail extends StatelessWidget {
   final String content;
   final String time;
   final String? audioUrl;
+  final UserInfo? user;
 
   const BottleCardDetail({
     Key? key,
     required this.imageUrl,
     required this.title,
     required this.content,
+    this.user,
     required this.time,
     this.audioUrl,
+    
   }) : super(key: key);
 
   @override
@@ -204,19 +209,34 @@ class BottleCardDetail extends StatelessWidget {
                   child: Row(
                     children: [
                       // 用户头像
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          shape: BoxShape.rectangle,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 2,
-                          ),
-                          image: DecorationImage(
-                            image: NetworkImage(imageUrl),
-                            fit: BoxFit.cover,
+                      InkWell(
+                        onTap: () {
+                          if (user?.id != null && user!.id != 0) {
+                            Get.toNamed(
+                              '/profile/${user!.id}',  // 使用命名路由
+                              arguments: {
+                                'userId': user!.id,
+                                'nickname': user!.nickname,
+                                'avatar': user!.avatar,
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2,
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage(user?.avatar ?? ''),
+                              fit: BoxFit.cover,
+                              onError: (_, __) => const Icon(Icons.person),  // 添加错误处理
+                            ),
                           ),
                         ),
                       ),
@@ -229,7 +249,7 @@ class BottleCardDetail extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                'Tzuyu',
+                                user?.nickname ?? '',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
