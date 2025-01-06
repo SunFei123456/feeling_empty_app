@@ -11,6 +11,7 @@ class BottleCardModel {
   final int topicId;
   final UserInfo user;
   final int views;
+  
 
   BottleCardModel({
     required this.id,

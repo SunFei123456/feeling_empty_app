@@ -10,7 +10,9 @@ class ProfileController extends GetxController {
   final _uploadService = UploadService();
   final user = Rxn<UserModel>();
   final isLoading = false.obs;
+  final isLoadingPrivate = false.obs;
   final publicBottles = <BottleCardModel>[].obs;
+  final privateBottles = <BottleCardModel>[].obs;
   final hasMoreBottles = true.obs;
   final currentPage = 1.obs;
   final pageSize = 10;
@@ -19,6 +21,14 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     fetchUserInfo();
+
+    // 获取用户信息成功后再获取漂流瓶
+    ever(user, (value) {
+      if (value != null) {
+        fetchPublicBottles(refresh: true);
+        fetchPrivateBottles(refresh: true);
+      }
+    });
   }
 
   // 获取用户信息
@@ -100,19 +110,12 @@ class ProfileController extends GetxController {
 
       if (!hasMoreBottles.value) return;
 
-      // 确保用户ID存在
-      if (user.value?.id == null) {
-        print('User ID is null, cannot fetch bottles');
-        return;
-      }
-
-      final response = await _userApi.getPublicBottles(
+      final response = await _userApi.getBottles(
         userId: user.value!.id,
-        page: currentPage.value,
-        pageSize: pageSize,
+        page: 1,
+        pageSize: 20,
+        isPublic: true,
       );
-
-      print('Fetched public bottles: ${response.data}'); // 添加日志
 
       if (response.success) {
         final bottles = response.data ?? [];
@@ -131,9 +134,53 @@ class ProfileController extends GetxController {
     }
   }
 
+  // 获取私密漂流瓶
+  Future<void> fetchPrivateBottles({bool refresh = false}) async {
+    try {
+      if (refresh) {
+        currentPage.value = 1;
+        hasMoreBottles.value = true;
+        privateBottles.clear();
+      }
+
+      if (!hasMoreBottles.value) return;
+      final response = await _userApi.getBottles(
+        userId: user.value!.id,
+        page: 1,
+        pageSize: 20,
+        isPublic: false,
+      );
+
+      if (response.success) {
+        final bottles = response.data ?? [];
+        if (bottles.isEmpty) {
+          hasMoreBottles.value = false;
+        } else {
+          privateBottles.assignAll(bottles);
+          currentPage.value++;
+        }
+      } else {
+        Get.snackbar('错误', response.message ?? '获取漂流瓶失败');
+      }
+    } catch (e) {
+      print('Fetch public bottles error: $e');
+      Get.snackbar('错误', '获取漂流瓶失败');
+    }
+  }
+
   // 刷新漂流瓶列表
   Future<void> refreshBottles() async {
     await fetchPublicBottles(refresh: true);
+  }
+
+  // 刷新私密漂流瓶列表
+  Future<void> refreshPrivateBottles() async {
+    await fetchPrivateBottles(refresh: true);
+  }
+
+  // 加载更多私密漂流瓶
+  Future<void> loadMorePrivateBottles() async {
+    await fetchPrivateBottles();
   }
 
   // 加载更多漂流瓶

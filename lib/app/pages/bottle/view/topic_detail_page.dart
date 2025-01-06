@@ -122,11 +122,13 @@ class TopicDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottleCard(BuildContext context, Map<String, String> bottleData) {
+  Widget _buildBottleCard(
+      BuildContext context, Map<String, String> bottleData) {
     return GestureDetector(
       onTap: () {
         Get.to(
           () => BottleCardDetail(
+            bottleId: int.parse(bottleData['id'] ?? '0'),
             imageUrl: bottleData['imageUrl']!,
             title: bottleData['title']!,
             content: bottleData['subtitle']!,
@@ -230,4 +232,4 @@ class TopicDetailPage extends StatelessWidget {
       ),
     );
   }
-} 
+}

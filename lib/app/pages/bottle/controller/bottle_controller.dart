@@ -59,4 +59,5 @@ class BottleController extends GetxController {
       isLoadingHotBottles.value = false;
     }
   }
+
 } 

@@ -6,14 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
+import 'package:dio/dio.dart';
+import 'package:fangkong_xinsheng/app/pages/square/api/index.dart';
+import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
+import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
 
-class BottleCardDetail extends StatelessWidget {
+class BottleCardDetail extends StatefulWidget {
   final String imageUrl;
   final String title;
   final String content;
   final String time;
   final String? audioUrl;
   final UserInfo? user;
+  final int bottleId;
+  final bool isResonated;
+  final bool isFavorited;
+  final int resonateCount;
 
   const BottleCardDetail({
     Key? key,
@@ -23,8 +31,116 @@ class BottleCardDetail extends StatelessWidget {
     this.user,
     required this.time,
     this.audioUrl,
-    
+    required this.bottleId,
+    this.isResonated = false,
+    this.isFavorited = false,
+    this.resonateCount = 0,
   }) : super(key: key);
+
+  @override
+  State<BottleCardDetail> createState() => _BottleCardDetailState();
+}
+
+class _BottleCardDetailState extends State<BottleCardDetail> {
+  final _api = BottleInteractionApiService();
+  late bool _isResonated;
+  late bool _isFavorited;
+  late int _resonateCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _isResonated = widget.isResonated;
+    _isFavorited = widget.isFavorited;
+    _resonateCount = widget.resonateCount;
+  }
+
+  Future<void> _handleResonate() async {
+    try {
+      if (_isResonated) {
+        final response = await _api.unresonateBottle(widget.bottleId);
+        if (response.success) {
+          setState(() {
+            _isResonated = false;
+            _resonateCount--;
+          });
+        }
+      } else {
+        final response = await _api.resonateBottle(widget.bottleId);
+        if (response.success) {
+          setState(() {
+            _isResonated = true;
+            _resonateCount++;
+          });
+        }
+      }
+    } catch (e) {
+      Get.snackbar('错误', '操作失败，请稍后重试');
+    }
+  }
+
+  Future<void> _handleFavorite() async {
+    try {
+      if (_isFavorited) {
+        final response = await _api.unfavoriteBottle(widget.bottleId);
+        if (response.success) {
+          setState(() => _isFavorited = false);
+        }
+      } else {
+        final response = await _api.favoriteBottle(widget.bottleId);
+        if (response.success) {
+          setState(() => _isFavorited = true);
+        }
+      }
+    } catch (e) {
+      Get.snackbar('错误', '操作失败，请稍后重试');
+    }
+  }
+
+  Widget _buildInteractionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        InkWell(
+          onTap: _handleResonate,
+          child: _buildInteractionButton(
+            _isResonated ? Icons.favorite : Icons.favorite_border,
+            _resonateCount.toString(),
+            _isResonated ? Colors.red : Colors.grey[700],
+          ),
+        ),
+        _buildInteractionButton(
+            Icons.chat_bubble_outline, '207', Colors.grey[700]),
+        _buildInteractionButton(Icons.send, '123', Colors.grey[700]),
+        InkWell(
+          onTap: _handleFavorite,
+          child: _buildInteractionButton(
+            _isFavorited ? Icons.bookmark : Icons.bookmark_border,
+            '',
+            _isFavorited ? Colors.blue : Colors.grey[700],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInteractionButton(IconData icon, String count, Color? color) {
+    return Row(
+      children: [
+        Icon(icon, size: 24, color: color),
+        if (count.isNotEmpty) ...[
+          const SizedBox(width: 4),
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +172,7 @@ class BottleCardDetail extends StatelessWidget {
             children: [
               // 图片区域
               Hero(
-                tag: 'bottle_card_image_$imageUrl',
+                tag: 'bottle_card_image_${widget.imageUrl}',
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
@@ -66,7 +182,7 @@ class BottleCardDetail extends StatelessWidget {
                       bottomRight: Radius.circular(15),
                     ),
                     image: DecorationImage(
-                      image: NetworkImage(imageUrl),
+                      image: NetworkImage(widget.imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -82,7 +198,7 @@ class BottleCardDetail extends StatelessWidget {
                     children: [
                       // 标题
                       Text(
-                        title,
+                        widget.title,
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -102,7 +218,7 @@ class BottleCardDetail extends StatelessWidget {
 
                       // 正文内容
                       Text(
-                        content,
+                        widget.content,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[800],
@@ -110,19 +226,11 @@ class BottleCardDetail extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (audioUrl != null && audioUrl!.isNotEmpty) 
-                        AudioPlayerWidget(audioUrl: audioUrl!),
+                      if (widget.audioUrl != null &&
+                          widget.audioUrl!.isNotEmpty)
+                        AudioPlayerWidget(audioUrl: widget.audioUrl!),
                       // 互动按钮
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildInteractionButton(Icons.favorite_border, '12K'),
-                          _buildInteractionButton(
-                              Icons.chat_bubble_outline, '207'),
-                          _buildInteractionButton(Icons.send, '123'),
-                          _buildInteractionButton(Icons.bookmark_border, ''),
-                        ],
-                      ),
+                      _buildInteractionButtons(),
                     ],
                   ),
                 ),
@@ -213,13 +321,13 @@ class BottleCardDetail extends StatelessWidget {
                       // 用户头像
                       InkWell(
                         onTap: () {
-                          if (user?.id != null && user!.id != 0) {
+                          if (widget.user?.id != null && widget.user!.id != 0) {
                             Get.toNamed(
-                              '/profile/${user!.id}',  // 使用命名路由
+                              '/profile/${widget.user!.id}', // 使用命名路由
                               arguments: {
-                                'userId': user!.id,
-                                'nickname': user!.nickname,
-                                'avatar': user!.avatar,
+                                'userId': widget.user!.id,
+                                'nickname': widget.user!.nickname,
+                                'avatar': widget.user!.avatar,
                               },
                             );
                           }
@@ -235,9 +343,10 @@ class BottleCardDetail extends StatelessWidget {
                               width: 2,
                             ),
                             image: DecorationImage(
-                              image: NetworkImage(user?.avatar ?? ''),
+                              image: NetworkImage(widget.user?.avatar ?? ''),
                               fit: BoxFit.cover,
-                              onError: (_, __) => const Icon(Icons.person),  // 添加错误处理
+                              onError: (_, __) =>
+                                  const Icon(Icons.person), // 添加错误处理
                             ),
                           ),
                         ),
@@ -251,7 +360,7 @@ class BottleCardDetail extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                user?.nickname ?? '',
+                                widget.user?.nickname ?? '',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -268,7 +377,7 @@ class BottleCardDetail extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            time,
+                            widget.time,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.black.withOpacity(0.7),
@@ -284,24 +393,6 @@ class BottleCardDetail extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInteractionButton(IconData icon, String count) {
-    return Row(
-      children: [
-        Icon(icon, size: 24, color: Colors.grey[700]),
-        if (count.isNotEmpty) ...[
-          const SizedBox(width: 4),
-          Text(
-            count,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

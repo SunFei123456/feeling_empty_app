@@ -207,6 +207,7 @@ class HistoryCard extends StatelessWidget {
           // 点击进入漂流瓶详情页
           onTap: () => Get.to(
             () => BottleCardDetail(
+              bottleId: item.id,
               imageUrl: item.imageUrl,
               title: item.title,
               content: item.content,

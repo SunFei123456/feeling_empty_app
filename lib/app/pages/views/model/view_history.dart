@@ -32,8 +32,10 @@ class ViewHistoryItem {
   final String mood;
   final int views;
   final int resonances;
+  final int favorites;
   final DateTime createdAt;
   final UserInfo user;
+  final int? topicId;
 
   ViewHistoryItem({
     required this.id,
@@ -44,8 +46,10 @@ class ViewHistoryItem {
     required this.mood,
     required this.views,
     required this.resonances,
+    required this.favorites,
     required this.createdAt,
     required this.user,
+    this.topicId,
   });
 
   factory ViewHistoryItem.fromJson(Map<String, dynamic> json) {
@@ -53,13 +57,15 @@ class ViewHistoryItem {
       id: json['id'] as int,
       title: json['title'] as String,
       content: json['content'] as String,
-      imageUrl: json['image_url'] as String,
-      audioUrl: json['audio_url'] as String,
+      imageUrl: json['image_url'] as String? ?? '',
+      audioUrl: json['audio_url'] as String? ?? '',
       mood: json['mood'] as String,
       views: json['views'] as int,
       resonances: json['resonances'] as int,
+      favorites: json['favorites'] as int? ?? 0,
       createdAt: DateTime.parse(json['created_at']),
-      user: UserInfo.fromJson(json['user']),
+      user: UserInfo.fromJson(json['user'] as Map<String, dynamic>),
+      topicId: json['topic_id'] as int?,
     );
   }
 }

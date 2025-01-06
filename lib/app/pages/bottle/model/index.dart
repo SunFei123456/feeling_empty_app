@@ -9,6 +9,7 @@ class CreateBottleRequest {
   final bool isPublic;         // 是否公开
   final int? topicId;          // 话题ID
   final String title;          // 标题
+  final int? oceanId;          // 海域id 
 
   CreateBottleRequest({
     this.content,
@@ -17,6 +18,7 @@ class CreateBottleRequest {
     required this.mood,
     required this.isPublic,
     this.topicId,
+    this.oceanId,
     required this.title,
   }) {
     // 验证内容有效性
@@ -44,6 +46,7 @@ class CreateBottleRequest {
       'is_public': isPublic,
       if (topicId != null) 'topic_id': topicId,
       'title': title,
+      if (oceanId != null) 'ocean_id': oceanId,
     };
   }
 
@@ -57,6 +60,7 @@ class CreateBottleRequest {
       isPublic: json['is_public'] as bool,
       topicId: json['topic_id'] as int?,
       title: json['title'] as String,
+      oceanId: json['ocean_id'] as int?,
     );
   }
 

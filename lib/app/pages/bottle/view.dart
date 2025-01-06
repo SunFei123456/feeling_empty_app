@@ -157,33 +157,36 @@ class _BottlePageState extends State<BottlePage> {
                   // 内容
                   Padding(
                     padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Icons.explore,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                        const Spacer(),
-                        Text(
-                          '探索世界',
-                          style: TextStyle(
+                    child: InkWell(
+                      onTap: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(
+                            Icons.explore,
                             color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
+                            size: 32,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '发现更多精彩内容',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
+                          const Spacer(),
+                          const Text(
+                            '探索世界',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            '发现更多精彩内容',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -292,15 +295,15 @@ class _BottlePageState extends State<BottlePage> {
     final actions = [
       {
         'icon': Icons.explore,
-        'label': '探索',
-        'color': Colors.blue,
-        'page_url': AppRoutes.VIEW_HISTORY
+        'label': '共振',
+        'color': Colors.lightGreen,
+        'page_url': AppRoutes.RESONATED_BOTTLE
       },
       {
-        'icon': Icons.favorite,
+        'icon': Icons.collections_bookmark,
         'label': '收藏',
         'color': Colors.red,
-        'page_url': AppRoutes.VIEW_HISTORY
+        'page_url': AppRoutes.FAVORITED_BOTTLE
       },
       {
         'icon': Icons.history,
@@ -512,11 +515,11 @@ class _BottlePageState extends State<BottlePage> {
           onTap: () {
             Get.to(
               () => BottleCardDetail(
+                bottleId: index,
                 imageUrl: bottleData['imageUrl']!,
                 title: bottleData['title']!,
                 content: bottleData['subtitle']!,
                 time: bottleData['time']!,
-
               ),
               transition: Transition.fadeIn,
             );
@@ -716,25 +719,32 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Obx(() {
                           final user = profileController.user.value;
                           return ClipOval(
-                            child: user?.avatar != null && user!.avatar.isNotEmpty
+                            child: user?.avatar != null &&
+                                    user!.avatar.isNotEmpty
                                 ? Image.network(
                                     user.avatar,
                                     width: 46,
                                     height: 46,
                                     fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;
                                       return Center(
                                         child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded /
-                                                  loadingProgress.expectedTotalBytes!
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
                                               : null,
                                           strokeWidth: 2,
                                         ),
                                       );
                                     },
-                                    errorBuilder: (context, error, stackTrace) => Icon(
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
                                       Icons.person,
                                       size: 20,
                                       color: Colors.blue[400],

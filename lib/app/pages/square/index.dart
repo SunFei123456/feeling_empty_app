@@ -201,6 +201,7 @@ class _SquarePageState extends State<SquarePage> {
       onTap: () {
         Get.to(
           () => BottleCardDetail(
+            bottleId: bottle.id,
             imageUrl: imageUrl,
             title: title,
             content: content,

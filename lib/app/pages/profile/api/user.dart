@@ -43,16 +43,17 @@ class UserApiService extends BaseApiService {
   }
 
   // 获取用户公开的漂流瓶
-  Future<ApiResponse<List<BottleCardModel>>> getPublicBottles({
+  Future<ApiResponse<List<BottleCardModel>>> getBottles({
     required int userId,
     required int page,
     required int pageSize,
+    required bool isPublic,
   }) async {
     try {
       final response = await BaseApiService.dio.get(
         '/bottles',
         queryParameters: {
-          'is_public': true,
+          'is_public': isPublic,
           'page': page,
           'page_size': pageSize,
           'user_id': userId,

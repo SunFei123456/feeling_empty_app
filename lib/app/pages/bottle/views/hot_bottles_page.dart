@@ -114,6 +114,7 @@ class HotBottlesPage extends GetView<BottleController> {
       onTap: () {
         Get.to(
           () => BottleCardDetail(
+            bottleId: bottle.id,
             imageUrl: bottle.imageUrl.isEmpty
                 ? 'https://picsum.photos/500/800'
                 : bottle.imageUrl,

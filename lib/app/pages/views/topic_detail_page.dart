@@ -263,6 +263,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
       onTap: () {
         Get.to(
           () => BottleCardDetail(
+            bottleId: bottleData['id'] == null ? 0 : int.parse(bottleData['id']!),
             imageUrl: bottleData['imageUrl']!,
             title: bottleData['title']!,
             content: bottleData['subtitle']!,

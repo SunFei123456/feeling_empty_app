@@ -78,4 +78,40 @@ class BottleApiService extends BaseApiService {
   /// 上传音频（代理到通用上传服务）
   Future<ApiResponse<String>> uploadAudio(String filePath) => 
       _uploadService.uploadAudio(filePath);
+
+
+  /// 删除漂流瓶
+  Future<ApiResponse<void>> deleteBottle(int bottleId) async {
+    try {
+      final response = await BaseApiService.dio.delete(
+        '/bottles/$bottleId',
+      );
+      return ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => json,
+      );
+    } catch (e) {
+      print('Delete bottle error: $e');
+      rethrow;
+    }
+  }
+
+  /// 修改瓶子可见性
+  Future<ApiResponse<void>> updateBottleVisibility(int bottleId, bool isPublic) async {
+    try {
+      final response = await BaseApiService.dio.put(
+        '/bottles/$bottleId',
+        data: {
+          'is_public': isPublic,
+        },
+      );
+      return ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => json,
+      );
+    } catch (e) {
+      print('Update bottle visibility error: $e');
+      rethrow;
+    }
+  }
 }

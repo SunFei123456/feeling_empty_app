@@ -78,6 +78,7 @@ flutter:
   assets:
     - assets/images/avatar.jpg
     - assets/animations/unlock.json
+    - assets/animations/lottie_bottle_open.json
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

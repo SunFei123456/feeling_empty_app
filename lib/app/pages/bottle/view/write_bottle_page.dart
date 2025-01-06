@@ -1,5 +1,6 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/index.dart';
+import 'package:fangkong_xinsheng/app/pages/views/model/ocean.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:fangkong_xinsheng/app/pages/views/api/ocean_api.dart';
 
 enum BottleType { text, image, audio }
 
@@ -41,6 +43,33 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   final TextEditingController _customTopicController = TextEditingController();
   bool _isAddingCustomTopic = false;
   bool _isPublic = true;
+  final OceanApiService _oceanApi = OceanApiService();
+  List<Ocean> _oceans = [];
+  Ocean? _selectedOcean;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOceans();
+  }
+
+  Future<void> _loadOceans() async {
+    try {
+      final response = await _oceanApi.getOceans();
+      if (response.success && response.data != null) {
+        setState(() {
+          _oceans = response.data!;
+          if (_oceans.isNotEmpty) {
+            _selectedOcean = _oceans.first; // 可选：默认选择第一个海域
+          }
+        });
+      } else {
+        print('加载海域失败: ${response.message}');
+      }
+    } catch (e) {
+      print('加载海域失败: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -196,6 +225,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
             const SizedBox(height: 20),
             // 话题选择
             _buildTopicSelector(isDark),
+            const SizedBox(height: 20),
+            _buildOceanSelector(isDark),
             const SizedBox(height: 20),
             _buildPublicSwitch(isDark),
           ],
@@ -764,6 +795,11 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       return;
     }
 
+    if (_selectedOcean == null) {
+      Get.snackbar('提示', '请选择投放海域');
+      return;
+    }
+
     try {
       final bottleApi = BottleApiService();
       String? imageUrl;
@@ -798,6 +834,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         isPublic: _isPublic,
         topicId: null,
         title: _titleController.text,
+        oceanId: _selectedOcean!.id,
       );
 
       // 发送创建请求
@@ -838,6 +875,140 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOceanSelector(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '选择投放海域',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 120,
+          child: _oceans.isEmpty
+              ? Center(
+                  child: Text(
+                    '加载海域中...',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _oceans.length,
+                  itemBuilder: (context, index) {
+                    final ocean = _oceans[index];
+                    final isSelected = _selectedOcean?.id == ocean.id;
+                    
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => _selectedOcean = ocean);
+                      },
+                      child: Container(
+                        width: 120,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? (isDark ? Colors.blue[400]! : Colors.blue)
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                ocean.bg,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: isDark ? Colors.grey[600] : Colors.grey[400],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 8,
+                              left: 8,
+                              right: 8,
+                              child: Text(
+                                ocean.name,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 } 

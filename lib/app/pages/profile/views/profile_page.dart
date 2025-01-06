@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'dart:io';
+import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
+import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,23 +20,12 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late final SettingController _settingController;
   late final ProfileController _profileController;
 
-  // 示例图片数据
-  final List<String> _publicImages = [
-    'assets/images/avatar.jpg',
-    'assets/images/avatar.jpg',
-    'assets/images/avatar.jpg',
-    'assets/images/avatar.jpg',
-  ];
-
-  final List<String> _privateImages = [
-    'assets/images/avatar.jpg',
-    'assets/images/avatar.jpg',
-  ];
 
   @override
   void initState() {
@@ -41,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
     _profileController = Get.put(ProfileController());
+    
   }
 
   @override
@@ -93,12 +86,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                 onPressed: () => Get.back(),
                               ),
                               Obx(() => Text(
-                                '@${_profileController.user.value?.nickname ?? ""}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              )),
+                                    '@${_profileController.user.value?.nickname ?? ""}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )),
                               const Spacer(),
                               IconButton(
                                 icon: const Icon(Icons.more_horiz),
@@ -108,8 +101,10 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                     barrierDismissible: true,
                                     barrierLabel: '',
                                     barrierColor: Colors.black54,
-                                    transitionDuration: const Duration(milliseconds: 300),
-                                    pageBuilder: (context, animation, secondaryAnimation) {
+                                    transitionDuration:
+                                        const Duration(milliseconds: 300),
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
                                       return SlideTransition(
                                         position: Tween<Offset>(
                                           begin: const Offset(1, 0),
@@ -148,7 +143,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                           ),
                           child: Obx(() {
                             final user = _profileController.user.value;
-                            final isLoading = _profileController.isLoading.value;
+                            final isLoading =
+                                _profileController.isLoading.value;
 
                             if (isLoading) {
                               return const Center(
@@ -167,9 +163,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         image: DecorationImage(
-                                          image: user?.avatar != null && user!.avatar.isNotEmpty
+                                          image: user?.avatar != null &&
+                                                  user!.avatar.isNotEmpty
                                               ? NetworkImage(user.avatar)
-                                              : const AssetImage('assets/images/avatar.jpg') as ImageProvider,
+                                              : const AssetImage(
+                                                      'assets/images/avatar.jpg')
+                                                  as ImageProvider,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -178,7 +177,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
                                     // 用户名和认证标记
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           user?.nickname ?? '',
@@ -209,7 +209,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
                                     // 统计数据
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         _buildStat('233', 'Posts'),
                                         _buildStatDivider(),
@@ -228,9 +229,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.orange,
                                           foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
                                         ),
                                         child: const Text('Follow'),
@@ -244,7 +247,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                   right: 0,
                                   child: IconButton(
                                     icon: const Icon(Icons.edit),
-                                    onPressed: () => AppRoutes.to(AppRoutes.EDIT_PROFILE),
+                                    onPressed: () =>
+                                        AppRoutes.to(AppRoutes.EDIT_PROFILE),
                                     color: Colors.grey[600],
                                   ),
                                 ),
@@ -315,17 +319,20 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                       crossAxisSpacing: 16,
                       itemCount: _profileController.publicBottles.length,
                       itemBuilder: (context, index) {
-                        final bottle = _profileController.publicBottles[index];
-                        // 如果到达列表底部，加载更多
-                        if (index == _profileController.publicBottles.length - 1) {
-                          _profileController.loadMoreBottles();
+                        if (index >= _profileController.publicBottles.length) {
+                          return const SizedBox();
                         }
+
+                        final bottle = _profileController.publicBottles[index];
+              
+
                         return GestureDetector(
                           onTap: () {
                             Get.to(
                               () => BottleCardDetail(
-                                imageUrl: bottle.imageUrl.isNotEmpty 
-                                    ? bottle.imageUrl 
+                                bottleId: bottle.id,
+                                imageUrl: bottle.imageUrl.isNotEmpty
+                                    ? bottle.imageUrl
                                     : 'https://picsum.photos/500/800',
                                 title: bottle.title,
                                 content: bottle.content,
@@ -336,6 +343,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                               transition: Transition.fadeIn,
                             );
                           },
+                          onLongPress: () => _showBottomDrawer(context, bottle),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
@@ -364,7 +372,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                   Padding(
                                     padding: const EdgeInsets.all(12.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           bottle.title,
@@ -388,7 +397,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                         ),
                                         const SizedBox(height: 12),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               children: [
@@ -428,27 +438,192 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     ),
                   ),
 
-                  // 私有照片瀑布流
-                  MasonryGridView.count(
-                    padding: const EdgeInsets.all(16),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    itemCount: _privateImages.length,
-                    itemBuilder: (context, index) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          height: index.isEven ? 200 : 240,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(_privateImages[index]),
-                              fit: BoxFit.cover,
-                            ),
+                  // 私密漂流瓶
+                  RefreshIndicator(
+                    onRefresh: _profileController.refreshPrivateBottles,
+                    child: Obx(() {
+                      if (_profileController.isLoadingPrivate.value && 
+                          _profileController.privateBottles.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (_profileController.privateBottles.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.lock_outline, size: 64, color: Colors.grey[300]),
+                              const SizedBox(height: 16),
+                              Text(
+                                '暂无私密漂流瓶',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[400],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                        );
+                      }
+
+                      return MasonryGridView.count(
+                        padding: const EdgeInsets.all(16),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        itemCount: _profileController.privateBottles.length,
+                        itemBuilder: (context, index) {
+                          final bottle = _profileController.privateBottles[index];
+                          
+                          
+
+                          return GestureDetector(
+                            onTap: () {
+                              Get.to(
+                                () => BottleCardDetail(
+                                  bottleId: bottle.id,
+                                  imageUrl: bottle.imageUrl.isNotEmpty
+                                      ? bottle.imageUrl
+                                      : 'https://picsum.photos/500/800',
+                                  title: bottle.title,
+                                  content: bottle.content,
+                                  time: bottle.createdAt,
+                                  audioUrl: bottle.audioUrl,
+                                  user: bottle.user,
+                                ),
+                                transition: Transition.fadeIn,
+                              );
+                            },
+                            onLongPress: () => _showBottomDrawer(context, bottle),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (bottle.imageUrl.isNotEmpty)
+                                          AspectRatio(
+                                            aspectRatio: 1,
+                                            child: Image.network(
+                                              bottle.imageUrl,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                bottle.title,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                bottle.content,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[600],
+                                                  height: 1.2,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.remove_red_eye,
+                                                        size: 12,
+                                                        color: Colors.grey[400],
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${bottle.views}',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey[400],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    bottle.createdAt.substring(0, 10),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // 私密标记
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.lock_outline,
+                                              size: 12,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              '私密',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       );
-                    },
+                    }),
                   ),
                 ],
               ),
@@ -533,7 +708,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       );
 
       if (image != null) {
-        final String? uploadedUrl = await _profileController.uploadAvatar(File(image.path));
+        final String? uploadedUrl =
+            await _profileController.uploadAvatar(File(image.path));
         if (uploadedUrl != null) {
           await _profileController.updateUserInfo(avatar: uploadedUrl);
         }
@@ -542,6 +718,85 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       print('Pick image error: $e');
       Get.snackbar('错误', '选择图片失败');
     }
+  }
+
+  void _showBottomDrawer(BuildContext context, BottleCardModel bottle) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 顶部拖动条
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // 操作按钮
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text('删除', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context); // 先关闭底部抽屉
+                ConfirmDialog.show(
+                  title: "删除确认",
+                  content: "确认要删除此漂流瓶吗？",
+                  confirmText: "删除",
+                  cancelText: "取消",
+                  onConfirm: () async {
+                    try {
+                      final response =
+                          await BottleApiService().deleteBottle(bottle.id);
+                      if (response.success) {
+                        Get.snackbar('成功', '删除成功');
+                        _profileController.refreshBottles();
+                      } else {
+                        Get.snackbar('错误', response.message ?? '删除失败');
+                      }
+                    } catch (e) {
+                      Get.snackbar('错误', '删除失败: $e');
+                    }
+                  },
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.visibility_off, color: Colors.orange),
+              title:
+                  const Text('修改可见性', style: TextStyle(color: Colors.orange)),
+              onTap: () {
+                Navigator.pop(context);
+                // 修改可见性逻辑
+                BottleApiService().updateBottleVisibility(bottle.id, false);
+                // 修改后刷新列表
+                _profileController.refreshBottles();
+                _profileController.refreshPrivateBottles();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share, color: Colors.blue),
+              title: const Text('分享', style: TextStyle(color: Colors.blue)),
+              onTap: () {
+                Navigator.pop(context);
+                // todo 分享逻辑
+              },
+            ),
+            // 底部安全区域
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -557,7 +812,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 44;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(

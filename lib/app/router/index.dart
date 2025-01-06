@@ -1,5 +1,8 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/favorite_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/ocean_square_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/resonated_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
@@ -75,6 +78,9 @@ class AppRoutes {
   static const PUBLISH = '/publish';
   static const EDIT_PROFILE = '/edit-profile';
   static const VIEW_HISTORY = '/view_history';
+  static const RESONATED_BOTTLE = '/resonated_bottle';
+  static const FAVORITED_BOTTLE = '/favorited_bottle';
+  static const OCEANSQUARE = '/ocean_square';
 
   /// 路由
   static final routes = <AppRoute>[
@@ -157,6 +163,23 @@ class AppRoutes {
       binding: BindingsBuilder(() {
         Get.put(BottleController());
       }),
+    ),
+
+    // 收藏的漂流瓶列表页面
+    AppRoute(
+      name: FAVORITED_BOTTLE,
+      page: () =>  FavoritePage(),
+    ),
+
+    // 共振 的漂流瓶列表页面
+    AppRoute(
+      name: RESONATED_BOTTLE,
+      page: () =>  ResonatedPage(),
+    ),
+    // 海域广场页面
+    AppRoute(
+      name: OCEANSQUARE,
+      page: () =>  OceanSquarePage(),
     ),
   ];
 
