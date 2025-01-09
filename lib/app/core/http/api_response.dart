@@ -13,8 +13,11 @@ class ApiResponse<T> {
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJson) {
+    // 根据 code 判断是否成功，200 表示成功
+    final isSuccess = json['code'] == 200;
+    
     return ApiResponse<T>(
-      success: json['success'] as bool,
+      success: isSuccess,
       message: json['message'] as String?,
       code: json['code'] as int?,
       data: json['data'] == null ? null : fromJson(json['data']),

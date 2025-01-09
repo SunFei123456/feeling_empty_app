@@ -1,26 +1,173 @@
 import 'dart:ui';
 
+import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
+import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
 
-class BottleCardDetail extends StatelessWidget {
+import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
+
+// 凡是进入到 瓶子的详情页,  走这个页面 BottleCardDetail
+// ignore: must_be_immutable
+class BottleCardDetail extends StatefulWidget {
+  final int id;
   final String imageUrl;
   final String title;
-  final String subtitle;
-  final String time;
-  final String location;
+  final String content;
+  final String createdAt;
+  final String? audioUrl;
+  final UserInfo? user;
+  bool isResonated;
+  bool isFavorited;
+  final int views;
+  int resonates;
+  final int favorites;
+  final int shares;
 
-  const BottleCardDetail({
-    Key? key,
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-    required this.time,
-    required this.location,
-  }) : super(key: key);
+  BottleCardDetail({
+    super.key,
+    required this.id,
+    this.imageUrl = '',
+    this.title = '',
+    this.content = '',
+    this.user,
+    this.createdAt = '',
+    this.audioUrl = '',
+    this.isResonated = false,
+    this.isFavorited = false,
+    this.views = 0, // 浏览数量
+    this.favorites = 0, // 收藏数量
+    this.resonates = 0, // 共振数量
+    this.shares = 0, // 分享数量
+  });
+
+  @override
+  State<BottleCardDetail> createState() => _BottleCardDetailState();
+}
+
+class _BottleCardDetailState extends State<BottleCardDetail> {
+  final _api = BottleInteractionApiService();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _handleResonate() async {
+    try {
+      if (widget.isResonated) {
+        final response = await _api.unresonateBottle(widget.id);
+        if (response.success) {
+          setState(() {
+            widget.isResonated = false;
+            widget.resonates--;
+          });
+        }
+      } else {
+        final response = await _api.resonateBottle(widget.id);
+        if (response.success) {
+          setState(() {
+            widget.isResonated = true;
+            widget.resonates++;
+          });
+        }
+      }
+    } catch (e) {
+      Get.snackbar('错误', '操作失败，请稍后重试');
+    }
+  }
+
+  Future<void> _handleFavorite() async {
+    try {
+      if (widget.isFavorited) {
+        final response = await _api.unfavoriteBottle(widget.id);
+        if (response.success) {
+          setState(() => widget.isFavorited = false);
+        }
+      } else {
+        final response = await _api.favoriteBottle(widget.id);
+        if (response.success) {
+          setState(() => widget.isFavorited = true);
+        }
+      }
+    } catch (e) {
+      Get.snackbar('错误', '操作失败，请稍后重试');
+    }
+  }
+
+  Widget _buildInteractionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        InkWell(
+          onTap: _handleResonate,
+          child: _buildInteractionButton(
+            widget.isResonated ? Icons.favorite : Icons.favorite_border,
+            widget.resonates,
+            widget.isResonated ? Colors.red : Colors.grey[700],
+          ),
+        ),
+        InkWell(
+          onTap: _handleFavorite,
+          child: _buildInteractionButton(
+            widget.isFavorited ? Icons.bookmark : Icons.bookmark_border,
+            widget.favorites,
+            widget.isFavorited ? Colors.blue : Colors.grey[700],
+          ),
+        ),
+        InkWell(
+          onTap: () {},
+          child: _buildInteractionButton(
+              Icons.view_agenda_outlined, widget.views, Colors.grey[700]),
+        ),
+        InkWell(
+          onTap: () {},
+          child: _buildInteractionButton(
+              Icons.share, widget.shares, Colors.grey[700]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInteractionButton(IconData icon, int count, Color? color) {
+    return Row(
+      children: [
+        Icon(icon, size: 24, color: color),
+        const SizedBox(width: 4),
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    // 判断瓶子类型
+    bool isImageBottle = widget.imageUrl.isNotEmpty;
+    bool isAudioBottle = widget.audioUrl != null && widget.audioUrl!.isNotEmpty;
+    bool isTextBottle = !isImageBottle && !isAudioBottle;
+
+    // 定义渐变背景颜色
+    List<Color> getGradientColors() {
+      if (isAudioBottle) {
+        return [
+          const Color(0xFFFF8C61), // 珊瑚色
+          const Color(0xFFFF6B6B), // 粉红色
+        ];
+      } else {
+        return [
+          const Color(0xFF4FACFE), // 天蓝色
+          const Color(0xFF00F2FE), // 青色
+        ];
+      }
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -47,9 +194,9 @@ class BottleCardDetail extends StatelessWidget {
           // 主要内容
           Column(
             children: [
-              // 图片区域
+              // 图片/渐变背景区域
               Hero(
-                tag: 'bottle_card_image_$imageUrl',
+                tag: 'bottle_card_image_${widget.imageUrl}',
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
@@ -58,11 +205,40 @@ class BottleCardDetail extends StatelessWidget {
                       bottomLeft: Radius.circular(15),
                       bottomRight: Radius.circular(15),
                     ),
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
-                      fit: BoxFit.cover,
-                    ),
                   ),
+                  child: isImageBottle
+                    ? Image.network(
+                        widget.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[100],
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image_rounded,
+                              color: Colors.grey[400],
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: getGradientColors(),
+                          ),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isAudioBottle
+                                ? Icons.audiotrack_rounded
+                                : Icons.format_quote_rounded,
+                            size: 80,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                      ),
                 ),
               ),
               const SizedBox(height: 35),
@@ -73,28 +249,58 @@ class BottleCardDetail extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 类型标识
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isImageBottle
+                                  ? Icons.image
+                                  : isAudioBottle
+                                      ? Icons.audiotrack
+                                      : Icons.text_fields,
+                              color: Colors.black54,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isImageBottle ? '图片' : isAudioBottle ? '语音' : '文字',
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       // 标题
                       Text(
-                        title,
+                        widget.title,
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
 
-                      // 位置信息
+                      // 发布时间
                       Row(
                         children: [
-                          Icon(Icons.location_on,
+                          Icon(Icons.timeline,
                               size: 12, color: Colors.grey[600]),
                           const SizedBox(width: 4),
                           Text(
-                            location,
+                           formatTime(widget.createdAt),
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                                fontSize: 14,
+                                color: Colors.black.withOpacity(0.7)),
                           ),
                         ],
                       ),
@@ -102,7 +308,7 @@ class BottleCardDetail extends StatelessWidget {
 
                       // 正文内容
                       Text(
-                        'KSPO DOME. The Idol Star Athletics Championships (Korean: 아이돌스타 선수권대회) is a South Korean television program which aired for the first time in 2010. The program features celebrities, most notably Korean pop idols singers and groups, which compete in multi-sport events. The show is broadcast by MBC',
+                        widget.content,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[800],
@@ -110,18 +316,11 @@ class BottleCardDetail extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-
+                      if (widget.audioUrl != null &&
+                          widget.audioUrl!.isNotEmpty)
+                        AudioPlayerWidget(audioUrl: widget.audioUrl!),
                       // 互动按钮
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildInteractionButton(Icons.favorite_border, '12K'),
-                          _buildInteractionButton(
-                              Icons.chat_bubble_outline, '207'),
-                          _buildInteractionButton(Icons.send, '123'),
-                          _buildInteractionButton(Icons.bookmark_border, ''),
-                        ],
-                      ),
+                      _buildInteractionButtons(),
                     ],
                   ),
                 ),
@@ -210,24 +409,40 @@ class BottleCardDetail extends StatelessWidget {
                   child: Row(
                     children: [
                       // 用户头像
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          shape: BoxShape.rectangle,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 2,
-                          ),
-                          image: DecorationImage(
-                            image: NetworkImage(imageUrl),
-                            fit: BoxFit.cover,
+                      InkWell(
+                        onTap: () {
+                          if (widget.user?.id != null && widget.user!.id != 0) {
+                            Get.toNamed(
+                              '/profile/${widget.user!.id}', // 使用命名路由
+                              arguments: {
+                                'userId': widget.user!.id,
+                                'nickname': widget.user!.nickname,
+                                'avatar': widget.user!.avatar,
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2,
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage(widget.user?.avatar ?? ''),
+                              fit: BoxFit.cover,
+                              onError: (_, __) =>
+                                  const Icon(Icons.person), // 添加错误处理
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // 用户名和时间
+                      // 用户名和认证标识
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -235,7 +450,7 @@ class BottleCardDetail extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                'Tzuyu',
+                                widget.user?.nickname ?? '',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -251,13 +466,6 @@ class BottleCardDetail extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            time,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black.withOpacity(0.7),
-                            ),
-                          ),
                         ],
                       ),
                     ],
@@ -268,24 +476,6 @@ class BottleCardDetail extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInteractionButton(IconData icon, String count) {
-    return Row(
-      children: [
-        Icon(icon, size: 24, color: Colors.grey[700]),
-        if (count.isNotEmpty) ...[
-          const SizedBox(width: 4),
-          Text(
-            count,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

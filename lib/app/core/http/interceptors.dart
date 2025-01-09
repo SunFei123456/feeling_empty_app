@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
+import 'package:get/get.dart' hide Response;
 
 /// 认证拦截器
 class AuthInterceptor extends Interceptor {
@@ -17,24 +19,26 @@ class AuthInterceptor extends Interceptor {
 class LoggerInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('REQUEST[${options.method}] => PATH: ${options.path}');
-    return super.onRequest(options, handler);
+    print('请求URL: ${options.baseUrl}${options.path}');
+    print('请求方法: ${options.method}');
+    print('请求头: ${options.headers}');
+    print('请求数据: ${options.data}');
+    handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
-      'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-    );
-    return super.onResponse(response, handler);
+    print('响应码: ${response.statusCode}');
+    print('响应数据: ${response.data}');
+    handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print(
-      'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-    );
-    return super.onError(err, handler);
+    print('请求错误: ${err.type}');
+    print('错误信息: ${err.message}');
+    print('错误详情: ${err.error}');
+    handler.next(err);
   }
 }
 
@@ -151,5 +155,29 @@ class NoInternetConnectionException extends DioException {
   @override
   String toString() {
     return 'No internet connection';
+  }
+}
+
+class TokenInterceptor extends Interceptor {
+  final TokenService _tokenService = TokenService();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final token = _tokenService.getToken();
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.response?.statusCode == 401) {
+      // Token 过期或无效，清除本地 token 并跳转到登录页
+      _tokenService.clearAuth();
+      Get.offAllNamed('/login');
+      return;
+    }
+    handler.next(err);
   }
 } 

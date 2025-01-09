@@ -1,217 +1,399 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'dart:ui' show lerpDouble;
 
-import 'package:getx_study/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/widget/hot_topics.dart';
+import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
 
-class BottlePage extends StatelessWidget {
+class BottlePage extends StatefulWidget {
   const BottlePage({Key? key}) : super(key: key);
+
+  @override
+  State<BottlePage> createState() => _BottlePageState();
+}
+
+class _BottlePageState extends State<BottlePage> {
+  late final ProfileController _profileController;
+  late final TopicController _topicController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      Get.put(ProfileController());
+    }
+    if (!Get.isRegistered<TopicController>()) {
+      Get.put(TopicController());
+    }
+    _profileController = Get.find<ProfileController>();
+    _topicController = Get.find<TopicController>();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // 背景渐变
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).brightness == Brightness.light
-                      ? const Color(0xFFE3F2FD)
-                      : const Color(0xFF1A237E),
-                  Theme.of(context).brightness == Brightness.light
-                      ? const Color(0xFFBBDEFB)
-                      : const Color(0xFF0D47A1),
-                ],
-              ),
-            ),
-          ),
+          // 海洋动态背景
+          _buildOceanBackground(),
 
-          // 主内容
+          // 主要内容
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              // 自定义头部
+              // 顶部AppBar
               SliverPersistentHeader(
                 pinned: true,
-                delegate: BottleHeaderDelegate(),
+                delegate: BottleHeaderDelegate(_profileController),
               ),
 
               // 内容区域
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 海洋动画区域
                       const SizedBox(height: 20),
-                      _buildOceanAnimation(),
+
+                      // 漂流瓶动画展示区
+                      _buildBottleShowcase(),
                       const SizedBox(height: 30),
 
-                      // 漂流瓶类型选择
-                      _buildBottleTypes(context),
+                      // 快捷操作区
+                      _buildQuickActions(),
                       const SizedBox(height: 30),
 
-                      // 最近的漂流瓶
-                      _buildRecentBottles(context),
+                      // 热门话题区
+                      _buildHotTopics(),
+                      const SizedBox(height: 20),
+
+                      // 最近漂流瓶
+                      _buildRecentBottles(),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-
-          // 投放漂流瓶按钮
-          Positioned(
-            bottom: 100,
-            right: 30,
-            child: _buildThrowButton(context),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildOceanAnimation() {
-    return SizedBox(
-      height: 200,
-      child: PageView.builder(
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(20),
+  Widget _buildOceanBackground() {
+    return Stack(
+      children: [
+        // 渐变背景
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.blue[200]!.withOpacity(0.3),
+                Colors.blue[400]!.withOpacity(0.2),
+                Colors.purple[200]!.withOpacity(0.1),
+              ],
             ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.waves,
-                        size: 50,
-                        color: Colors.blue[700],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'bottle_ocean_title'.tr + ' ${index + 1}',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+          ),
+        ),
+
+        // 波浪动画效果
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: WaveAnimation(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottleShowcase() {
+    return Container(
+      height: 180,
+      child: Row(
+        children: [
+          // 左侧大卡片
+          Expanded(
+            flex: 2,
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue[400]!,
+                    Colors.blue[600]!,
+                  ],
                 ),
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      5,
-                      (i) => Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: i == index
-                              ? Colors.blue[700]
-                              : Colors.blue[700]?.withOpacity(0.3),
-                        ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  // 装饰性图案
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.1),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
 
-  Widget _buildBottleTypes(BuildContext context) {
-    final types = [
-      {'icon': Icons.text_fields, 'label': 'bottle_type_text'.tr},
-      {'icon': Icons.image, 'label': 'bottle_type_image'.tr},
-      {'icon': Icons.mic, 'label': 'bottle_type_voice'.tr},
-    ];
-
-    return AnimationLimiter(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          types.length,
-          (index) => AnimationConfiguration.staggeredList(
-            position: index,
-            duration: const Duration(milliseconds: 500),
-            child: SlideAnimation(
-              verticalOffset: 50.0,
-              child: FadeInAnimation(
-                child: _buildTypeCard(
-                  context,
-                  types[index]['icon'] as IconData,
-                  types[index]['label'] as String,
-                ),
+                  // 内容
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: InkWell(
+                      onTap: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(
+                            Icons.explore,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                          const Spacer(),
+                          const Text(
+                            '探索世界',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '发现更多精彩内容',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
+          // 右侧两个小卡片
+          Expanded(
+            child: Column(
+              children: [
+                _buildSmallCard(
+                  icon: Icons.create,
+                  title: '写漂流瓶',
+                  color: Colors.purple,
+                  onTap: () => AppRoutes.to(AppRoutes.WRITE_BOTTLE),
+                ),
+                const SizedBox(height: 8),
+                _buildSmallCard(
+                  icon: Icons.local_fire_department,
+                  title: '热门瓶子',
+                  color: Colors.orange,
+                  onTap: () => AppRoutes.to(AppRoutes.HOT_BOTTLE),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSmallCard({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color,
+                color.withOpacity(0.8),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -10,
+                top: -10,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    const Spacer(),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTypeCard(BuildContext context, IconData icon, String label) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+  Widget _buildQuickActions() {
+    final actions = [
+      {
+        'icon': Icons.local_fire_department,
+        'label': '热门',
+        'color': Colors.orange,
+        'page_url': AppRoutes.HOT_BOTTLE
+      },
+      {
+        'icon': Icons.explore,
+        'label': '共振',
+        'color': Colors.lightGreen,
+        'page_url': AppRoutes.RESONATED_BOTTLE
+      },
+      {
+        'icon': Icons.collections_bookmark,
+        'label': '收藏',
+        'color': Colors.red,
+        'page_url': AppRoutes.FAVORITED_BOTTLE
+      },
+      {
+        'icon': Icons.history,
+        'label': '历史',
+        'color': Colors.purple,
+        'page_url': AppRoutes.VIEW_HISTORY
+      },
+    ];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: actions.map((action) {
+        return GestureDetector(
+          onTap: () {
+            AppRoutes.to(action['page_url'] as String);
+          },
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: (action['color'] as Color).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  action['icon'] as IconData,
+                  color: action['color'] as Color,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                action['label'] as String,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 30),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
-      ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildRecentBottles(BuildContext context) {
+  Widget _buildHotTopics() {
+    return HotTopicsWidget();
+  }
+
+  Widget _buildRecentBottles() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'recent_bottles'.tr,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'recent_bottles'.tr,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // 查看更多逻辑
+              },
+              child: Text(
+                '查看更多',
+                style: TextStyle(
+                  color: Colors.blue[400],
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
         AnimationLimiter(
           child: ListView.builder(
             shrinkWrap: true,
@@ -236,124 +418,125 @@ class BottlePage extends StatelessWidget {
   }
 
   Widget _buildBottleCard(BuildContext context, int index) {
+    // 模拟数据
+    final bottleData = {
+      'title': '这是一个漂流瓶标题 ${index + 1}',
+      'subtitle': '这是漂流瓶的预览内容，可能包含一些文字描述...',
+      'time': '2024-03-${index + 10}',
+      'location': '来自未知的海域',
+      'imageUrl': 'https://picsum.photos/500/300?random=$index',
+    };
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(20),
           onTap: () {
-            // 处理点击事件
+            Get.to(
+              () => BottleCardDetail(
+                id: index,
+                imageUrl: bottleData['imageUrl']!,
+                title: bottleData['title']!,
+                content: bottleData['subtitle']!,
+                createdAt: bottleData['time']!,
+              ),
+              transition: Transition.fadeIn,
+            );
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildBottleIcon(index),
-                const SizedBox(height: 12),
-                Text(
-                  'bottle_message_title'.tr,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'bottle_message_preview'.tr,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottleIcon(int index) {
-    final colors = [
-      Colors.blue,
-      Colors.purple,
-      Colors.green,
-      Colors.orange,
-      Colors.pink,
-    ];
-
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: colors[index % colors.length].withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(
-        Icons.mail_outline,
-        color: colors[index % colors.length],
-      ),
-    );
-  }
-
-  Widget _buildThrowButton(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[400]!, Colors.blue[600]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(30),
-          onTap: () {
-            // 处理投放漂流瓶
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.add,
-                  color: Colors.white,
+                // 左侧图片
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Hero(
+                    tag: 'bottle_card_image_${bottleData['imageUrl']}',
+                    child: Image.network(
+                      bottleData['imageUrl']!,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'throw_bottle'.tr,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 16),
+
+                // 右侧内容
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        bottleData['title']!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        bottleData['subtitle']!,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            bottleData['time']!,
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(
+                            Icons.location_on,
+                            size: 14,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              bottleData['location']!,
+                              style: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -365,27 +548,52 @@ class BottlePage extends StatelessWidget {
   }
 }
 
+// 波浪动画组件
+class WaveAnimation extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      // 实现波浪动画效果
+    );
+  }
+}
+
+// 漂流瓶3D动画组件
+class BottleAnimation extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        // 实现漂流瓶3D动画效果
+        );
+  }
+}
+
 class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final ProfileController profileController;
+
+  BottleHeaderDelegate(this.profileController);
+
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     // 计算滚动进度 (0.0 到 1.0)
     final progress = shrinkOffset / maxExtent;
-
-    // 根据滚动进度计算标题位置和大小
     final fontSize = lerpDouble(28, 20, progress) ?? 28;
     final paddingLeft = lerpDouble(16, 16, progress) ?? 10;
 
     return Container(
       decoration: BoxDecoration(
-        color: shrinkOffset > 0 ? Colors.white : Colors.transparent,
-        // 添加底部阴影
+        color: shrinkOffset > 0
+            ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9)
+            : Colors.transparent,
         boxShadow: [
           if (shrinkOffset > 0)
             BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2)),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Align(
@@ -400,7 +608,10 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                 child: Text(
                   'bottle_title'.tr,
                   style: TextStyle(
-                      fontSize: fontSize, fontWeight: FontWeight.bold),
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[800],
+                  ),
                 ),
               ),
               Padding(
@@ -409,13 +620,14 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                   children: [
                     const Text(
                       "Hi~",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(width: 15),
                     GestureDetector(
                       onTap: () {
-                        // 点击头像的处理逻辑
                         AppRoutes.to('/profile');
                       },
                       child: Container(
@@ -436,10 +648,47 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                             ),
                           ],
                         ),
-                        child: ClipOval(
-                          child: Icon(Icons.person,
-                              size: 20, color: Colors.blue[400]),
-                        ),
+                        child: Obx(() {
+                          final user = profileController.user.value;
+                          return ClipOval(
+                            child: user?.avatar != null &&
+                                    user!.avatar.isNotEmpty
+                                ? Image.network(
+                                    user.avatar,
+                                    width: 46,
+                                    height: 46,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
+                                      Icons.person,
+                                      size: 20,
+                                      color: Colors.blue[400],
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: 20,
+                                    color: Colors.blue[400],
+                                  ),
+                          );
+                        }),
                       ),
                     ),
                   ],

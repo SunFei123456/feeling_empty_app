@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import 'package:getx_study/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'controller/login_controller.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GetBuilder<LoginController>(
-        init: LoginController(),
+        init: LoginController()..initDefaultCredentials(),
         builder: (controller) {
           return Stack(
             children: [
@@ -33,7 +34,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // 主要内容
               SafeArea(
                 child: SingleChildScrollView(
@@ -60,12 +61,12 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 60),
 
-                      // 手机号输入框
-                      _buildPhoneInput(controller),
+                      // 邮箱输入框
+                      _buildEmailInput(controller),
                       const SizedBox(height: 20),
 
-                      // 验证码输入框和获取验证码按钮
-                      _buildVerificationCodeInput(controller),
+                      // 密码输入框
+                      _buildPasswordInput(controller),
                       const SizedBox(height: 40),
 
                       // 登录按钮
@@ -85,7 +86,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneInput(LoginController controller) {
+  Widget _buildEmailInput(LoginController controller) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -99,25 +100,22 @@ class LoginPage extends StatelessWidget {
         ],
       ),
       child: TextField(
-        controller: controller.phoneController,
-        keyboardType: TextInputType.phone,
-        maxLength: 11,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        controller: controller.accountController,
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
-          hintText: 'phone_hint'.tr,
-          counterText: '',
+          hintText: 'Enter your account',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          prefixIcon: const Icon(Icons.phone_android),
+          prefixIcon: const Icon(Icons.email),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
     );
   }
 
-  Widget _buildVerificationCodeInput(LoginController controller) {
+  Widget _buildPasswordInput(LoginController controller) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -130,40 +128,18 @@ class LoginPage extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller.codeController,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                hintText: 'verification_code_hint'.tr,
-                counterText: '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: const Icon(Icons.lock_outline),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              ),
-            ),
+      child: TextField(
+        controller: controller.passwordController,
+        obscureText: true,
+        decoration: InputDecoration(
+          hintText: 'Enter your password',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Obx(() => TextButton(
-                  onPressed: controller.canGetCode.value
-                      ? controller.getVerificationCode
-                      : null,
-                  child: Text(
-                    controller.countdownStr.value,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                )),
-          ),
-        ],
+          prefixIcon: const Icon(Icons.lock_outline),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
       ),
     );
   }
@@ -171,22 +147,24 @@ class LoginPage extends StatelessWidget {
   Widget _buildLoginButton(LoginController controller) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: controller.login,
+      child: Obx(() => ElevatedButton(
+        onPressed: controller.isLoading.value ? null : controller.login,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: Text(
-          'login'.tr,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+        child: controller.isLoading.value
+            ? const CircularProgressIndicator()
+            : Text(
+                'login'.tr,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+      )),
     );
   }
 
@@ -239,66 +217,5 @@ class LoginPage extends StatelessWidget {
         onPressed: () {},
       ),
     );
-  }
-}
-
-class LoginController extends GetxController {
-  final phoneController = TextEditingController(text: 'root');
-  final codeController = TextEditingController(text: '123456');
-  
-  final countdownStr = 'get_code'.tr.obs;
-  final canGetCode = true.obs;
-  Timer? _timer;
-  int _countdown = 60;
-
-  @override
-  void onClose() {
-    phoneController.dispose();
-    codeController.dispose();
-    _timer?.cancel();
-    super.onClose();
-  }
-
-  void getVerificationCode() {
-    if (!canGetCode.value) return;
-    if (phoneController.text != 'root') {
-      Get.snackbar('error'.tr, 'phone_invalid'.tr);
-      return;
-    }
-
-    canGetCode.value = false;
-    _countdown = 60;
-    _startCountdown();
-  }
-
-  void _startCountdown() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdown <= 0) {
-        timer.cancel();
-        countdownStr.value = 'get_code'.tr;
-        canGetCode.value = true;
-      } else {
-        _countdown--;
-        countdownStr.value = '${_countdown}s';
-      }
-    });
-  }
-
-  void login() {
-    final phone = phoneController.text;
-    final code = codeController.text;
-
-    if (phone != 'root' || code != '123456') {
-      Get.snackbar(
-        'error'.tr,
-        'invalid_credentials'.tr,
-        duration: const Duration(seconds: 2),
-      );
-      return;
-    }
-
-    Get.changeThemeMode(ThemeMode.light);
-    Get.offAllNamed(AppRoutes.home);
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/core/services/storage_service.dart';
+import 'package:fangkong_xinsheng/app/core/services/storage_service.dart';
 
 /// 主题服务
 class ThemeService extends GetxService {
   final _storage = Get.find<StorageService>();
-  
+
   /// 获取当前主题模式
   Future<ThemeMode> getThemeMode() async {
     final isDark = await _storage.getBool(StorageKeys.isDarkMode) ?? false;

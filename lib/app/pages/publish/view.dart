@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/pages/bottle/views/write_bottle_page.dart';
-import 'package:getx_study/app/pages/time_post_office/views/write_letter_page.dart';
-import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart' show NotchBottomBarController;
+import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
+import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart'
+    show NotchBottomBarController;
 
 class PublishPage extends StatelessWidget {
   const PublishPage({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class PublishPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
@@ -93,24 +94,20 @@ class PublishPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isDark 
-                ? color.withOpacity(0.15)
-                : color.withOpacity(0.1),
+            color: isDark ? color.withOpacity(0.15) : color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark
-                  ? color.withOpacity(0.4)
-                  : color.withOpacity(0.3),
+              color: isDark ? color.withOpacity(0.4) : color.withOpacity(0.3),
             ),
             boxShadow: [
-              if (!isDark)  // 暗黑模式下不显示阴影
+              if (!isDark) // 暗黑模式下不显示阴影
                 BoxShadow(
                   color: color.withOpacity(0.1),
                   blurRadius: 10,
@@ -124,9 +121,8 @@ class PublishPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? color.withOpacity(0.2)
-                      : color.withOpacity(0.1),
+                  color:
+                      isDark ? color.withOpacity(0.2) : color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -178,4 +174,4 @@ class PublishPage extends StatelessWidget {
       ),
     );
   }
-} 
+}

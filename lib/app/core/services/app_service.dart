@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_study/app/core/services/storage_service.dart';
+import 'package:fangkong_xinsheng/app/core/services/storage_service.dart';
 
 class AppService extends GetxService {
   final _storage = Get.find<StorageService>();
@@ -19,10 +19,12 @@ class AppService extends GetxService {
   Future<void> _loadSettings() async {
     // 加载主题设置
     _isDarkMode.value = await _storage.getBool(StorageKeys.isDarkMode) ?? false;
-    
+
     // 加载语言设置
-    final languageCode = await _storage.getString(StorageKeys.languageCode) ?? 'en';
-    final countryCode = await _storage.getString(StorageKeys.countryCode) ?? 'US';
+    final languageCode =
+        await _storage.getString(StorageKeys.languageCode) ?? 'en';
+    final countryCode =
+        await _storage.getString(StorageKeys.countryCode) ?? 'US';
     _currentLocale.value = Locale(languageCode, countryCode);
   }
 

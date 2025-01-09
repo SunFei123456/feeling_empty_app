@@ -1,7 +1,12 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
+import 'package:fangkong_xinsheng/app/pages/views/controller/view_history_controller.dart';
+import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:getx_study/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class SquarePage extends StatefulWidget {
   const SquarePage({Key? key}) : super(key: key);
@@ -12,23 +17,8 @@ class SquarePage extends StatefulWidget {
 
 class _SquarePageState extends State<SquarePage> {
   final CardSwiperController controller = CardSwiperController();
-  late final List<Widget> cards;
-
-  @override
-  void initState() {
-    super.initState();
-    cards = List.generate(
-      5,
-      (index) => _buildCard(
-        title: 'Idol Championship in 2022',
-        subtitle: 'Archery Session Moment in 2021',
-        time: '2021.12.25 18:00(KST)',
-        location: 'KSPO DOME',
-        imageUrl: 'https://picsum.photos/500/800?random=$index',
-      ),
-    );
-  }
-
+  final squareController = Get.put(SquareController());
+  final viewHistoryController = Get.put(ViewHistoryController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,19 +90,33 @@ class _SquarePageState extends State<SquarePage> {
 
                   // 卡片区域
                   Expanded(
-                    child: CardSwiper(
-                      controller: controller,
-                      cardsCount: cards.length,
-                      isLoop: false,
-                      backCardOffset: const Offset(0, 0),
-                      padding: const EdgeInsets.all(24.0),
-                      cardBuilder: (BuildContext context,
-                          int index,
-                          int horizontalOffsetPercentage,
-                          int verticalOffsetPercentage) {
-                        return cards[index];
-                      },
-                    ),
+                    child: Obx(() {
+                      if (squareController.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      return CardSwiper(
+                        controller: controller,
+                        cardsCount: squareController.bottles.length,
+                        isLoop: false,
+                        backCardOffset: const Offset(25, 25),
+                        padding: const EdgeInsets.all(24.0),
+                        scale: 0.95,
+                        numberOfCardsDisplayed: 3,
+                        onEnd: () {
+                          squareController.fetchRandomBottles();
+                        },
+                        cardBuilder: (BuildContext context,
+                            int index,
+                            int horizontalOffsetPercentage,
+                            int verticalOffsetPercentage) {
+                          final bottle = squareController.bottles[index];
+                          return _buildCard(
+                            bottle: bottle,
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -125,13 +129,35 @@ class _SquarePageState extends State<SquarePage> {
 
   Widget _buildStoryItem(int index) {
     final items = [
-      {'title': 'Your Story', 'image': 'assets/images/avatar.jpg'},
-      {'title': 'miarulhaq', 'image': 'https://picsum.photos/100/100?random=1'},
-      {
-        'title': 'halofellas',
-        'image': 'https://picsum.photos/100/100?random=2'
-      },
-      {'title': 'fmaotan', 'image': 'https://picsum.photos/100/100?random=3'},
+      // {
+      //   'id': 1,
+      //   'name': '梦想海域',
+      //   'bg':
+      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu1.png'
+      // },
+      // {
+      //   'id': 2,
+      //   'name': '希望之海',
+      //   'bg':
+      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
+      // },
+      // {
+      //   'id': 3,
+      //   'name': '宁静港湾',
+      //   'bg':
+      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
+      // },
+      // {
+      //   'id': 4,
+      //   'name': '勇气之渊',
+      //   'bg':
+      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
+      // },
+
+      {'id': 1, 'name': '梦想海域', 'bg': 'https://picsum.photos/100/100?random=1'},
+      {'id': 2, 'name': '希望之海', 'bg': 'https://picsum.photos/100/100?random=2'},
+      {'id': 3, 'name': '宁静港湾', 'bg': 'https://picsum.photos/100/100?random=3'},
+      {'id': 4, 'name': '勇气之渊', 'bg': 'https://picsum.photos/100/100?random=5'},
     ];
 
     return Padding(
@@ -147,7 +173,7 @@ class _SquarePageState extends State<SquarePage> {
               gradient: LinearGradient(
                 colors: [
                   Colors.purple.withOpacity(0.5),
-                  Colors.orange.withOpacity(0.5),
+                  Colors.orange.withOpacity(0.5)
                 ],
               ),
             ),
@@ -156,7 +182,7 @@ class _SquarePageState extends State<SquarePage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(17),
                 image: DecorationImage(
-                  image: NetworkImage(items[index]['image']!),
+                  image: NetworkImage(items[index]['bg'] as String),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -164,7 +190,7 @@ class _SquarePageState extends State<SquarePage> {
           ),
           const SizedBox(height: 4),
           Text(
-            items[index]['title']!,
+            items[index]['name'] as String,
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -175,25 +201,53 @@ class _SquarePageState extends State<SquarePage> {
     );
   }
 
-  Widget _buildCard({
-    required String title,
-    required String subtitle,
-    required String time,
-    required String location,
-    required String imageUrl,
-  }) {
+  Widget _buildCard({required BottleModel bottle}) {
+    // 判断瓶子类型
+    bool isImageBottle = bottle.imageUrl.isNotEmpty;
+    bool isAudioBottle = bottle.audioUrl.isNotEmpty;
+    bool isTextBottle = !isImageBottle && !isAudioBottle;
+
+    // 定义渐变背景颜色
+    List<Color> getGradientColors() {
+      if (isAudioBottle) {
+        // 音频：暖色调渐变
+        return [
+          const Color(0xFFFF8C61), // 珊瑚色
+          const Color(0xFFFF6B6B), // 粉红色
+          const Color(0xFFFF5F6D), // 玫瑰色
+        ];
+      } else {
+        // 纯文本：冷色调渐变
+        return [
+          const Color(0xFF4FACFE), // 天蓝色
+          const Color(0xFF00F2FE), // 青色
+          const Color(0xFF00DBDE), // 蓝绿色
+        ];
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         Get.to(
           () => BottleCardDetail(
-            imageUrl: imageUrl,
-            title: title,
-            subtitle: subtitle,
-            time: time,
-            location: location,
+            id: bottle.id,
+            imageUrl: bottle.imageUrl,
+            title: bottle.title,
+            content: bottle.content,
+            createdAt: bottle.createdAt,
+            audioUrl: bottle.audioUrl,
+            user: UserInfo(
+              id: bottle.user.id,
+              sex: bottle.user.sex,
+              nickname: bottle.user.nickname,
+              avatar: bottle.user.avatar,
+            ),
+            views: bottle.views,
+            resonates: bottle.resonates,
           ),
           transition: Transition.cupertino,
         );
+        viewHistoryController.createViewHistory(bottle.id);
       },
       child: Container(
         clipBehavior: Clip.antiAlias,
@@ -210,17 +264,40 @@ class _SquarePageState extends State<SquarePage> {
         ),
         child: Stack(
           children: [
-            // 背景��片
-            // Hero
-            Hero(
-              tag: 'bottle_card_image_$imageUrl',
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
+            // 背景
+            if (isImageBottle)
+              // 图片背景
+              Hero(
+                tag: 'bottle_card_image_${bottle.imageUrl}',
+                child: Image.network(
+                  bottle.imageUrl,
+                  fit: BoxFit.cover,
+                  height: double.infinity,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.error),
+                ),
+              )
+            else
+              // 纯色渐变背景
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: getGradientColors(),
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    isAudioBottle
+                        ? Icons.audiotrack
+                        : Icons.format_quote_rounded,
+                    size: 48,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                ),
               ),
-            ),
 
             // 渐变遮罩
             Container(
@@ -244,59 +321,51 @@ class _SquarePageState extends State<SquarePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 标题
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+                  // 类型标识和标题
                   Row(
                     children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: Colors.white70,
-                        size: 14,
+                      // 类型图标
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          isImageBottle
+                              ? Icons.image
+                              : isAudioBottle
+                                  ? Icons.audiotrack
+                                  : Icons.text_fields,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        location,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
+                      const SizedBox(width: 8),
+                      // 标题
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            bottle.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    time,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -304,11 +373,11 @@ class _SquarePageState extends State<SquarePage> {
             // 关闭按钮
             Positioned(
               right: 16,
-              bottom: 16,
+              top: 16,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.black87,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: IconButton(
                   icon: const Icon(
@@ -326,5 +395,12 @@ class _SquarePageState extends State<SquarePage> {
         ),
       ),
     );
+  }
+
+  bool _onSwipe(
+      int previousIndex, int? currentIndex, CardSwiperDirection direction) {
+    print(
+        'Card swiped from index $previousIndex to $currentIndex in direction $direction');
+    return true;
   }
 }
