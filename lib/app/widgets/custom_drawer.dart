@@ -1,4 +1,5 @@
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
@@ -82,16 +83,18 @@ class CustomDrawer extends StatelessWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 30,
-                                  backgroundImage: NetworkImage(user?.avatar ?? ''),
+                                  backgroundImage:
+                                      NetworkImage(user?.avatar ?? ''),
                                 ),
                                 const SizedBox(width: 15),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                       Text(
+                                      Text(
                                         user?.nickname ?? '',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -117,24 +120,56 @@ class CustomDrawer extends StatelessWidget {
                           ],
                         ),
                       ),
-                  
-                      // 设置选项列表
+
+                      // 用户相关选项
                       Expanded(
                         child: ListView(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           children: [
-                            // 主题设置
                             _buildSettingItem(
+                              context: context,
+                              icon: Icons.edit,
+                              title: '修改资料',
+                              onTap: () => AppRoutes.to(AppRoutes.EDIT_PROFILE),
+                            ),
+                            _buildSettingItem(
+                              context: context,
+                              icon: Icons.history,
+                              title: '浏览历史',
+                              onTap: () => AppRoutes.to(AppRoutes.VIEW_HISTORY),
+                            ),
+                            _buildSettingItem(
+                              context: context,
+                              icon: Icons.bookmark,
+                              title: '我的收藏',
+                              onTap: () =>
+                                  AppRoutes.to(AppRoutes.FAVORITED_BOTTLE),
+                            ),
+                            _buildSettingItem(
+                              context: context,
+                              icon: Icons.favorite,
+                              title: '我的共鸣',
+                              onTap: () =>
+                                  AppRoutes.to(AppRoutes.RESONATED_BOTTLE),
+                            ),
+
+                            const Divider(height: 32), // 添加分隔线
+
+                            // 原有的设置选项
+                            _buildSettingItem(
+                              context: context,
                               icon: Icons.dark_mode,
                               title: 'dark_mode'.tr,
                               trailing: Switch(
                                 value: settingController.isDarkMode,
-                                onChanged: (_) => settingController.toggleTheme(),
+                                onChanged: (_) =>
+                                    settingController.toggleTheme(),
                               ),
                             ),
-                  
+
                             // 语言设置
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.language,
                               title: 'language'.tr,
                               trailing: DropdownButton<Locale>(
@@ -153,9 +188,10 @@ class CustomDrawer extends StatelessWidget {
                                 },
                               ),
                             ),
-                  
+
                             // 版本信息
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.info,
                               title: 'version'.tr,
                               trailing: const Text(
@@ -163,26 +199,30 @@ class CustomDrawer extends StatelessWidget {
                                 style: TextStyle(color: Colors.grey),
                               ),
                             ),
-                  
+
                             const Divider(),
-                  
+
                             // 其他选项
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.notifications,
                               title: '通知设置',
                               onTap: () {},
                             ),
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.security,
                               title: '隐私设置',
                               onTap: () {},
                             ),
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.help,
                               title: '帮助与反馈',
                               onTap: () {},
                             ),
                             _buildSettingItem(
+                              context: context,
                               icon: Icons.logout,
                               title: '退出登录',
                               textColor: Colors.red,
@@ -203,6 +243,7 @@ class CustomDrawer extends StatelessWidget {
   }
 
   Widget _buildSettingItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     Widget? trailing,
@@ -210,16 +251,30 @@ class CustomDrawer extends StatelessWidget {
     Color? textColor,
   }) {
     return ListTile(
-      leading: Icon(icon, color: textColor ?? Colors.grey[600]),
+      leading: Icon(
+        icon,
+        color: textColor ?? Theme.of(context).primaryColor.withOpacity(0.7),
+        size: 22,
+      ),
       title: Text(
         title,
         style: TextStyle(
-          color: textColor,
-          fontSize: 16,
+          color: textColor ?? Colors.black87,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: trailing,
+      trailing: trailing ??
+          (onTap != null
+              ? Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: Colors.grey[400],
+                )
+              : null),
       onTap: onTap,
+      dense: true, // 使列表项更紧凑
+      visualDensity: VisualDensity.compact, // 减小垂直间距
     );
   }
 }

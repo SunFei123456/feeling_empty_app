@@ -1,7 +1,6 @@
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
-
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 class HotBottlesResponse {
-  final List<BottleCardModel> bottles;
+  final List<BottleModel> bottles;
   final String timeRange;
   final int total;
   final int page;
@@ -18,12 +17,11 @@ class HotBottlesResponse {
   factory HotBottlesResponse.fromJson(Map<String, dynamic> json) {
     print('Parsing HotBottlesResponse: $json');
     return HotBottlesResponse(
-      bottles: (json['bottles'] as List?)
-          ?.map((item) {
+      bottles: (json['bottles'] as List?)?.map((item) {
             print('Parsing bottle item: $item');
-            return BottleCardModel.fromJson(item as Map<String, dynamic>);
-          })
-          .toList() ?? [],
+            return BottleModel.fromJson(item as Map<String, dynamic>);
+          }).toList() ??
+          [],
       timeRange: json['time_range'] as String? ?? 'week',
       total: json['total'] as int? ?? 0,
       page: json['page'] as int? ?? 1,

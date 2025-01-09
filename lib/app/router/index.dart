@@ -16,7 +16,6 @@ import 'package:fangkong_xinsheng/app/pages/square/index.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
-import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart';
 import 'package:fangkong_xinsheng/main.dart';
 

@@ -1,41 +1,46 @@
 import 'dart:ui';
 
-import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
+import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
-import 'package:dio/dio.dart';
-import 'package:fangkong_xinsheng/app/pages/square/api/index.dart';
-import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
+
 import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
 
+// 凡是进入到 瓶子的详情页,  走这个页面 BottleCardDetail
+// ignore: must_be_immutable
 class BottleCardDetail extends StatefulWidget {
+  final int id;
   final String imageUrl;
   final String title;
   final String content;
-  final String time;
+  final String createdAt;
   final String? audioUrl;
   final UserInfo? user;
-  final int bottleId;
-  final bool isResonated;
-  final bool isFavorited;
-  final int resonateCount;
+  bool isResonated;
+  bool isFavorited;
+  final int views;
+  int resonates;
+  final int favorites;
+  final int shares;
 
-  const BottleCardDetail({
-    Key? key,
-    required this.imageUrl,
-    required this.title,
-    required this.content,
+  BottleCardDetail({
+    super.key,
+    required this.id,
+    this.imageUrl = '',
+    this.title = '',
+    this.content = '',
     this.user,
-    required this.time,
-    this.audioUrl,
-    required this.bottleId,
+    this.createdAt = '',
+    this.audioUrl = '',
     this.isResonated = false,
     this.isFavorited = false,
-    this.resonateCount = 0,
-  }) : super(key: key);
+    this.views = 0, // 浏览数量
+    this.favorites = 0, // 收藏数量
+    this.resonates = 0, // 共振数量
+    this.shares = 0, // 分享数量
+  });
 
   @override
   State<BottleCardDetail> createState() => _BottleCardDetailState();
@@ -43,34 +48,28 @@ class BottleCardDetail extends StatefulWidget {
 
 class _BottleCardDetailState extends State<BottleCardDetail> {
   final _api = BottleInteractionApiService();
-  late bool _isResonated;
-  late bool _isFavorited;
-  late int _resonateCount;
 
   @override
   void initState() {
     super.initState();
-    _isResonated = widget.isResonated;
-    _isFavorited = widget.isFavorited;
-    _resonateCount = widget.resonateCount;
   }
 
   Future<void> _handleResonate() async {
     try {
-      if (_isResonated) {
-        final response = await _api.unresonateBottle(widget.bottleId);
+      if (widget.isResonated) {
+        final response = await _api.unresonateBottle(widget.id);
         if (response.success) {
           setState(() {
-            _isResonated = false;
-            _resonateCount--;
+            widget.isResonated = false;
+            widget.resonates--;
           });
         }
       } else {
-        final response = await _api.resonateBottle(widget.bottleId);
+        final response = await _api.resonateBottle(widget.id);
         if (response.success) {
           setState(() {
-            _isResonated = true;
-            _resonateCount++;
+            widget.isResonated = true;
+            widget.resonates++;
           });
         }
       }
@@ -81,15 +80,15 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
 
   Future<void> _handleFavorite() async {
     try {
-      if (_isFavorited) {
-        final response = await _api.unfavoriteBottle(widget.bottleId);
+      if (widget.isFavorited) {
+        final response = await _api.unfavoriteBottle(widget.id);
         if (response.success) {
-          setState(() => _isFavorited = false);
+          setState(() => widget.isFavorited = false);
         }
       } else {
-        final response = await _api.favoriteBottle(widget.bottleId);
+        final response = await _api.favoriteBottle(widget.id);
         if (response.success) {
-          setState(() => _isFavorited = true);
+          setState(() => widget.isFavorited = true);
         }
       }
     } catch (e) {
@@ -104,46 +103,71 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
         InkWell(
           onTap: _handleResonate,
           child: _buildInteractionButton(
-            _isResonated ? Icons.favorite : Icons.favorite_border,
-            _resonateCount.toString(),
-            _isResonated ? Colors.red : Colors.grey[700],
+            widget.isResonated ? Icons.favorite : Icons.favorite_border,
+            widget.resonates,
+            widget.isResonated ? Colors.red : Colors.grey[700],
           ),
         ),
-        _buildInteractionButton(
-            Icons.chat_bubble_outline, '207', Colors.grey[700]),
-        _buildInteractionButton(Icons.send, '123', Colors.grey[700]),
         InkWell(
           onTap: _handleFavorite,
           child: _buildInteractionButton(
-            _isFavorited ? Icons.bookmark : Icons.bookmark_border,
-            '',
-            _isFavorited ? Colors.blue : Colors.grey[700],
+            widget.isFavorited ? Icons.bookmark : Icons.bookmark_border,
+            widget.favorites,
+            widget.isFavorited ? Colors.blue : Colors.grey[700],
           ),
+        ),
+        InkWell(
+          onTap: () {},
+          child: _buildInteractionButton(
+              Icons.view_agenda_outlined, widget.views, Colors.grey[700]),
+        ),
+        InkWell(
+          onTap: () {},
+          child: _buildInteractionButton(
+              Icons.share, widget.shares, Colors.grey[700]),
         ),
       ],
     );
   }
 
-  Widget _buildInteractionButton(IconData icon, String count, Color? color) {
+  Widget _buildInteractionButton(IconData icon, int count, Color? color) {
     return Row(
       children: [
         Icon(icon, size: 24, color: color),
-        if (count.isNotEmpty) ...[
-          const SizedBox(width: 4),
-          Text(
-            count,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+        const SizedBox(width: 4),
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
           ),
-        ],
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // 判断瓶子类型
+    bool isImageBottle = widget.imageUrl.isNotEmpty;
+    bool isAudioBottle = widget.audioUrl != null && widget.audioUrl!.isNotEmpty;
+    bool isTextBottle = !isImageBottle && !isAudioBottle;
+
+    // 定义渐变背景颜色
+    List<Color> getGradientColors() {
+      if (isAudioBottle) {
+        return [
+          const Color(0xFFFF8C61), // 珊瑚色
+          const Color(0xFFFF6B6B), // 粉红色
+        ];
+      } else {
+        return [
+          const Color(0xFF4FACFE), // 天蓝色
+          const Color(0xFF00F2FE), // 青色
+        ];
+      }
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -170,7 +194,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
           // 主要内容
           Column(
             children: [
-              // 图片区域
+              // 图片/渐变背景区域
               Hero(
                 tag: 'bottle_card_image_${widget.imageUrl}',
                 child: Container(
@@ -181,11 +205,40 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       bottomLeft: Radius.circular(15),
                       bottomRight: Radius.circular(15),
                     ),
-                    image: DecorationImage(
-                      image: NetworkImage(widget.imageUrl),
-                      fit: BoxFit.cover,
-                    ),
                   ),
+                  child: isImageBottle
+                    ? Image.network(
+                        widget.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[100],
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image_rounded,
+                              color: Colors.grey[400],
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: getGradientColors(),
+                          ),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isAudioBottle
+                                ? Icons.audiotrack_rounded
+                                : Icons.format_quote_rounded,
+                            size: 80,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                      ),
                 ),
               ),
               const SizedBox(height: 35),
@@ -196,6 +249,37 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 类型标识
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isImageBottle
+                                  ? Icons.image
+                                  : isAudioBottle
+                                      ? Icons.audiotrack
+                                      : Icons.text_fields,
+                              color: Colors.black54,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isImageBottle ? '图片' : isAudioBottle ? '语音' : '文字',
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       // 标题
                       Text(
                         widget.title,
@@ -206,12 +290,18 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       ),
                       const SizedBox(height: 8),
 
-                      // 位置信息
+                      // 发布时间
                       Row(
                         children: [
-                          Icon(Icons.location_on,
+                          Icon(Icons.timeline,
                               size: 12, color: Colors.grey[600]),
                           const SizedBox(width: 4),
+                          Text(
+                           formatTime(widget.createdAt),
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black.withOpacity(0.7)),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -352,7 +442,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // 用户名和时间
+                      // 用户名和认证标识
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -376,13 +466,6 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            widget.time,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black.withOpacity(0.7),
-                            ),
-                          ),
                         ],
                       ),
                     ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
+import 'package:fangkong_xinsheng/app/widgets/common_bottle_card.dart';
 
 class ResonatedPage extends StatefulWidget {
   @override
@@ -48,10 +48,10 @@ class _ResonatedPageState extends State<ResonatedPage> {
           currentPage++;
         }
       } else {
-        Get.snackbar('错误', response.message ?? '获取共鸣列表失败');
+        Get.snackbar('提示', response.message ?? '获取共鸣列表失败');
       }
     } catch (e) {
-      Get.snackbar('错误', '获取共鸣列表失败');
+      Get.snackbar('提示', '获取共鸣列表失败');
     } finally {
       setState(() => isLoading = false);
     }
@@ -61,24 +61,76 @@ class _ResonatedPageState extends State<ResonatedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我的共鸣'),
+        title: const Text(
+          '我的共鸣',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
+      body: isLoading && resonatedItems.isEmpty
+          ? const Center(child: CircularProgressIndicator())
           : resonatedItems.isEmpty
               ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadResonatedItems,
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: resonatedItems.length,
-                    itemBuilder: (context, index) {
-                      final item = resonatedItems[index];
-                      return _buildBottleCard(item);
-                    },
-                  ),
+              : Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            offset: const Offset(0, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.favorite_rounded,
+                              color: Theme.of(context).primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '共 ${resonatedItems.length} 条共鸣',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () => _loadResonatedItems(refresh: true),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          itemCount: resonatedItems.length,
+                          itemBuilder: (context, index) {
+                            final item = resonatedItems[index];
+                            return CommonBottleCard(bottle: item);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
     );
   }
@@ -89,7 +141,7 @@ class _ResonatedPageState extends State<ResonatedPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.favorite_border, size: 64, color: Colors.grey[300]),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             '暂无共鸣内容',
             style: TextStyle(
@@ -101,116 +153,5 @@ class _ResonatedPageState extends State<ResonatedPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildBottleCard(ViewHistoryItem item) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () => Get.to(
-          () => BottleCardDetail(
-            bottleId: item.id,
-            imageUrl: item.imageUrl,
-            title: item.title,
-            content: item.content,
-            time: item.createdAt.toString(),
-            audioUrl: item.audioUrl,
-            user: item.user,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 缩略图
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  item.imageUrl,
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(width: 16),
-              // 内容部分
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      item.content,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 12),
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 12,
-                          backgroundImage: NetworkImage(item.user.avatar),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            item.user.nickname,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          _formatDate(item.createdAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return '今天';
-    } else if (difference.inDays == 1) {
-      return '昨天';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}天前';
-    } else {
-      return '${date.month}月${date.day}日';
-    }
   }
 } 

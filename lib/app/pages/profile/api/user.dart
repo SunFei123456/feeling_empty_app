@@ -1,8 +1,7 @@
 import 'package:fangkong_xinsheng/app/core/http/api_response.dart';
 import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
-
 class UserApiService extends BaseApiService {
   // 获取用户信息
   Future<ApiResponse<UserModel>> getUserInfo() async {
@@ -43,7 +42,7 @@ class UserApiService extends BaseApiService {
   }
 
   // 获取用户公开的漂流瓶
-  Future<ApiResponse<List<BottleCardModel>>> getBottles({
+  Future<ApiResponse<List<BottleModel>>> getBottles({
     required int userId,
     required int page,
     required int pageSize,
@@ -65,8 +64,7 @@ class UserApiService extends BaseApiService {
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
         (json) => (json as List)
-            .map((item) =>
-                BottleCardModel.fromJson(item as Map<String, dynamic>))
+            .map((item) => BottleModel.fromJson(item as Map<String, dynamic>))
             .toList(),
       );
     } catch (e) {

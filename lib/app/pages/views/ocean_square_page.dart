@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -6,7 +7,6 @@ import 'dart:math' show sin;
 import 'dart:ui';
 import 'package:fangkong_xinsheng/app/pages/views/api/ocean_api.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/ocean.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 
 class OceanSquarePage extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class OceanSquarePage extends StatefulWidget {
 class _OceanSquarePageState extends State<OceanSquarePage> {
   final OceanApiService _oceanApi = OceanApiService();
   List<Ocean> _oceans = [];
-  List<BottleCardModel> _bottles = [];
+  List<BottleModel> _bottles = [];
   Ocean? _currentOcean;
   bool _isLoading = true;
 
@@ -273,7 +273,7 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
     );
   }
 
-  void _showBottleDialog(BottleCardModel bottle) {
+  void _showBottleDialog(BottleModel bottle) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -322,7 +322,7 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
     );
   }
 
-  void _openBottle(BottleCardModel bottle) {
+  void _openBottle(BottleModel bottle) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -339,13 +339,13 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
                 Navigator.pop(context);
                 Get.to(
                   () => BottleCardDetail(
-                    bottleId: bottle.id,
+                    id: bottle.id,
                     title: bottle.title,
                     content: bottle.content,
                     imageUrl: bottle.imageUrl,
-                    time: bottle.createdAt,
+                    audioUrl: bottle.audioUrl,
+                    createdAt: bottle.createdAt,
                     user: bottle.user,
-                  
                   ),
                 );
               });

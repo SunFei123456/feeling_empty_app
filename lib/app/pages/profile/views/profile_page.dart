@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'dart:io';
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -26,14 +26,12 @@ class _ProfilePageState extends State<ProfilePage>
   late final SettingController _settingController;
   late final ProfileController _profileController;
 
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
     _profileController = Get.put(ProfileController());
-    
   }
 
   @override
@@ -212,11 +210,11 @@ class _ProfilePageState extends State<ProfilePage>
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        _buildStat('233', 'Posts'),
+                                        _buildStat('89 M', '粉丝'),
                                         _buildStatDivider(),
-                                        _buildStat('89 M', 'Followers'),
+                                        _buildStat('666', '关注'),
                                         _buildStatDivider(),
-                                        _buildStat('12', 'Following'),
+                                        _buildStat('233', '漂流瓶子'),
                                       ],
                                     ),
                                     const SizedBox(height: 20),
@@ -236,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 BorderRadius.circular(10),
                                           ),
                                         ),
-                                        child: const Text('Follow'),
+                                        child: const Text('关注'),
                                       ),
                                     ),
                                   ],
@@ -324,19 +322,18 @@ class _ProfilePageState extends State<ProfilePage>
                         }
 
                         final bottle = _profileController.publicBottles[index];
-              
 
                         return GestureDetector(
                           onTap: () {
                             Get.to(
                               () => BottleCardDetail(
-                                bottleId: bottle.id,
+                                id: bottle.id,
                                 imageUrl: bottle.imageUrl.isNotEmpty
                                     ? bottle.imageUrl
                                     : 'https://picsum.photos/500/800',
                                 title: bottle.title,
                                 content: bottle.content,
-                                time: bottle.createdAt,
+                                createdAt: bottle.createdAt,
                                 audioUrl: bottle.audioUrl,
                                 user: bottle.user,
                               ),
@@ -442,7 +439,7 @@ class _ProfilePageState extends State<ProfilePage>
                   RefreshIndicator(
                     onRefresh: _profileController.refreshPrivateBottles,
                     child: Obx(() {
-                      if (_profileController.isLoadingPrivate.value && 
+                      if (_profileController.isLoadingPrivate.value &&
                           _profileController.privateBottles.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
@@ -452,7 +449,8 @@ class _ProfilePageState extends State<ProfilePage>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.lock_outline, size: 64, color: Colors.grey[300]),
+                              Icon(Icons.lock_outline,
+                                  size: 64, color: Colors.grey[300]),
                               const SizedBox(height: 16),
                               Text(
                                 '暂无私密漂流瓶',
@@ -474,28 +472,28 @@ class _ProfilePageState extends State<ProfilePage>
                         crossAxisSpacing: 16,
                         itemCount: _profileController.privateBottles.length,
                         itemBuilder: (context, index) {
-                          final bottle = _profileController.privateBottles[index];
-                          
-                          
+                          final bottle =
+                              _profileController.privateBottles[index];
 
                           return GestureDetector(
                             onTap: () {
                               Get.to(
                                 () => BottleCardDetail(
-                                  bottleId: bottle.id,
+                                  id: bottle.id,
                                   imageUrl: bottle.imageUrl.isNotEmpty
                                       ? bottle.imageUrl
                                       : 'https://picsum.photos/500/800',
                                   title: bottle.title,
                                   content: bottle.content,
-                                  time: bottle.createdAt,
+                                  createdAt: bottle.createdAt,
                                   audioUrl: bottle.audioUrl,
                                   user: bottle.user,
                                 ),
                                 transition: Transition.fadeIn,
                               );
                             },
-                            onLongPress: () => _showBottomDrawer(context, bottle),
+                            onLongPress: () =>
+                                _showBottomDrawer(context, bottle),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
@@ -512,7 +510,8 @@ class _ProfilePageState extends State<ProfilePage>
                                 child: Stack(
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         if (bottle.imageUrl.isNotEmpty)
@@ -526,7 +525,8 @@ class _ProfilePageState extends State<ProfilePage>
                                         Padding(
                                           padding: const EdgeInsets.all(12.0),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 bottle.title,
@@ -550,7 +550,9 @@ class _ProfilePageState extends State<ProfilePage>
                                               ),
                                               const SizedBox(height: 12),
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Row(
                                                     children: [
@@ -564,13 +566,15 @@ class _ProfilePageState extends State<ProfilePage>
                                                         '${bottle.views}',
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          color: Colors.grey[400],
+                                                          color:
+                                                              Colors.grey[400],
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                   Text(
-                                                    bottle.createdAt.substring(0, 10),
+                                                    bottle.createdAt
+                                                        .substring(0, 10),
                                                     style: TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.grey[400],
@@ -594,7 +598,8 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.6),
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -720,7 +725,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   }
 
-  void _showBottomDrawer(BuildContext context, BottleCardModel bottle) {
+  void _showBottomDrawer(BuildContext context, BottleModel bottle) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

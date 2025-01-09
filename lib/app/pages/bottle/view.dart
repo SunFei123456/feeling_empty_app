@@ -7,8 +7,9 @@ import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart
 import 'dart:ui' show lerpDouble;
 
 import 'package:fangkong_xinsheng/app/router/index.dart';
-import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/widget/hot_topics.dart';
+import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
 
 class BottlePage extends StatefulWidget {
   const BottlePage({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class BottlePage extends StatefulWidget {
 
 class _BottlePageState extends State<BottlePage> {
   late final ProfileController _profileController;
+  late final TopicController _topicController;
 
   @override
   void initState() {
@@ -26,7 +28,11 @@ class _BottlePageState extends State<BottlePage> {
     if (!Get.isRegistered<ProfileController>()) {
       Get.put(ProfileController());
     }
+    if (!Get.isRegistered<TopicController>()) {
+      Get.put(TopicController());
+    }
     _profileController = Get.find<ProfileController>();
+    _topicController = Get.find<TopicController>();
   }
 
   @override
@@ -294,6 +300,12 @@ class _BottlePageState extends State<BottlePage> {
   Widget _buildQuickActions() {
     final actions = [
       {
+        'icon': Icons.local_fire_department,
+        'label': '热门',
+        'color': Colors.orange,
+        'page_url': AppRoutes.HOT_BOTTLE
+      },
+      {
         'icon': Icons.explore,
         'label': '共振',
         'color': Colors.lightGreen,
@@ -310,12 +322,6 @@ class _BottlePageState extends State<BottlePage> {
         'label': '历史',
         'color': Colors.purple,
         'page_url': AppRoutes.VIEW_HISTORY
-      },
-      {
-        'icon': Icons.local_fire_department,
-        'label': '热门',
-        'color': Colors.orange,
-        'page_url': AppRoutes.HOT_BOTTLE
       },
     ];
 
@@ -356,81 +362,7 @@ class _BottlePageState extends State<BottlePage> {
   }
 
   Widget _buildHotTopics() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '热门话题',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
-        ),
-        const SizedBox(height: 15),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Get.to(
-                    () => TopicDetailPage(
-                      topicName: '#话题${index + 1}',
-                      bottleCount: Random().nextInt(1000),
-                    ),
-                    transition: Transition.rightToLeft,
-                  );
-                },
-                child: Container(
-                  width: 200,
-                  margin: const EdgeInsets.only(right: 15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.blue[400]!.withOpacity(0.8),
-                        Colors.purple[300]!.withOpacity(0.6),
-                      ],
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        bottom: 15,
-                        left: 15,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '#话题${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '${Random().nextInt(1000)}条内容',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
+    return HotTopicsWidget();
   }
 
   Widget _buildRecentBottles() {
@@ -515,11 +447,11 @@ class _BottlePageState extends State<BottlePage> {
           onTap: () {
             Get.to(
               () => BottleCardDetail(
-                bottleId: index,
+                id: index,
                 imageUrl: bottleData['imageUrl']!,
                 title: bottleData['title']!,
                 content: bottleData['subtitle']!,
-                time: bottleData['time']!,
+                createdAt: bottleData['time']!,
               ),
               transition: Transition.fadeIn,
             );

@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/api/user.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 import 'package:fangkong_xinsheng/app/core/services/upload_service.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 
 class ProfileController extends GetxController {
   final _userApi = UserApiService();
@@ -11,8 +11,8 @@ class ProfileController extends GetxController {
   final user = Rxn<UserModel>();
   final isLoading = false.obs;
   final isLoadingPrivate = false.obs;
-  final publicBottles = <BottleCardModel>[].obs;
-  final privateBottles = <BottleCardModel>[].obs;
+  final publicBottles = <BottleModel>[].obs;
+  final privateBottles = <BottleModel>[].obs;
   final hasMoreBottles = true.obs;
   final currentPage = 1.obs;
   final pageSize = 10;

@@ -1,4 +1,5 @@
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
+
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
@@ -76,7 +77,8 @@ class HotBottlesPage extends GetView<BottleController> {
 
   Widget _buildBottleGrid(String timeRange) {
     return Obx(() {
-      if (controller.isLoadingHotBottles.value && controller.hotBottles.isEmpty) {
+      if (controller.isLoadingHotBottles.value &&
+          controller.hotBottles.isEmpty) {
         return const Center(child: CircularProgressIndicator());
       }
 
@@ -109,18 +111,18 @@ class HotBottlesPage extends GetView<BottleController> {
     });
   }
 
-  Widget _buildHotBottleCard(BottleCardModel bottle) {
+  Widget _buildHotBottleCard(BottleModel bottle) {
     return GestureDetector(
       onTap: () {
         Get.to(
           () => BottleCardDetail(
-            bottleId: bottle.id,
+            id: bottle.id,
             imageUrl: bottle.imageUrl.isEmpty
                 ? 'https://picsum.photos/500/800'
                 : bottle.imageUrl,
             title: bottle.title.isNotEmpty ? bottle.title : bottle.mood,
             content: bottle.content,
-            time: bottle.createdAt,
+            createdAt: bottle.createdAt,
             audioUrl: bottle.audioUrl,
             user: UserInfo(
               id: bottle.user.id,

@@ -1,6 +1,9 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'dart:math';
 
 import 'package:fangkong_xinsheng/app/router/index.dart';
@@ -8,11 +11,13 @@ import 'package:fangkong_xinsheng/app/router/index.dart';
 class TopicDetailPage extends StatefulWidget {
   final String topicName;
   final int bottleCount;
+  final int topicId;
 
   const TopicDetailPage({
     Key? key,
     required this.topicName,
     required this.bottleCount,
+    required this.topicId,
   }) : super(key: key);
 
   @override
@@ -23,6 +28,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   late final PageController _pageController;
+  final TopicController _topicController = Get.find<TopicController>();
 
   @override
   void initState() {
@@ -32,7 +38,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
       vsync: this,
     );
     _pageController = PageController();
-
+    _topicController.initTopicDetail(widget.topicId);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         _pageController.animateToPage(
@@ -88,9 +94,8 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20)),
                                 child: Icon(
                                   Icons.tag,
                                   size: 40,
@@ -102,23 +107,45 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      widget.topicName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      '这是一个关于${widget.topicName}的话题，在这里分享你的故事...',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
-                                        fontSize: 13,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                                    Obx(
+                                      () => _topicController
+                                              .isDetailLoading.value
+                                          ? const Center(
+                                              child:
+                                                  CircularProgressIndicator())
+                                          : Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Obx(() => Text(
+                                                      _topicController
+                                                          .topicDetail
+                                                          .value
+                                                          .title,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    )),
+                                                const SizedBox(height: 8),
+                                                Obx(() => Text(
+                                                      _topicController
+                                                          .topicDetail
+                                                          .value
+                                                          .desc,
+                                                      style: TextStyle(
+                                                        color: Colors.white
+                                                            .withOpacity(0.9),
+                                                        fontSize: 13,
+                                                      ),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    )),
+                                              ],
+                                            ),
                                     ),
                                   ],
                                 ),
@@ -143,25 +170,33 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                           ),
                           child: Row(
                             children: [
-                              _buildStatItem(
-                                value: '${widget.bottleCount}',
-                                label: '内容',
-                              ),
+                              Obx(() => _buildStatItem(
+                                    value:
+                                        '${_topicController.topicDetail.value.contentCount}',
+                                    label: '内容',
+                                  )),
                               const SizedBox(width: 30),
-                              _buildStatItem(
-                                value: '${Random().nextInt(1000)}',
-                                label: '参与',
-                              ),
+                              Obx(() => _buildStatItem(
+                                    value:
+                                        '${_topicController.topicDetail.value.participantCount}',
+                                    label: '参与',
+                                  )),
                               const SizedBox(width: 30),
-                              _buildStatItem(
-                                value: '${Random().nextInt(10000)}',
-                                label: '浏览',
-                              ),
+                              Obx(() => _buildStatItem(
+                                    value:
+                                        '${_topicController.topicDetail.value.views}',
+                                    label: '浏览',
+                                  )),
                               const Spacer(),
                               ElevatedButton(
                                 onPressed: () {
-                                  AppRoutes.to(AppRoutes.WRITE_BOTTLE,
-                                      arguments: {'topic': widget.topicName});
+                                  Get.to(
+                                    () => WriteBottlePage(
+                                      defaultTopic: _topicController
+                                          .topicDetail.value.title,
+                                      defaultTopicId: widget.topicId,
+                                    ),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -201,9 +236,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                   isScrollable: true,
                   labelColor: isDark ? Colors.white : Colors.black,
                   labelStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 14, fontWeight: FontWeight.bold),
                   unselectedLabelColor: isDark ? Colors.grey[600] : Colors.grey,
                   indicatorColor: isDark ? Colors.white : Colors.black,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -224,6 +257,12 @@ class _TopicDetailPageState extends State<TopicDetailPage>
           controller: _pageController,
           onPageChanged: (index) {
             _tabController.animateTo(index);
+            // 根据选中的 tab 刷新数据
+            if (index == 0) {
+              _topicController.loadTopicBottles(widget.topicId, isHot: true);
+            } else {
+              _topicController.loadTopicBottles(widget.topicId, isHot: false);
+            }
           },
           children: [
             _buildBottleList(true),
@@ -235,41 +274,58 @@ class _TopicDetailPageState extends State<TopicDetailPage>
   }
 
   Widget _buildBottleList(bool isHotTab) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        final bottleData = {
-          'title': '${widget.topicName}下的作品 ${index + 1}',
-          'subtitle': '这是一段关于${widget.topicName}的故事...',
-          'time': isHotTab
-              ? '${Random().nextInt(30) + 1}天前'
-              : '2024-03-${10 + index}',
-          'location': '来自未知的海域',
-          'imageUrl': 'https://picsum.photos/500/800?random=$index',
-        };
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: _buildBottleCard(context, bottleData),
-        );
-      },
-    );
+    return Obx(() => ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: _topicController.bottles.length,
+          itemBuilder: (context, index) {
+            final bottle = _topicController.bottles[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: _buildBottleCard(context, bottle),
+            );
+          },
+        ));
   }
 
-  Widget _buildBottleCard(
-      BuildContext context, Map<String, String> bottleData) {
+  Widget _buildBottleCard(BuildContext context, BottleModel bottle) {
+    // 判断瓶子类型
+    bool isImageBottle = bottle.imageUrl.isNotEmpty;
+    bool isAudioBottle = bottle.audioUrl.isNotEmpty;
+    bool isTextBottle = !isImageBottle && !isAudioBottle;
+
+    // 定义渐变背景颜色
+    List<Color> getGradientColors() {
+      if (isAudioBottle) {
+        return [
+          const Color(0xFFFF8C61), // 珊瑚色
+          const Color(0xFFFF6B6B), // 粉红色
+          const Color(0xFFFF5F6D), // 玫瑰色
+        ];
+      } else {
+        return [
+          const Color(0xFF4FACFE), // 天蓝色
+          const Color(0xFF00F2FE), // 青色
+          const Color(0xFF00DBDE), // 蓝绿色
+        ];
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         Get.to(
           () => BottleCardDetail(
-            bottleId: bottleData['id'] == null ? 0 : int.parse(bottleData['id']!),
-            imageUrl: bottleData['imageUrl']!,
-            title: bottleData['title']!,
-            content: bottleData['subtitle']!,
-            time: bottleData['time']!,
+            id: bottle.id,
+            title: bottle.title,
+            content: bottle.content,
+            imageUrl: bottle.imageUrl,
+            audioUrl: bottle.audioUrl,
+            createdAt: bottle.createdAt,
+            user: bottle.user,
+            views: bottle.views,
+            resonates: bottle.resonates,
+            isResonated: bottle.isResonated,
+            isFavorited: bottle.isFavorited,
           ),
-          transition: Transition.fadeIn,
         );
       },
       child: Container(
@@ -288,7 +344,6 @@ class _TopicDetailPageState extends State<TopicDetailPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 图片
             Expanded(
               flex: 7,
               child: Container(
@@ -296,22 +351,85 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(15),
                   ),
-                  image: DecorationImage(
-                    image: NetworkImage(bottleData['imageUrl']!),
-                    fit: BoxFit.cover,
-                  ),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // 背景
+                    if (isImageBottle)
+                      Image.network(
+                        bottle.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.error),
+                      )
+                    else
+                      // 纯色渐变背景
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: getGradientColors(),
+                          ),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isAudioBottle
+                                ? Icons.audiotrack
+                                : Icons.format_quote_rounded,
+                            size: 48,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                      ),
+
+                    // 渐变遮罩
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.center,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // 类型标识
+                    Positioned(
+                      left: 16,
+                      top: 16,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          isImageBottle
+                              ? Icons.image
+                              : isAudioBottle
+                                  ? Icons.audiotrack
+                                  : Icons.text_fields,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            // 内容区域
             Container(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 标题
                   Text(
-                    bottleData['title']!,
+                    bottle.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -321,7 +439,6 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // 底部数据 - 只显示时间和浏览量
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -334,7 +451,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            bottleData['time']!,
+                            bottle.createdAt,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[500],
@@ -351,7 +468,21 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${Random().nextInt(999)}',
+                            '${bottle.views}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(
+                            Icons.favorite_border,
+                            size: 16,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${bottle.resonates}',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[500],

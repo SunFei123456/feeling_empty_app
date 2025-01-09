@@ -1,10 +1,10 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/square/api/index.dart';
-import 'package:fangkong_xinsheng/app/pages/square/model/bottle_card.dart';
 
 class SquareController extends GetxController {
   final _squareApi = SquareApiService();
-  final bottles = <BottleCardModel>[].obs;
+  final bottles = <BottleModel>[].obs;
   final isLoading = false.obs;
 
   @override

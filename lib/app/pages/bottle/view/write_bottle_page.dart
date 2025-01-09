@@ -1,5 +1,6 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/index.dart';
+import 'package:fangkong_xinsheng/app/pages/views/api/topic_api.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/ocean.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +16,14 @@ import 'package:fangkong_xinsheng/app/pages/views/api/ocean_api.dart';
 enum BottleType { text, image, audio }
 
 class WriteBottlePage extends StatefulWidget {
-  const WriteBottlePage({Key? key}) : super(key: key);
+  final String? defaultTopic;
+  final int? defaultTopicId;
+
+  const WriteBottlePage({
+    Key? key,
+    this.defaultTopic,
+    this.defaultTopicId,
+  }) : super(key: key);
 
   @override
   State<WriteBottlePage> createState() => _WriteBottlePageState();
@@ -25,11 +33,11 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   final _contentController = TextEditingController();
   final _titleController = TextEditingController();
   BottleType _selectedType = BottleType.text;
-  
+
   // 图片相关
   final _imagePicker = ImagePicker();
   XFile? _selectedImage;
-  
+
   // 录音相关
   final _audioRecorder = AudioRecorder();
   final _audioPlayer = AudioPlayer();
@@ -46,11 +54,16 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   final OceanApiService _oceanApi = OceanApiService();
   List<Ocean> _oceans = [];
   Ocean? _selectedOcean;
+  int? _selectedTopicId;
 
   @override
   void initState() {
     super.initState();
     _loadOceans();
+    if (widget.defaultTopic != null) {
+      _selectedTopic = widget.defaultTopic;
+      _selectedTopicId = widget.defaultTopicId;
+    }
   }
 
   Future<void> _loadOceans() async {
@@ -59,9 +72,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       if (response.success && response.data != null) {
         setState(() {
           _oceans = response.data!;
-          if (_oceans.isNotEmpty) {
-            _selectedOcean = _oceans.first; // 可选：默认选择第一个海域
-          }
+          _selectedOcean = _oceans.first;
         });
       } else {
         print('加载海域失败: ${response.message}');
@@ -460,14 +471,54 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
 
   Widget _buildMoodTags(bool isDark) {
     final List<Map<String, dynamic>> moods = [
-      {'emoji': '😊', 'label': '开心', 'value': BottleMood.happy.name, 'color': Colors.yellow},
-      {'emoji': '😢', 'label': '难过', 'value': BottleMood.sad.name, 'color': Colors.blue},
-      {'emoji': '🤔', 'label': '思考', 'value': BottleMood.thinking.name, 'color': Colors.purple},
-      {'emoji': '😠', 'label': '生气', 'value': BottleMood.angry.name, 'color': Colors.red},
-      {'emoji': '🥳', 'label': '期待', 'value': BottleMood.excited.name, 'color': Colors.orange},
-      {'emoji': '😴', 'label': '疲惫', 'value': BottleMood.tired.name, 'color': Colors.grey},
-      {'emoji': '🥰', 'label': '喜欢', 'value': BottleMood.love.name, 'color': Colors.pink},
-      {'emoji': '😮', 'label': '惊讶', 'value': BottleMood.surprised.name, 'color': Colors.green},
+      {
+        'emoji': '😊',
+        'label': '开心',
+        'value': BottleMood.happy.name,
+        'color': Colors.yellow
+      },
+      {
+        'emoji': '😢',
+        'label': '难过',
+        'value': BottleMood.sad.name,
+        'color': Colors.blue
+      },
+      {
+        'emoji': '🤔',
+        'label': '思考',
+        'value': BottleMood.thinking.name,
+        'color': Colors.purple
+      },
+      {
+        'emoji': '😠',
+        'label': '生气',
+        'value': BottleMood.angry.name,
+        'color': Colors.red
+      },
+      {
+        'emoji': '🥳',
+        'label': '期待',
+        'value': BottleMood.excited.name,
+        'color': Colors.orange
+      },
+      {
+        'emoji': '😴',
+        'label': '疲惫',
+        'value': BottleMood.tired.name,
+        'color': Colors.grey
+      },
+      {
+        'emoji': '🥰',
+        'label': '喜欢',
+        'value': BottleMood.love.name,
+        'color': Colors.pink
+      },
+      {
+        'emoji': '😮',
+        'label': '惊讶',
+        'value': BottleMood.surprised.name,
+        'color': Colors.green
+      },
     ];
 
     return Column(
@@ -486,16 +537,15 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            childAspectRatio: 1,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
+              crossAxisCount: 4,
+              childAspectRatio: 1,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12),
           itemCount: moods.length,
           itemBuilder: (context, index) {
             final mood = moods[index];
             final isSelected = _selectedMood == mood['label'];
-            
+
             return GestureDetector(
               onTap: () {
                 setState(() {
@@ -552,7 +602,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         color: isSelected
                             ? mood['color']
                             : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -566,11 +617,27 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   }
 
   Widget _buildTopicSelector(bool isDark) {
-    final List<String> predefinedTopics = [
-      '日常生活', '学习心得', '职场故事', 
-      '恋爱物语', '美食分享', '旅行记录',
-      '深夜感悟', '趣事分享', '音乐推荐',
+    List<Map<String, dynamic>> predefinedTopics = [
+      {"id": 1, "title": "日常生活"},
+      {"id": 2, "title": "学习心得"},
+      {"id": 3, "title": "职场故事"},
+      {"id": 4, "title": "恋爱物语"},
+      {"id": 5, "title": "美食分享"},
+      {"id": 6, "title": "旅行记录"},
+      {"id": 7, "title": "深夜感悟"},
+      {"id": 8, "title": "趣事分享"},
+      {"id": 9, "title": "音乐推荐"},
     ];
+
+    if (widget.defaultTopic != null && widget.defaultTopicId != null) {
+      if (!predefinedTopics
+          .any((topic) => topic['id'] == widget.defaultTopicId)) {
+        predefinedTopics.add({
+          "id": widget.defaultTopicId!,
+          "title": widget.defaultTopic!,
+        });
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,7 +680,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         ),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+                            color:
+                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
                           ),
                         ),
                       ),
@@ -629,11 +697,22 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_customTopicController.text.isNotEmpty) {
-                            setState(() {
-                              _selectedTopic = _customTopicController.text;
-                            });
+                            // 调取接口
+                            final res = await TopicApiService()
+                                .createTopic(_customTopicController.text);
+
+                            if (res.success) {
+                              Get.snackbar('成功', '话题添加成功');
+
+                              setState(() {
+                                _selectedTopic = _customTopicController.text;
+                                _selectedTopicId = res.data['id'];
+                              });
+                            } else {
+                              Get.snackbar('失败', '话题添加失败');
+                            }
                             _customTopicController.clear();
                             Navigator.pop(context);
                           }
@@ -666,11 +745,13 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         ),
         const SizedBox(height: 16),
         Wrap(
-          spacing: 8,
+          spacing: 12,
           runSpacing: 8,
           children: [
             ...predefinedTopics.map((topic) => _buildTopicChip(topic, isDark)),
-            if (_selectedTopic != null && !predefinedTopics.contains(_selectedTopic))
+            if (_selectedTopic != null &&
+                !predefinedTopics
+                    .any((topic) => topic['title'] == _selectedTopic))
               _buildTopicChip(_selectedTopic!, isDark),
           ],
         ),
@@ -678,12 +759,15 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     );
   }
 
-  Widget _buildTopicChip(String topic, bool isDark) {
-    final isSelected = _selectedTopic == topic;
+  Widget _buildTopicChip(dynamic topic, bool isDark) {
+    final String topicTitle =
+        topic is Map ? topic['title'] as String : topic as String;
+    final isSelected = _selectedTopic == topicTitle;
+
     return FilterChip(
       selected: isSelected,
       showCheckmark: false,
-      label: Text(topic),
+      label: Text(topicTitle),
       labelStyle: TextStyle(
         color: isSelected
             ? (isDark ? Colors.blue[200] : Colors.blue)
@@ -691,7 +775,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         fontSize: 14,
       ),
       backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
-      selectedColor: isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+      selectedColor:
+          isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
       side: BorderSide(
         color: isSelected
             ? (isDark ? Colors.blue[700]! : Colors.blue[200]!)
@@ -700,7 +785,9 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       onSelected: (selected) {
         setState(() {
-          _selectedTopic = selected ? topic : null;
+          _selectedTopic = selected ? topicTitle : null;
+          _selectedTopicId =
+              selected && topic is Map ? topic['id'] as int : null;
         });
         HapticFeedback.lightImpact();
       },
@@ -758,7 +845,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       } else {
         await _audioPlayer.play(DeviceFileSource(_recordedFilePath!));
         setState(() => _isPlaying = true);
-        
+
         _audioPlayer.onPlayerComplete.listen((event) {
           setState(() => _isPlaying = false);
         });
@@ -783,8 +870,8 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   }
 
   void _handleSubmit() async {
-    if (_contentController.text.isEmpty && 
-        _selectedImage == null && 
+    if (_contentController.text.isEmpty &&
+        _selectedImage == null &&
         _recordedFilePath == null) {
       Get.snackbar('提示', '请输入内容或添加媒体文件');
       return;
@@ -832,7 +919,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         audioUrl: audioUrl,
         mood: _selectedMood!,
         isPublic: _isPublic,
-        topicId: null,
+        topicId: _selectedTopicId,
         title: _titleController.text,
         oceanId: _selectedOcean!.id,
       );
@@ -908,7 +995,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                   itemBuilder: (context, index) {
                     final ocean = _oceans[index];
                     final isSelected = _selectedOcean?.id == ocean.id;
-                    
+
                     return GestureDetector(
                       onTap: () {
                         setState(() => _selectedOcean = ocean);
@@ -934,23 +1021,31 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,
-                                loadingBuilder: (context, child, loadingProgress) {
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
                                     child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                          : null,
-                                    ),
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null),
                                   );
                                 },
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
-                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                                    color: isDark
+                                        ? Colors.grey[800]
+                                        : Colors.grey[200],
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: isDark ? Colors.grey[600] : Colors.grey[400],
+                                      color: isDark
+                                          ? Colors.grey[600]
+                                          : Colors.grey[400],
                                     ),
                                   );
                                 },
@@ -1011,4 +1106,4 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       ],
     );
   }
-} 
+}
