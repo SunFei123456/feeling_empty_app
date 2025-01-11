@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
+
 class UserModel {
   final int id;
   final String nickname;
@@ -54,4 +56,7 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  // 是否是当前用户
+  bool get isCurrentUser => id == TokenService().getUserId();
 } 

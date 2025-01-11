@@ -6,6 +6,10 @@ import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 import 'package:fangkong_xinsheng/app/core/services/upload_service.dart';
 
 class ProfileController extends GetxController {
+  final int? userId;
+
+  ProfileController({this.userId});
+
   final _userApi = UserApiService();
   final _uploadService = UploadService();
   final user = Rxn<UserModel>();
@@ -20,7 +24,11 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUserInfo();
+    if (userId != null) {
+      loadUserProfile(userId!);
+    } else {
+      loadCurrentUserProfile();
+    }
 
     // 获取用户信息成功后再获取漂流瓶
     ever(user, (value) {
@@ -29,6 +37,37 @@ class ProfileController extends GetxController {
         fetchPrivateBottles(refresh: true);
       }
     });
+  }
+
+  Future<void> loadUserProfile(int userId) async {
+    // 加载指定用户资料的逻辑
+    getUserInfoByUid(userId);
+  }
+
+  Future<void> loadCurrentUserProfile() async {
+    // 加载当前用户资料的逻辑
+    fetchUserInfo();
+  }
+
+  // 根据uid 获取用户信息
+  Future<void> getUserInfoByUid(int uid) async {
+    try {
+      isLoading.value = true;
+      final response = await _userApi.getUserInfoByUid(uid);
+
+      if (response.success) {
+        user.value = response.data;
+        // 获取用户信息成功后再获取漂流瓶
+        await fetchPublicBottles(refresh: true);
+      } else {
+        Get.snackbar('错误', response.message ?? '获取用户信息失败');
+      }
+    } catch (e) {
+      print('Fetch user info error: $e');
+      Get.snackbar('错误', '获取用户信息失败');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // 获取用户信息
@@ -86,17 +125,38 @@ class ProfileController extends GetxController {
       );
 
       if (response.success) {
-        await fetchUserInfo(); // 更新成功后重新获取用户信息
+        // 直接更新本地用户数据
+        if (user.value != null) {
+          user.value = user.value!.copyWith(
+            nickname: nickname ?? user.value!.nickname,
+            avatar: avatar ?? user.value!.avatar,
+            sex: sex ?? user.value!.sex,
+          );
+        }
         Get.snackbar('成功', '更新用户信息成功');
       } else {
         Get.snackbar('错误', response.message ?? '更新用户信息失败');
+        throw Exception(response.message);
       }
     } catch (e) {
       print('Update user info error: $e');
       Get.snackbar('错误', '更新用户信息失败');
+      rethrow;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // 刷新用户信息
+  Future<void> refreshUserInfo() async {
+    if (userId != null) {
+      await loadUserProfile(userId!);
+    } else {
+      await loadCurrentUserProfile();
+    }
+    // 同时刷新漂流瓶列表
+    await refreshBottles();
+    await refreshPrivateBottles();
   }
 
   // 获取用户公开的漂流瓶

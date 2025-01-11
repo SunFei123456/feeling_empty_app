@@ -1,40 +1,55 @@
 import 'dart:io';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  final String? tag;
+
+  const EditProfilePage({
+    Key? key,
+    this.tag = 'current_user',
+  }) : super(key: key);
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _profileController = Get.find<ProfileController>();
+  late final ProfileController _profileController;
   final _nicknameController = TextEditingController();
   int _selectedSex = 0;
+  String? _tempAvatarUrl; // 临时头像地址
 
   @override
   void initState() {
     super.initState();
+    // 使用 tag 查找正确的 controller 实例
+    _profileController = Get.find<ProfileController>(tag: widget.tag);
+
+    // 初始化表单数据
     _nicknameController.text = _profileController.user.value?.nickname ?? '';
     _selectedSex = _profileController.user.value?.sex ?? 0;
+    _tempAvatarUrl = _profileController.user.value?.avatar;
   }
 
   @override
   void dispose() {
+    // 释放资源
     _nicknameController.dispose();
     super.dispose();
   }
 
   void _showImagePickerBottomSheet() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -45,51 +60,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: isDark ? Colors.white24 : Colors.grey[300],
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.photo_camera, color: Colors.blue),
-              ),
-              title: const Text('拍照'),
-              subtitle: const Text('使用相机拍摄新照片'),
+            _buildPickerOption(
+              icon: Icons.photo_camera,
+              title: '拍照',
+              subtitle: '使用相机拍摄新照片',
+              color: Colors.blue,
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.camera);
               },
+              isDark: isDark,
             ),
             const SizedBox(height: 8),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.photo_library, color: Colors.green),
-              ),
-              title: const Text('从相册选择'),
-              subtitle: const Text('从手机相册中选择照片'),
+            _buildPickerOption(
+              icon: Icons.photo_library,
+              title: '从相册选择',
+              subtitle: '从手机相册中选择照片',
+              color: Colors.green,
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.gallery);
               },
+              isDark: isDark,
             ),
             const SizedBox(height: 16),
           ],
         ),
       ),
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
     );
   }
 
@@ -104,9 +107,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
 
       if (image != null) {
-        final String? uploadedUrl = await _profileController.uploadAvatar(File(image.path));
+        final String? uploadedUrl =
+            await _profileController.uploadAvatar(File(image.path));
         if (uploadedUrl != null) {
-          await _profileController.updateUserInfo(avatar: uploadedUrl);
+          setState(() {
+            _tempAvatarUrl = uploadedUrl;
+          });
         }
       }
     } catch (e) {
@@ -117,42 +123,70 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _saveProfile() async {
     try {
+      // 显示加载状态
+      setState(() => _profileController.isLoading.value = true);
+      
       await _profileController.updateUserInfo(
+        avatar: _tempAvatarUrl,
         nickname: _nicknameController.text,
         sex: _selectedSex,
       );
-      Get.back();
+
+      // 确保更新成功后再返回
+      await _profileController.fetchUserInfo();
+      
+      // 使用 AppRoutes.back 而不是 Get.back
+      AppRoutes.back(result: true);
     } catch (e) {
       print('Save profile error: $e');
       Get.snackbar('错误', '保存失败');
+    } finally {
+      // 恢复加载状态
+      setState(() => _profileController.isLoading.value = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
-        title: const Text('编辑个人资料'),
+        title: Text(
+          '修改信息',
+          style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Colors.black,
+        ),
         actions: [
           TextButton.icon(
             onPressed: _saveProfile,
-            icon: const Icon(Icons.check),
-            label: const Text('保存'),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.blue,
+            label: Text(
+              '保存',
+              style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
             ),
           ),
         ],
       ),
       body: Obx(() {
-        final user = _profileController.user.value;
         final isLoading = _profileController.isLoading.value;
 
         if (isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
+          );
         }
 
         return SingleChildScrollView(
@@ -172,21 +206,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: user?.avatar != null && user!.avatar.isNotEmpty
-                                ? NetworkImage(user.avatar)
-                                : const AssetImage('assets/images/avatar.jpg') as ImageProvider,
+                            image: _tempAvatarUrl != null &&
+                                    _tempAvatarUrl!.isNotEmpty
+                                ? NetworkImage(_tempAvatarUrl!)
+                                : const AssetImage('assets/images/avatar.jpg')
+                                    as ImageProvider,
                             fit: BoxFit.cover,
                           ),
                           border: Border.all(
-                            color: Colors.white,
+                            color: isDark ? Colors.white24 : Colors.orange,
                             width: 4,
                           ),
                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
+                            if (!isDark)
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
                           ],
                         ),
                       ),
@@ -195,21 +232,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       right: 0,
                       bottom: 0,
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: isDark ? Colors.white24 : Colors.black87,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
+                          border: Border.all(
+                            color: isDark ? Colors.black87 : Colors.white,
+                            width: 3,
+                          ),
                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                            ),
+                            if (!isDark)
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                              ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.camera_alt,
-                          color: Colors.white,
+                          color: isDark ? Colors.black87 : Colors.white,
                           size: 20,
                         ),
                       ),
@@ -225,25 +266,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: isDark ? Colors.white70 : Colors.grey[800],
                 ),
               ),
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color:
+                      isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
                   controller: _nicknameController,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                   decoration: InputDecoration(
                     hintText: '请输入昵称',
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.5)
+                          : Colors.grey[500],
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.person_outline),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: isDark ? Colors.white70 : Colors.grey[600],
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
                   ),
                 ),
               ),
@@ -255,7 +311,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
+                  color: isDark ? Colors.white70 : Colors.grey[800],
                 ),
               ),
               const SizedBox(height: 16),
@@ -267,6 +323,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       label: '男生',
                       value: 1,
                       color: Colors.blue,
+                      isDark: isDark,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -276,6 +333,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       label: '女生',
                       value: 2,
                       color: Colors.pink,
+                      isDark: isDark,
                     ),
                   ),
                 ],
@@ -292,6 +350,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required String label,
     required int value,
     required Color color,
+    required bool isDark,
   }) {
     final isSelected = _selectedSex == value;
     return GestureDetector(
@@ -300,10 +359,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
+          color: isSelected
+              ? (isDark ? color.withOpacity(0.2) : color.withOpacity(0.1))
+              : (isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : Colors.transparent,
+            color: isSelected
+                ? (isDark ? color.withOpacity(0.5) : color)
+                : Colors.transparent,
             width: 2,
           ),
         ),
@@ -312,13 +375,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Icon(
               icon,
               size: 32,
-              color: isSelected ? color : Colors.grey,
+              color: isSelected
+                  ? (isDark ? color.withOpacity(0.9) : color)
+                  : (isDark ? Colors.white38 : Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? color : Colors.grey[600],
+                color: isSelected
+                    ? (isDark ? color.withOpacity(0.9) : color)
+                    : (isDark ? Colors.white38 : Colors.grey[600]),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -327,4 +394,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
-} 
+
+  Widget _buildPickerOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isDark ? color.withOpacity(0.2) : color.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: color),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          color: isDark ? Colors.white60 : Colors.grey[600],
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}

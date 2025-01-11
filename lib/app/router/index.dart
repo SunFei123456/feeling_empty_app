@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/favorite_page.dart';
@@ -121,7 +122,7 @@ class AppRoutes {
     // 我的
     AppRoute(
       name: '/profile',
-      page: () => ProfilePage(),
+      page: () => const ProfilePage(),
     ),
 
     // ----------------------------------- 二级页面-----------------------------------
@@ -213,5 +214,8 @@ class AppRoutes {
     Get.back<T>(result: result);
   }
 
-  static const INITIAL = AppRoutes.login; // 设置初始路由为登录页
+  static String get INITIAL {
+    final token = TokenService().getToken();
+    return token != null && token.isNotEmpty ? home : login;
+  }
 }

@@ -13,39 +13,92 @@ class LoginController extends GetxController {
   final verificationCodeController = TextEditingController();
   final isLoading = false.obs;
   final countdownSeconds = 0.obs;
-  final canSendCode = true.obs; // 是是否可以发送验证码
+  final canSendCode = true.obs;
   Timer? _timer;
+  bool _isDisposed = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _isDisposed = false;
+  }
 
   @override
   void onClose() {
-    qqController.dispose();
-    verificationCodeController.dispose();
+    _isDisposed = true;
     _timer?.cancel();
+    if (!_isDisposed) {
+      qqController.dispose();
+      verificationCodeController.dispose();
+    }
     super.onClose();
   }
 
-  // 开始倒计时
-  void startCountdown() {
-    countdownSeconds.value = 60;
-    canSendCode.value = false;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (countdownSeconds.value > 0) {
-        countdownSeconds.value--;
-      } else {
-        timer.cancel();
-        canSendCode.value = true;
+  Future<void> login() async {
+    if (_isDisposed) return;
+
+    final qq = qqController.text.trim();
+    final code = verificationCodeController.text.trim();
+
+    if (qq.isEmpty) {
+      Get.snackbar('提示', '请输入邮箱');
+      return;
+    }
+
+    if (code.isEmpty) {
+      Get.snackbar('提示', '请输入验证码');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final response = await LoginApiService().qqLogin(qq, code);
+
+      if (_isDisposed) {
+        isLoading.value = false;
+        return;
       }
-    });
+
+      if (response.success && response.data != null) {
+        final loginResponse = response.data!;
+        isLoading.value = false;
+
+        // 存储token
+        await Future.wait([
+          TokenService().saveToken(loginResponse.token),
+          TokenService().saveUserId(loginResponse.user.id),
+        ]);
+
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        isLoading.value = false;
+
+        if (!_isDisposed) {
+          verificationCodeController.clear();
+        }
+        Get.snackbar(
+          '提示',
+          response.message ?? '验证码错误，请重新输入',
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      print('登录失败: $e');
+      isLoading.value = false;
+      if (_isDisposed) return;
+      Get.snackbar('提示', '登录失败，请稍后重试');
+    }
   }
 
   Future<void> sendVerificationCode() async {
+    if (_isDisposed) return;
+
     final qq = qqController.text.trim();
     if (qq.isEmpty) {
       Get.snackbar('提示', '请输入QQ邮箱');
       return;
     }
 
-    // qq邮箱正则表达式
     final qqRegExp = RegExp(r'^[1-9]\d{4,10}@qq\.com$');
     if (!qqRegExp.hasMatch(qq)) {
       Get.snackbar('提示', '请输入正确的QQ邮箱');
@@ -55,61 +108,39 @@ class LoginController extends GetxController {
     try {
       final response = await LoginApiService().sendQqEmailCode(qq);
 
+      if (_isDisposed) return;
+
       if (response.success) {
-        // 检查响应是否成功
-        startCountdown(); // 成功后开始倒计时
+        startCountdown();
         Get.snackbar('提示', '验证码已发送');
       } else {
         Get.snackbar('提示', response.message ?? '发送验证码失败');
       }
     } catch (e) {
       print('发送验证码失败: $e');
-      Get.snackbar('错误', '发送验证码失败');
+      if (!_isDisposed) {
+        Get.snackbar('提示', '发送验证码失败');
+      }
     }
   }
 
-  Future<void> login() async {
-    final qq = qqController.text.trim();
-    final code = verificationCodeController.text.trim();
+  void startCountdown() {
+    if (_isDisposed) return;
 
-    if (qq.isEmpty || code.isEmpty) {
-      Get.snackbar('提示', '请填写完整信息');
-      return;
-    }
-
-    isLoading.value = true;
-    try {
-      final response = await LoginApiService().qqLogin(qq, code);
-
-      if (response.success && response.data != null) {
-        final loginResponse = response.data!;
-        // 保存token和用户信息
-        await TokenService().saveToken(loginResponse.token);
-        await TokenService().saveUserId(loginResponse.user.id);
-        Get.offAllNamed(AppRoutes.home);
-      } else {
-        Get.snackbar('提示', response.message ?? '登录失败');
+    countdownSeconds.value = 60;
+    canSendCode.value = false;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_isDisposed) {
+        timer.cancel();
+        return;
       }
-    } catch (e) {
-      print('登录失败: $e');
-      if (e is DioException) {
-        switch (e.type) {
-          case DioExceptionType.connectionTimeout:
-          case DioExceptionType.sendTimeout:
-          case DioExceptionType.receiveTimeout:
-            Get.snackbar('错误', '连接超时，请检查网络');
-            break;
-          case DioExceptionType.connectionError:
-            Get.snackbar('错误', '网络连接错误，请检查网络设置');
-            break;
-          default:
-            Get.snackbar('错误', '登录失败: ${e.message}');
-        }
+      if (countdownSeconds.value > 0) {
+        countdownSeconds.value--;
       } else {
-        Get.snackbar('错误', '登录失败，请稍后重试');
+        timer.cancel();
+        canSendCode.value = true;
       }
-    } finally {
-      isLoading.value = false;
-    }
+    });
   }
 }

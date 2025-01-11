@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -200,8 +201,8 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(15),
                       bottomRight: Radius.circular(15),
                     ),
@@ -418,13 +419,9 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       InkWell(
                         onTap: () {
                           if (widget.user?.id != null && widget.user!.id != 0) {
-                            Get.toNamed(
-                              '/profile/${widget.user!.id}', // 使用命名路由
-                              arguments: {
-                                'userId': widget.user!.id,
-                                'nickname': widget.user!.nickname,
-                                'avatar': widget.user!.avatar,
-                              },
+                            Get.to(
+                              () => ProfilePage(userId: widget.user!.id),
+                              transition: Transition.fadeIn,
                             );
                           }
                         },

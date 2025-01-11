@@ -3,6 +3,20 @@ import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 class UserApiService extends BaseApiService {
+
+  // 根据uid 获取用户信息
+  Future<ApiResponse<UserModel>> getUserInfoByUid(int uid) async {
+    try {
+      final response = await BaseApiService.dio.get('/users/$uid');
+      return ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => UserModel.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      print('Get user info error: $e');
+      rethrow;
+    }
+  }
   // 获取用户信息
   Future<ApiResponse<UserModel>> getUserInfo() async {
     try {
