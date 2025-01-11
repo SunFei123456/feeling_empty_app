@@ -1,4 +1,6 @@
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,17 +18,19 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
       type: MaterialType.transparency,
       child: Stack(
         children: [
-          // 半透明背景，点击时关闭抽屉
+          // 半透明背景
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
               width: double.infinity,
               height: double.infinity,
-              color: Colors.transparent,
+              color: Colors.black26,
             ),
           ),
           // 抽屉内容
@@ -34,207 +38,100 @@ class CustomDrawer extends StatelessWidget {
             right: 0,
             top: 0,
             bottom: 0,
-            child: GestureDetector(
-              onHorizontalDragUpdate: (details) {
-                if (details.primaryDelta! > 0) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(20),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(-5, 0),
-                    ),
-                  ],
-                ),
-                child: Obx(() {
-                  final user = profileController.user.value;
-                  return Column(
-                    children: [
-                      // 顶部用户信息区域
-                      Container(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).padding.top + 20,
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Colors.blue.withOpacity(0.5),
-                              Colors.purple.withOpacity(0.4),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                borderRadius:
+                    const BorderRadius.horizontal(left: Radius.circular(20)),
+              ),
+              child: Obx(() {
+                final user = profileController.user.value;
+                return Column(
+                  children: [
+                    // 用户信息区域
+                    _buildUserHeader(context, user, isDark),
+
+                    // 菜单列表
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        children: [
+                          _buildMenuSection(
+                            context,
+                            isDark,
+                            items: [
+                              MenuItem(
+                                icon: Icons.edit,
+                                title: '修改资料',
+                                onTap: () =>
+                                    AppRoutes.to(AppRoutes.EDIT_PROFILE),
+                              ),
+                              MenuItem(
+                                icon: Icons.history,
+                                title: '浏览历史',
+                                onTap: () =>
+                                    AppRoutes.to(AppRoutes.VIEW_HISTORY),
+                              ),
+                              MenuItem(
+                                icon: Icons.bookmark,
+                                title: '我的收藏',
+                                onTap: () =>
+                                    AppRoutes.to(AppRoutes.FAVORITED_BOTTLE),
+                              ),
+                              MenuItem(
+                                icon: Icons.favorite,
+                                title: '我的共鸣',
+                                onTap: () =>
+                                    AppRoutes.to(AppRoutes.RESONATED_BOTTLE),
+                              ),
                             ],
                           ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage:
-                                      NetworkImage(user?.avatar ?? ''),
+                          _buildDivider(isDark),
+                          _buildMenuSection(
+                            context,
+                            isDark,
+                            items: [
+                              MenuItem(
+                                icon: Icons.dark_mode,
+                                title: 'dark_mode'.tr,
+                                trailing: Switch(
+                                  activeColor:Colors.blue ,
+                                  value: settingController.isDarkMode,
+                                  onChanged: (_) =>
+                                      settingController.toggleTheme(),
                                 ),
-                                const SizedBox(width: 15),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user?.nickname ?? '',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        '@ ${user?.nickname ?? ''}',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.8),
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close,
-                                      color: Colors.white),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // 用户相关选项
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          children: [
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.edit,
-                              title: '修改资料',
-                              onTap: () => AppRoutes.to(AppRoutes.EDIT_PROFILE),
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.history,
-                              title: '浏览历史',
-                              onTap: () => AppRoutes.to(AppRoutes.VIEW_HISTORY),
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.bookmark,
-                              title: '我的收藏',
-                              onTap: () =>
-                                  AppRoutes.to(AppRoutes.FAVORITED_BOTTLE),
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.favorite,
-                              title: '我的共鸣',
-                              onTap: () =>
-                                  AppRoutes.to(AppRoutes.RESONATED_BOTTLE),
-                            ),
-
-                            const Divider(height: 32), // 添加分隔线
-
-                            // 原有的设置选项
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.dark_mode,
-                              title: 'dark_mode'.tr,
-                              trailing: Switch(
-                                value: settingController.isDarkMode,
-                                onChanged: (_) =>
-                                    settingController.toggleTheme(),
                               ),
-                            ),
-
-                            // 语言设置
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.language,
-                              title: 'language'.tr,
-                              trailing: DropdownButton<Locale>(
-                                value: settingController.currentLocale,
-                                underline: const SizedBox(),
-                                items: settingController.languages
-                                    .map((lang) => DropdownMenuItem(
-                                          value: lang['locale'] as Locale,
-                                          child: Text(lang['name'] as String),
-                                        ))
-                                    .toList(),
-                                onChanged: (locale) {
-                                  if (locale != null) {
-                                    settingController.updateLocale(locale);
-                                  }
+                              MenuItem(
+                                icon: Icons.language,
+                                title: 'language'.tr,
+                                trailing:
+                                    _buildLanguageDropdown(context, isDark),
+                              ),
+                            ],
+                          ),
+                          _buildDivider(isDark),
+                          _buildMenuSection(
+                            context,
+                            isDark,
+                            items: [
+                              MenuItem(
+                                icon: Icons.logout,
+                                title: '退出登录',
+                                textColor: Colors.red,
+                                onTap: () async {
+                                  await TokenService().clearAuth();
+                                  AppRoutes.offAll(AppRoutes.login);
                                 },
                               ),
-                            ),
-
-                            // 版本信息
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.info,
-                              title: 'version'.tr,
-                              trailing: const Text(
-                                '1.0.0',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-
-                            const Divider(),
-
-                            // 其他选项
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.notifications,
-                              title: '通知设置',
-                              onTap: () {},
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.security,
-                              title: '隐私设置',
-                              onTap: () {},
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.help,
-                              title: '帮助与反馈',
-                              onTap: () {},
-                            ),
-                            _buildSettingItem(
-                              context: context,
-                              icon: Icons.logout,
-                              title: '退出登录',
-                              textColor: Colors.red,
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  );
-                }),
-              ),
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -242,39 +139,130 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    Widget? trailing,
-    VoidCallback? onTap,
-    Color? textColor,
-  }) {
+  Widget _buildUserHeader(BuildContext context, UserModel? user, bool isDark) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 20,
+        bottom: 20,
+        left: 20,
+        right: 20,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.black12 : Colors.blue.withOpacity(0.1),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(user?.avatar ?? ''),
+            backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user?.nickname ?? '',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                Text(
+                  '@${user?.nickname ?? ''}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white60 : Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuSection(BuildContext context, bool isDark,
+      {required List<MenuItem> items}) {
+    return Column(
+      children:
+          items.map((item) => _buildMenuItem(context, item, isDark)).toList(),
+    );
+  }
+
+  Widget _buildMenuItem(BuildContext context, MenuItem item, bool isDark) {
     return ListTile(
       leading: Icon(
-        icon,
-        color: textColor ?? Theme.of(context).primaryColor.withOpacity(0.7),
+        item.icon,
+        color: item.textColor ?? (isDark ? Colors.white70 : Colors.black54),
         size: 22,
       ),
       title: Text(
-        title,
+        item.title,
         style: TextStyle(
-          color: textColor ?? Colors.black87,
+          color: item.textColor ?? (isDark ? Colors.white : Colors.black87),
           fontSize: 15,
-          fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: trailing ??
-          (onTap != null
-              ? Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: Colors.grey[400],
-                )
-              : null),
-      onTap: onTap,
-      dense: true, // 使列表项更紧凑
-      visualDensity: VisualDensity.compact, // 减小垂直间距
+      trailing: item.trailing,
+      onTap: item.onTap,
+      dense: true,
     );
   }
+
+  Widget _buildDivider(bool isDark) {
+    return Divider(color: isDark ? Colors.white12 : Colors.black12);
+  }
+
+  Widget _buildLanguageDropdown(BuildContext context, bool isDark) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dropdownMenuTheme: DropdownMenuThemeData(
+          textStyle: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+      ),
+      child: DropdownButton<Locale>(
+        value: settingController.currentLocale,
+        underline: const SizedBox(),
+        dropdownColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
+        items: settingController.languages
+            .map((lang) => DropdownMenuItem(
+                  value: lang['locale'] as Locale,
+                  child: Text(
+                    lang['name'] as String,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ))
+            .toList(),
+        onChanged: (Locale? newValue) {
+          if (newValue != null) {
+            settingController.updateLocale(newValue);
+          }
+        },
+      ),
+    );
+  }
+}
+
+class MenuItem {
+  final IconData icon;
+  final String title;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final Color? textColor;
+
+  MenuItem({
+    required this.icon,
+    required this.title,
+    this.trailing,
+    this.onTap,
+    this.textColor,
+  });
 }

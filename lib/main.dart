@@ -5,7 +5,6 @@ import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/views/not_found.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
-import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
 import 'package:fangkong_xinsheng/app/pages/square/index.dart';
 import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:fangkong_xinsheng/app/core/translations/translations.dart';

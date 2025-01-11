@@ -39,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
 
@@ -60,6 +61,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -103,7 +105,10 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                               Obx(() => Text(
                                     '@${_profileController.user.value?.nickname ?? ""}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1A1A1A),
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -151,7 +156,9 @@ class _ProfilePageState extends State<ProfilePage>
                           margin: const EdgeInsets.all(16),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(200),
+                            color: isDark
+                                ? Colors.black.withAlpha(200)
+                                : Colors.white.withAlpha(200),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -205,8 +212,11 @@ class _ProfilePageState extends State<ProfilePage>
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          user?.nickname ?? '',
-                                          style: const TextStyle(
+                                          user.nickname,
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white
+                                                : const Color(0xFF1A1A1A),
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -222,10 +232,12 @@ class _ProfilePageState extends State<ProfilePage>
                                     const SizedBox(height: 4),
 
                                     // 描述
-                                    const Text(
+                                    Text(
                                       'Twice K-Pop Idol Group Member',
                                       style: TextStyle(
-                                        color: Colors.grey,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -236,11 +248,11 @@ class _ProfilePageState extends State<ProfilePage>
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        _buildStat('89 M', '粉丝'),
+                                        _buildStat(isDark, '89 M', '粉丝'),
                                         _buildStatDivider(),
-                                        _buildStat('666', '关注'),
+                                        _buildStat(isDark, '666', '关注'),
                                         _buildStatDivider(),
-                                        _buildStat('233', '漂流瓶子'),
+                                        _buildStat(isDark, '233', '漂流瓶子'),
                                       ],
                                     ),
                                     const SizedBox(height: 20),
@@ -288,17 +300,22 @@ class _ProfilePageState extends State<ProfilePage>
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.all(8),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.black,
-                                              borderRadius: BorderRadius.only(
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              borderRadius:
+                                                  const BorderRadius.only(
                                                 topLeft: Radius.circular(20),
                                                 bottomRight:
                                                     Radius.circular(20),
                                               ),
                                             ),
-                                            child: const Icon(
+                                            child: Icon(
                                               Icons.edit,
-                                              color: Colors.white,
+                                              color: isDark
+                                                  ? Colors.black
+                                                  : Colors.white,
                                             ),
                                           ),
                                         ),
@@ -399,7 +416,9 @@ class _ProfilePageState extends State<ProfilePage>
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: isDark
+                                    ? Colors.black.withAlpha(200)
+                                    : Colors.white.withAlpha(200),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
@@ -693,12 +712,13 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildStat(String value, String label) {
+  Widget _buildStat(bool isDark, String value, String label) {
     return Column(
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -708,7 +728,7 @@ class _ProfilePageState extends State<ProfilePage>
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
       ],

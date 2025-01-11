@@ -8,11 +8,9 @@ import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
-import 'package:fangkong_xinsheng/app/pages/home/index.dart';
 import 'package:fangkong_xinsheng/app/pages/login/index.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
-import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
 import 'package:fangkong_xinsheng/app/pages/square/index.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
@@ -136,11 +134,7 @@ class AppRoutes {
       name: WRITE_LETTER,
       page: () => const WriteLetterPage(),
     ),
-    // 设置
-    AppRoute(
-      name: setting,
-      page: () => const SettingPage(),
-    ),
+
 
     AppRoute(
       name: TIME_POST_OFFICE,
