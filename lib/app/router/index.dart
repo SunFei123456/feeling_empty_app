@@ -1,7 +1,9 @@
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/views/favorite_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/follow_list_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/ocean_square_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/resonated_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
@@ -81,6 +83,8 @@ class AppRoutes {
   static const RESONATED_BOTTLE = '/resonated_bottle';
   static const FAVORITED_BOTTLE = '/favorited_bottle';
   static const OCEANSQUARE = '/ocean_square';
+  static const FOLLOWERS = '/followers';
+  static const FOLLOWING = '/following';
 
   /// 路由
   static final routes = <AppRoute>[
@@ -135,7 +139,6 @@ class AppRoutes {
       page: () => const WriteLetterPage(),
     ),
 
-
     AppRoute(
       name: TIME_POST_OFFICE,
       page: () => const TimePostOfficePage(),
@@ -180,6 +183,28 @@ class AppRoutes {
     AppRoute(
       name: OCEANSQUARE,
       page: () => OceanSquarePage(),
+    ),
+
+    // 粉丝列表
+    AppRoute(
+      name: FOLLOWERS,
+      page: () => FollowListPage(
+        title: '粉丝',
+        isFollowers: true,
+        userId: Get.arguments['userId'] as int,
+      ),
+      middlewares: [AuthMiddleware()],
+    ),
+
+    // 关注列表
+    AppRoute(
+      name: FOLLOWING,
+      page: () => FollowListPage(
+        title: '关注',
+        isFollowers: false,
+        userId: Get.arguments['userId'] as int,
+      ),
+      middlewares: [AuthMiddleware()],
     ),
   ];
 

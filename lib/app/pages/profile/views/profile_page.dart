@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:io';
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/home/model/user.dart';
@@ -244,17 +245,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     const SizedBox(height: 20),
 
                                     // 统计数据
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        _buildStat(isDark, '89 M', '粉丝'),
-                                        _buildStatDivider(),
-                                        _buildStat(isDark, '666', '关注'),
-                                        _buildStatDivider(),
-                                        _buildStat(isDark, '233', '漂流瓶子'),
-                                      ],
-                                    ),
+                                    _buildUserStats(),
                                     const SizedBox(height: 20),
 
                                     // Follow 按钮
@@ -262,20 +253,40 @@ class _ProfilePageState extends State<ProfilePage>
                                         ? SizedBox(
                                             width: double.infinity,
                                             child: ElevatedButton(
-                                              onPressed: () {},
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.orange,
-                                                foregroundColor: Colors.white,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
+                                                onPressed: () {
+                                              
+                                                  if (_profileController
+                                                          .followStatus.value ==
+                                                      'not_following') {
+                                                    _profileController
+                                                        .followUser(
+                                                            widget.userId!);
+                                                  } else {
+                                                    _profileController
+                                                        .unfollowUser(
+                                                            widget.userId!);
+                                                  }
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  // 互相关注 浅灰半透明色
+                                                  // 已关注 橙色
+                                                  // 未关注 蓝色
+                                                  backgroundColor:
+                                                      getFollowStatusColor(
+                                                          _profileController
+                                                              .followStatus
+                                                              .value),
+                                                  foregroundColor: Colors.white,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 12),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10)),
                                                 ),
-                                              ),
-                                              child: const Text('关注'),
-                                            ),
+                                                child: Text(getFollowStatusText(
+                                                    _profileController
+                                                        .followStatus.value))),
                                           )
                                         : const SizedBox(),
                                   ],
@@ -712,23 +723,65 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildStat(bool isDark, String value, String label) {
+  Widget _buildUserStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildStatItem(
+          '${0}',
+          '漂流瓶',
+        ),
+        _buildStatDivider(),
+        // 关注数量，可点击
+        InkWell(
+          onTap: () => AppRoutes.to(
+            AppRoutes.FOLLOWING,
+            arguments: {
+              'userId': widget.userId ?? TokenService().getUserId(),
+                
+            },
+          ),
+          child: _buildStatItem(
+            '${0}',
+            '关注',
+          ),
+        ),
+        _buildStatDivider(),
+        // 粉丝数量，可点击
+        InkWell(
+          onTap: () => AppRoutes.to(
+            AppRoutes.FOLLOWERS,
+            arguments: {
+              'userId': widget.userId ?? TokenService().getUserId(),
+              
+            },
+          ),
+          child: _buildStatItem(
+            '${0}',
+            '粉丝',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           value,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-            fontSize: 20,
+          style: const TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
-            color: isDark ? Colors.white : Colors.black,
+            color: Colors.grey,
           ),
         ),
       ],
@@ -736,67 +789,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _buildStatDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.grey[300],
-    );
-  }
-
-  void _showImagePickerBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: const Text('拍照'),
-              onTap: () {
-                Get.back();
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('从相册选择'),
-              onTap: () {
-                Get.back();
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: source,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 90,
-      );
-
-      if (image != null) {
-        final String? uploadedUrl =
-            await _profileController.uploadAvatar(File(image.path));
-        if (uploadedUrl != null) {
-          await _profileController.updateUserInfo(avatar: uploadedUrl);
-        }
-      }
-    } catch (e) {
-      print('Pick image error: $e');
-      Get.snackbar('错误', '选择图片失败');
-    }
+    return Container(height: 30, width: 1, color: Colors.grey[300]);
   }
 
   void _showBottomDrawer(BuildContext context, BottleModel bottle) {

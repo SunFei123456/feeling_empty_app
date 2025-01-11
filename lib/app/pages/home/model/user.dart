@@ -8,11 +8,11 @@ class UserModel {
 
   UserModel({
     required this.id,
-    required this.nickname,
-    required this.avatar,
-    required this.sex,
-    required this.createdAt,
-    required this.updatedAt,
+    this.nickname = "",
+    this.avatar = "",
+    this.sex = 0,
+    this.createdAt = "",
+    this.updatedAt = "",
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
