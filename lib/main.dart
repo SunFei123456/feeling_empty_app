@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'GetX Study',
+      title: '放空心声',
       getPages: AppRoutes.getPages(),
       unknownRoute: GetPage(name: "/notfound", page: () => const NotFound()),
 
