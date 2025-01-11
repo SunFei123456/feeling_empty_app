@@ -18,6 +18,7 @@ import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/views/write_letter_page.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart';
 import 'package:fangkong_xinsheng/main.dart';
+import 'package:fangkong_xinsheng/app/middleware/auth_middleware.dart';
 
 /// 路由管理类
 class AppRoute {
@@ -92,21 +93,25 @@ class AppRoutes {
     AppRoute(
       name: home,
       page: () => const MyHomePage(),
+      middlewares: [AuthMiddleware()],
     ),
     // 广场
     AppRoute(
       name: square,
       page: () => const SquarePage(),
+      middlewares: [AuthMiddleware()],
     ),
     // 漂流瓶
     AppRoute(
       name: BOTTLE,
       page: () => const BottlePage(),
+      middlewares: [AuthMiddleware()],
     ),
     // 时光邮局
     AppRoute(
       name: TIME_POST_OFFICE,
       page: () => const TimePostOfficePage(),
+      middlewares: [AuthMiddleware()],
     ),
     // 发布
     AppRoute(
@@ -153,7 +158,7 @@ class AppRoutes {
     // 历史记录页面
     AppRoute(
       name: VIEW_HISTORY,
-      page: () =>  ViewHistoryPage(),
+      page: () => ViewHistoryPage(),
     ),
 
     // 热门漂流瓶
@@ -168,18 +173,18 @@ class AppRoutes {
     // 收藏的漂流瓶列表页面
     AppRoute(
       name: FAVORITED_BOTTLE,
-      page: () =>  FavoritePage(),
+      page: () => FavoritePage(),
     ),
 
     // 共振 的漂流瓶列表页面
     AppRoute(
       name: RESONATED_BOTTLE,
-      page: () =>  ResonatedPage(),
+      page: () => ResonatedPage(),
     ),
     // 海域广场页面
     AppRoute(
       name: OCEANSQUARE,
-      page: () =>  OceanSquarePage(),
+      page: () => OceanSquarePage(),
     ),
   ];
 
@@ -208,5 +213,5 @@ class AppRoutes {
     Get.back<T>(result: result);
   }
 
-  static const INITIAL = '/login'; // 设置初始路由为登录页
+  static const INITIAL = AppRoutes.login; // 设置初始路由为登录页
 }

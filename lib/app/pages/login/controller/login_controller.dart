@@ -54,9 +54,10 @@ class LoginController extends GetxController {
 
     try {
       final response = await LoginApiService().sendQqEmailCode(qq);
-      
-      if (response.success) {  // 检查响应是否成功
-        startCountdown();  // 成功后开始倒计时
+
+      if (response.success) {
+        // 检查响应是否成功
+        startCountdown(); // 成功后开始倒计时
         Get.snackbar('提示', '验证码已发送');
       } else {
         Get.snackbar('提示', response.message ?? '发送验证码失败');
@@ -79,14 +80,12 @@ class LoginController extends GetxController {
     isLoading.value = true;
     try {
       final response = await LoginApiService().qqLogin(qq, code);
-      
+
       if (response.success && response.data != null) {
         final loginResponse = response.data!;
         // 保存token和用户信息
         await TokenService().saveToken(loginResponse.token);
-        if (loginResponse.user.id != 0) {
-          await TokenService().saveUserId(loginResponse.user.id);
-        }
+        await TokenService().saveUserId(loginResponse.user.id);
         Get.offAllNamed(AppRoutes.home);
       } else {
         Get.snackbar('提示', response.message ?? '登录失败');
