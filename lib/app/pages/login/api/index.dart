@@ -20,4 +20,27 @@ class LoginApiService extends BaseApiService {
       rethrow;
     }
   }
+  // 发送qq邮箱验证码
+  Future<ApiResponse<String>> sendQqEmailCode(String email) async {
+    try {
+      final response = await BaseApiService.dio.post('/auth/send-code', data: {'email': email});
+      final responseData = response.data as Map<String, dynamic>;
+      
+      return ApiResponse<String>(
+        code: responseData['code'] as int? ?? 500,
+        message: responseData['message'] as String? ?? '',
+        data: responseData['data'] as String? ?? '',
+        success: responseData['code'] == 200,
+      );
+    } catch (e) {
+      print('发送验证码失败: $e');
+      rethrow;
+    }
+  }
+
+  // qq验证码登录
+  Future<ApiResponse<LoginResponse>> qqLogin(String email, String code) async {
+    final response = await BaseApiService.dio.post('/auth/qq-email-login', data: {'email': email, 'code': code});
+    return ApiResponse.fromJson(response.data as Map<String, dynamic>, (json) => LoginResponse.fromJson(json));
+  }
 }

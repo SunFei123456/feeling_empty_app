@@ -18,12 +18,12 @@ class BottleCardDetail extends StatefulWidget {
   final String createdAt;
   final String? audioUrl;
   final UserInfo? user;
-  bool isResonated;
-  bool isFavorited;
-  final int views;
   int resonates;
   final int favorites;
   final int shares;
+  final int views;
+  bool isResonated;
+  bool isFavorited;
 
   BottleCardDetail({
     super.key,
@@ -34,12 +34,12 @@ class BottleCardDetail extends StatefulWidget {
     this.user,
     this.createdAt = '',
     this.audioUrl = '',
-    this.isResonated = false,
-    this.isFavorited = false,
     this.views = 0, // 浏览数量
     this.favorites = 0, // 收藏数量
     this.resonates = 0, // 共振数量
     this.shares = 0, // 分享数量
+    this.isResonated = false,
+    this.isFavorited = false,
   });
 
   @override
@@ -207,38 +207,39 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                     ),
                   ),
                   child: isImageBottle
-                    ? Image.network(
-                        widget.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[100],
+                      ? Image.network(
+                          widget.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: Icon(
+                                Icons.broken_image_rounded,
+                                color: Colors.grey[400],
+                                size: 40,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: getGradientColors(),
+                            ),
+                          ),
                           child: Center(
                             child: Icon(
-                              Icons.broken_image_rounded,
-                              color: Colors.grey[400],
-                              size: 40,
+                              isAudioBottle
+                                  ? Icons.audiotrack_rounded
+                                  : Icons.format_quote_rounded,
+                              size: 80,
+                              color: Colors.white.withOpacity(0.3),
                             ),
                           ),
                         ),
-                      )
-                    : Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: getGradientColors(),
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            isAudioBottle
-                                ? Icons.audiotrack_rounded
-                                : Icons.format_quote_rounded,
-                            size: 80,
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                      ),
                 ),
               ),
               const SizedBox(height: 35),
@@ -251,7 +252,8 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                     children: [
                       // 类型标识
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -270,7 +272,11 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              isImageBottle ? '图片' : isAudioBottle ? '语音' : '文字',
+                              isImageBottle
+                                  ? '图片'
+                                  : isAudioBottle
+                                      ? '语音'
+                                      : '文字',
                               style: const TextStyle(
                                 color: Colors.black54,
                                 fontSize: 12,
@@ -297,7 +303,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                               size: 12, color: Colors.grey[600]),
                           const SizedBox(width: 4),
                           Text(
-                           formatTime(widget.createdAt),
+                            formatTime(widget.createdAt),
                             style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.black.withOpacity(0.7)),

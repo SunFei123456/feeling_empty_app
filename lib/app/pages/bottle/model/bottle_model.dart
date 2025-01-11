@@ -10,11 +10,12 @@ class BottleModel {
   final String mood;
   final int topicId;
   final UserInfo user;
-  final int views;
   final bool isResonated;
   final bool isFavorited;
+  final int views;
   final int resonates;
-  // final int favorites;
+  final int favorites;
+  final int shares;
 
   const BottleModel({
     required this.id,
@@ -26,11 +27,12 @@ class BottleModel {
     this.mood = 'unknown',
     this.topicId = 0,
     required this.user,
-    this.views = 0,
     this.isResonated = false,
     this.isFavorited = false,
+    this.views = 0,
     this.resonates = 0,
-    // this.favorites = 0,
+    this.favorites = 0,
+    this.shares = 0,
   });
 
   factory BottleModel.fromJson(Map<String, dynamic> json) {
@@ -55,7 +57,8 @@ class BottleModel {
       ),
       views: json['views'] as int? ?? 0,
       resonates: json['resonances'] as int? ?? 0,
-      // favorites: json['favorites'] as int? ?? 0,
+      favorites: json['favorites'] as int? ?? 0,
+      shares: json['shares'] as int? ?? 0,
       isResonated: json['is_resonated'] as bool? ?? false,
       isFavorited: json['is_favorited'] as bool? ?? false,
     );
@@ -74,11 +77,10 @@ class BottleModel {
       'user': user.toJson(),
       'views': views,
       'resonates': resonates,
-      // 'favorites': favorites,
+      'favorites': favorites,
+      'shares': shares,
       'is_resonated': isResonated,
       'is_favorited': isFavorited,
-
-    
     };
   }
 }
