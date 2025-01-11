@@ -61,6 +61,7 @@ class AppRoute {
 /// 路由管理
 class AppRoutes {
   /// 定义路由名称常量
+  static const MAIN = '/';
   static const home = '/';
   static const square = '/square';
   static const login = '/login';

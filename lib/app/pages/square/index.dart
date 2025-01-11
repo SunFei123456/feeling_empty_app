@@ -244,6 +244,10 @@ class _SquarePageState extends State<SquarePage> {
             ),
             views: bottle.views,
             resonates: bottle.resonates,
+            favorites: bottle.favorites,
+            shares: bottle.shares,
+            isResonated: bottle.isResonated,
+            isFavorited: bottle.isFavorited,
           ),
           transition: Transition.cupertino,
         );

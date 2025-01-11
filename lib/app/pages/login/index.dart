@@ -13,7 +13,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GetBuilder<LoginController>(
-        init: LoginController()..initDefaultCredentials(),
+        init: LoginController(),
         builder: (controller) {
           return Stack(
             children: [
@@ -61,12 +61,12 @@ class LoginPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 60),
 
-                      // 邮箱输入框
-                      _buildEmailInput(controller),
+                      // QQ号输入框
+                      _buildQQInput(controller),
                       const SizedBox(height: 20),
 
-                      // 密码输入框
-                      _buildPasswordInput(controller),
+                      // 验证码输入框
+                      _buildVerificationCodeInput(controller),
                       const SizedBox(height: 40),
 
                       // 登录按钮
@@ -86,7 +86,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmailInput(LoginController controller) {
+  Widget _buildQQInput(LoginController controller) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -99,23 +99,44 @@ class LoginPage extends StatelessWidget {
           ),
         ],
       ),
-      child: TextField(
-        controller: controller.accountController,
-        keyboardType: TextInputType.emailAddress,
-        decoration: InputDecoration(
-          hintText: 'Enter your account',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller.qqController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: '请输入QQ号',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                prefixIcon: const Icon(Icons.person_outline),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+            ),
           ),
-          prefixIcon: const Icon(Icons.email),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
+          Obx(() => Container(
+            height: 56,
+            margin: const EdgeInsets.only(right: 8),
+            child: TextButton(
+              onPressed: controller.canSendCode.value ? controller.sendVerificationCode : null,
+              child: Text(
+                controller.countdownSeconds.value > 0 
+                    ? '${controller.countdownSeconds.value}s'
+                    : '发送验证码',
+                style: TextStyle(
+                  color: controller.canSendCode.value ? Colors.blue : Colors.grey,
+                ),
+              ),
+            ),
+          )),
+        ],
       ),
     );
   }
 
-  Widget _buildPasswordInput(LoginController controller) {
+  Widget _buildVerificationCodeInput(LoginController controller) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -129,16 +150,18 @@ class LoginPage extends StatelessWidget {
         ],
       ),
       child: TextField(
-        controller: controller.passwordController,
-        obscureText: true,
+        controller: controller.verificationCodeController,
+        keyboardType: TextInputType.number,
+        maxLength: 6,
         decoration: InputDecoration(
-          hintText: 'Enter your password',
+          hintText: '请输入验证码',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           prefixIcon: const Icon(Icons.lock_outline),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          counterText: "",
         ),
       ),
     );
@@ -188,33 +211,34 @@ class LoginPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSocialLoginButton(Icons.wechat, Colors.green),
+            _buildSocialLoginButton(Icons.wechat, Colors.green, '微信登录'),
             const SizedBox(width: 20),
-            _buildSocialLoginButton(Icons.facebook, Colors.blue),
-            const SizedBox(width: 20),
-            _buildSocialLoginButton(Icons.apple, Colors.black),
+            _buildSocialLoginButton(Icons.hub, Colors.black, 'GitHub登录'),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildSocialLoginButton(IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color),
-        onPressed: () {},
+  Widget _buildSocialLoginButton(IconData icon, Color color, String tooltip) {
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: IconButton(
+          icon: Icon(icon, color: color),
+          onPressed: () {},
+        ),
       ),
     );
   }

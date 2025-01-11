@@ -21,11 +21,14 @@ class LoginResponse {
   final String token;
   final UserInfo user;
 
-  LoginResponse({required this.token, required this.user});
+  LoginResponse({
+    required this.token, 
+    required this.user,
+  });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
-    token: json['token'] as String,
-    user: UserInfo.fromJson(json['user'] as Map<String, dynamic>),
+    token: json['token'] as String? ?? '',
+    user: UserInfo.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
   );
 }
 
@@ -39,20 +42,20 @@ class UserInfo {
   final String phone;
 
   UserInfo({
-    required this.id,
-    required this.nickname,
-    required this.avatar,
-    required this.sex,
-    required this.email,
-    required this.phone,
+    this.id = 0,
+    this.nickname = '',
+    this.avatar = '',
+    this.sex = 0,
+    this.email = '',
+    this.phone = '',
   });
 
   factory UserInfo.fromJson(Map<String, dynamic> json) => UserInfo(
-    id: json['id'] as int,
-    nickname: json['nickname'] as String,
-    avatar: json['avatar'] as String,
-    sex: json['sex'] as int,
-    email: json['email'] as String,
-    phone: json['phone'] as String,
+    id: json['id'] as int? ?? 0,
+    nickname: json['nickname'] as String? ?? '',
+    avatar: json['avatar'] as String? ?? '',
+    sex: json['sex'] as int? ?? 0,
+    email: json['email'] as String? ?? '',
+    phone: json['phone'] as String? ?? '',
   );
 }
