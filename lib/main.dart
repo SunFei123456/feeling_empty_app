@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/views/not_found.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
@@ -22,6 +23,7 @@ void main() async {
   // 初始化服务
   await Get.putAsync(() => StorageService().init());
   await Get.putAsync(() => AppService().init());
+  await dotenv.load(fileName: ".env");
   Get.put(SettingController());
 
   runApp(const MyApp());
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const SquarePage(),
     const PublishPage(),
     const TimePostOfficePage(),
-    ProfilePage(),
+    const ProfilePage(),
   ];
 
   @override

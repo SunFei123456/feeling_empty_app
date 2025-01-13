@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as path;
 import 'package:fangkong_xinsheng/app/core/http/api_response.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 
 /// 文件上传服务
 class UploadService {
+  static String api = dotenv.get('Dev_Api');
   static final UploadService _instance = UploadService._internal();
   factory UploadService() => _instance;
   UploadService._internal();
@@ -21,7 +23,7 @@ class UploadService {
       }
 
       final response = await Dio().get(
-        'http://8.152.194.158:8080/api/v1/cos/upload-token',
+        'http://$api/api/v1/cos/upload-token',
         queryParameters: {'ext': ext},
         options: Options(
           headers: {
@@ -45,13 +47,13 @@ class UploadService {
   Future<ApiResponse<String>> _uploadFile(String filePath) async {
     try {
       String ext = path.extension(filePath).substring(1);
-      
+
       // 获取上传凭证和临时URL
       final uploadData = await _getUploadToken(ext);
-      
+
       String uploadUrl = uploadData['url'];
       String contentType = uploadData['content_type'];
-      
+
       // 上传文件
       File file = File(filePath);
       final response = await Dio().put(
@@ -67,8 +69,9 @@ class UploadService {
 
       if (response.statusCode == 200) {
         // 构建访问URL
-        String fileUrl = 'https://${uploadData['bucket']}.cos.${uploadData['region']}.myqcloud.com/${uploadData['key']}';
-        
+        String fileUrl =
+            'https://${uploadData['bucket']}.cos.${uploadData['region']}.myqcloud.com/${uploadData['key']}';
+
         return ApiResponse(
           success: true,
           data: fileUrl,
@@ -89,8 +92,10 @@ class UploadService {
   }
 
   /// 上传图片
-  Future<ApiResponse<String>> uploadImage(String filePath) => _uploadFile(filePath);
+  Future<ApiResponse<String>> uploadImage(String filePath) =>
+      _uploadFile(filePath);
 
   /// 上传音频
-  Future<ApiResponse<String>> uploadAudio(String filePath) => _uploadFile(filePath);
-} 
+  Future<ApiResponse<String>> uploadAudio(String filePath) =>
+      _uploadFile(filePath);
+}
