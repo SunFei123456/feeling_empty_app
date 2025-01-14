@@ -16,7 +16,10 @@ import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
-
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:flutter/foundation.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -28,6 +31,17 @@ void main() async {
   await Get.putAsync(() => AppService().init());
   await dotenv.load(fileName: ".env");
   Get.put(SettingController());
+
+  // 初始化 WebView
+  late final WebViewPlatform platform;
+  if (WebViewPlatform.instance == null) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      platform = WebKitWebViewPlatform();
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      platform = AndroidWebViewPlatform();
+    }
+    WebViewPlatform.instance = platform;
+  }
 
   runApp(const MyApp());
 }

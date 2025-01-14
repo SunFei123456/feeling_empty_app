@@ -7,6 +7,7 @@ import 'package:fangkong_xinsheng/app/pages/home/model/user.dart';
 import 'package:fangkong_xinsheng/app/pages/login/model/login.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
+import 'package:fangkong_xinsheng/app/webview/index.dart';
 import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,10 +22,7 @@ import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart
 class ProfilePage extends StatefulWidget {
   final int? userId;
 
-  const ProfilePage({
-    Key? key,
-    this.userId,
-  }) : super(key: key);
+  const ProfilePage({Key? key, this.userId}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -180,9 +178,7 @@ class _ProfilePageState extends State<ProfilePage>
                               );
                             }
                             if (user == null) {
-                              return const Center(
-                                child: Text('用户不存在'),
-                              );
+                              return const Center(child: Text('用户不存在'));
                             }
 
                             return Stack(
@@ -223,10 +219,19 @@ class _ProfilePageState extends State<ProfilePage>
                                           ),
                                         ),
                                         const SizedBox(width: 4),
-                                        Icon(
-                                          Icons.verified,
-                                          size: 20,
-                                          color: Colors.blue[400],
+                                        InkWell(
+                                          onTap: () {
+                                            WebViewPage.navigate(
+                                              title: "抖音网页版",
+                                              context: context,
+                                              url: 'https://www.douyin.com/',
+                                            );
+                                          },
+                                          child: Icon(
+                                            Icons.verified,
+                                            size: 20,
+                                            color: Colors.blue[400],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -254,7 +259,6 @@ class _ProfilePageState extends State<ProfilePage>
                                             width: double.infinity,
                                             child: ElevatedButton(
                                                 onPressed: () {
-                                              
                                                   if (_profileController
                                                           .followStatus.value ==
                                                       'not_following') {
@@ -291,6 +295,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         : const SizedBox(),
                                   ],
                                 ),
+
                                 // 编辑按钮
                                 _isCurrentUser
                                     ? Positioned(
@@ -322,12 +327,10 @@ class _ProfilePageState extends State<ProfilePage>
                                                     Radius.circular(20),
                                               ),
                                             ),
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: isDark
-                                                  ? Colors.black
-                                                  : Colors.white,
-                                            ),
+                                            child: Icon(Icons.edit,
+                                                color: isDark
+                                                    ? Colors.black
+                                                    : Colors.white),
                                           ),
                                         ),
                                       )
@@ -738,7 +741,6 @@ class _ProfilePageState extends State<ProfilePage>
             AppRoutes.FOLLOWING,
             arguments: {
               'userId': widget.userId ?? TokenService().getUserId(),
-                
             },
           ),
           child: _buildStatItem(
@@ -753,7 +755,6 @@ class _ProfilePageState extends State<ProfilePage>
             AppRoutes.FOLLOWERS,
             arguments: {
               'userId': widget.userId ?? TokenService().getUserId(),
-              
             },
           ),
           child: _buildStatItem(
