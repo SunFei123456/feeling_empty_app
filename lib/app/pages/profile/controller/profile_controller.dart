@@ -13,7 +13,7 @@ class ProfileController extends GetxController {
 
   final _userApi = UserApiService();
   final _uploadService = UploadService();
-  final user = Rxn<UserModel>();
+  final user = Rxn<UserModel>(); // 用户信息
   final isLoading = false.obs;
   final isLoadingPrivate = false.obs;
   final publicBottles = <BottleModel>[].obs;
@@ -137,7 +137,6 @@ class ProfileController extends GetxController {
         Get.snackbar('错误', response.message ?? '获取用户信息失败');
       }
     } catch (e) {
-      print('Fetch user info error: $e');
       Get.snackbar('错误', '获取用户信息失败');
     } finally {
       isLoading.value = false;
