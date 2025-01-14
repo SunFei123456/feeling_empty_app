@@ -1,8 +1,12 @@
 import 'dart:ui';
 import 'dart:io';
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
+import 'package:fangkong_xinsheng/app/pages/home/model/user.dart';
+import 'package:fangkong_xinsheng/app/pages/login/model/login.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
+import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,9 +16,15 @@ import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
 import 'package:fangkong_xinsheng/app/widgets/custom_drawer.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  final int? userId;
+
+  const ProfilePage({
+    Key? key,
+    this.userId,
+  }) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -25,13 +35,23 @@ class _ProfilePageState extends State<ProfilePage>
   late TabController _tabController;
   late final SettingController _settingController;
   late final ProfileController _profileController;
+  late final bool _isCurrentUser;
 
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
-    _profileController = Get.put(ProfileController());
+
+    // 在这里处理用户身份校验
+    _isCurrentUser = widget.userId == null || isCurrentUser(widget.userId!);
+
+    // 根据是否是当前用户决定使用哪个 tag
+    _profileController = Get.put(
+      ProfileController(userId: _isCurrentUser ? null : widget.userId),
+      tag: _isCurrentUser ? 'current_user' : widget.userId.toString(),
+    );
   }
 
   @override
@@ -42,6 +62,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -85,41 +106,48 @@ class _ProfilePageState extends State<ProfilePage>
                               ),
                               Obx(() => Text(
                                     '@${_profileController.user.value?.nickname ?? ""}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1A1A1A),
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   )),
                               const Spacer(),
-                              IconButton(
-                                icon: const Icon(Icons.more_horiz),
-                                onPressed: () {
-                                  showGeneralDialog(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    barrierLabel: '',
-                                    barrierColor: Colors.black54,
-                                    transitionDuration:
-                                        const Duration(milliseconds: 300),
-                                    pageBuilder: (context, animation,
-                                        secondaryAnimation) {
-                                      return SlideTransition(
-                                        position: Tween<Offset>(
-                                          begin: const Offset(1, 0),
-                                          end: Offset.zero,
-                                        ).animate(CurvedAnimation(
-                                          parent: animation,
-                                          curve: Curves.easeInOut,
-                                        )),
-                                        child: CustomDrawer(
-                                          settingController: _settingController,
-                                          profileController: _profileController,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                              !_isCurrentUser
+                                  ? const SizedBox()
+                                  : IconButton(
+                                      icon: const Icon(Icons.more_horiz),
+                                      onPressed: () {
+                                        showGeneralDialog(
+                                          context: context,
+                                          barrierDismissible: true,
+                                          barrierLabel: '',
+                                          barrierColor: Colors.black54,
+                                          transitionDuration:
+                                              const Duration(milliseconds: 300),
+                                          pageBuilder: (context, animation,
+                                              secondaryAnimation) {
+                                            return SlideTransition(
+                                              position: Tween<Offset>(
+                                                begin: const Offset(1, 0),
+                                                end: Offset.zero,
+                                              ).animate(CurvedAnimation(
+                                                parent: animation,
+                                                curve: Curves.easeInOut,
+                                              )),
+                                              child: CustomDrawer(
+                                                settingController:
+                                                    _settingController,
+                                                profileController:
+                                                    _profileController,
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
                             ],
                           ),
                         ),
@@ -129,7 +157,9 @@ class _ProfilePageState extends State<ProfilePage>
                           margin: const EdgeInsets.all(16),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(200),
+                            color: isDark
+                                ? Colors.black.withAlpha(200)
+                                : Colors.white.withAlpha(200),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -149,6 +179,11 @@ class _ProfilePageState extends State<ProfilePage>
                                 child: CircularProgressIndicator(),
                               );
                             }
+                            if (user == null) {
+                              return const Center(
+                                child: Text('用户不存在'),
+                              );
+                            }
 
                             return Stack(
                               children: [
@@ -161,8 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         image: DecorationImage(
-                                          image: user?.avatar != null &&
-                                                  user!.avatar.isNotEmpty
+                                          image: user.avatar.isNotEmpty
                                               ? NetworkImage(user.avatar)
                                               : const AssetImage(
                                                       'assets/images/avatar.jpg')
@@ -179,8 +213,11 @@ class _ProfilePageState extends State<ProfilePage>
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          user?.nickname ?? '',
-                                          style: const TextStyle(
+                                          user.nickname,
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white
+                                                : const Color(0xFF1A1A1A),
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -196,60 +233,105 @@ class _ProfilePageState extends State<ProfilePage>
                                     const SizedBox(height: 4),
 
                                     // 描述
-                                    const Text(
+                                    Text(
                                       'Twice K-Pop Idol Group Member',
                                       style: TextStyle(
-                                        color: Colors.grey,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                         fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(height: 20),
 
                                     // 统计数据
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        _buildStat('89 M', '粉丝'),
-                                        _buildStatDivider(),
-                                        _buildStat('666', '关注'),
-                                        _buildStatDivider(),
-                                        _buildStat('233', '漂流瓶子'),
-                                      ],
-                                    ),
+                                    _buildUserStats(),
                                     const SizedBox(height: 20),
 
                                     // Follow 按钮
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.orange,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        child: const Text('关注'),
-                                      ),
-                                    ),
+                                    !_isCurrentUser
+                                        ? SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                              
+                                                  if (_profileController
+                                                          .followStatus.value ==
+                                                      'not_following') {
+                                                    _profileController
+                                                        .followUser(
+                                                            widget.userId!);
+                                                  } else {
+                                                    _profileController
+                                                        .unfollowUser(
+                                                            widget.userId!);
+                                                  }
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  // 互相关注 浅灰半透明色
+                                                  // 已关注 橙色
+                                                  // 未关注 蓝色
+                                                  backgroundColor:
+                                                      getFollowStatusColor(
+                                                          _profileController
+                                                              .followStatus
+                                                              .value),
+                                                  foregroundColor: Colors.white,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 12),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10)),
+                                                ),
+                                                child: Text(getFollowStatusText(
+                                                    _profileController
+                                                        .followStatus.value))),
+                                          )
+                                        : const SizedBox(),
                                   ],
                                 ),
                                 // 编辑按钮
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () =>
-                                        AppRoutes.to(AppRoutes.EDIT_PROFILE),
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
+                                _isCurrentUser
+                                    ? Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            final result = await AppRoutes.to(
+                                                AppRoutes.EDIT_PROFILE,
+                                                arguments: _isCurrentUser
+                                                    ? 'current_user'
+                                                    : widget.userId.toString());
+
+                                            if (result == true) {
+                                              await _profileController
+                                                  .refreshUserInfo();
+                                            }
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                bottomRight:
+                                                    Radius.circular(20),
+                                              ),
+                                            ),
+                                            child: Icon(
+                                              Icons.edit,
+                                              color: isDark
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox(),
                               ],
                             );
                           }),
@@ -345,7 +427,9 @@ class _ProfilePageState extends State<ProfilePage>
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: isDark
+                                    ? Colors.black.withAlpha(200)
+                                    : Colors.white.withAlpha(200),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
@@ -639,22 +723,65 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildStat(String value, String label) {
+  Widget _buildUserStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildStatItem(
+          '${0}',
+          '漂流瓶',
+        ),
+        _buildStatDivider(),
+        // 关注数量，可点击
+        InkWell(
+          onTap: () => AppRoutes.to(
+            AppRoutes.FOLLOWING,
+            arguments: {
+              'userId': widget.userId ?? TokenService().getUserId(),
+                
+            },
+          ),
+          child: _buildStatItem(
+            '${0}',
+            '关注',
+          ),
+        ),
+        _buildStatDivider(),
+        // 粉丝数量，可点击
+        InkWell(
+          onTap: () => AppRoutes.to(
+            AppRoutes.FOLLOWERS,
+            arguments: {
+              'userId': widget.userId ?? TokenService().getUserId(),
+              
+            },
+          ),
+          child: _buildStatItem(
+            '${0}',
+            '粉丝',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           value,
           style: const TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: Colors.grey,
           ),
         ),
       ],
@@ -662,67 +789,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _buildStatDivider() {
-    return Container(
-      height: 30,
-      width: 1,
-      color: Colors.grey[300],
-    );
-  }
-
-  void _showImagePickerBottomSheet() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: const Text('拍照'),
-              onTap: () {
-                Get.back();
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('从相册选择'),
-              onTap: () {
-                Get.back();
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: source,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 90,
-      );
-
-      if (image != null) {
-        final String? uploadedUrl =
-            await _profileController.uploadAvatar(File(image.path));
-        if (uploadedUrl != null) {
-          await _profileController.updateUserInfo(avatar: uploadedUrl);
-        }
-      }
-    } catch (e) {
-      print('Pick image error: $e');
-      Get.snackbar('错误', '选择图片失败');
-    }
+    return Container(height: 30, width: 1, color: Colors.grey[300]);
   }
 
   void _showBottomDrawer(BuildContext context, BottleModel bottle) {

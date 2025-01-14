@@ -1,11 +1,16 @@
 import 'dart:io';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/model/follower.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/api/user.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 import 'package:fangkong_xinsheng/app/core/services/upload_service.dart';
 
 class ProfileController extends GetxController {
+  final int? userId;
+
+  ProfileController({this.userId});
+
   final _userApi = UserApiService();
   final _uploadService = UploadService();
   final user = Rxn<UserModel>();
@@ -16,11 +21,19 @@ class ProfileController extends GetxController {
   final hasMoreBottles = true.obs;
   final currentPage = 1.obs;
   final pageSize = 10;
+  final followStatus = ''.obs; // 关注状态
+  final followers = <Follower>[].obs; // 关注的人
+  final following = <Follower>[].obs; // 粉丝
 
   @override
   void onInit() {
     super.onInit();
-    fetchUserInfo();
+    if (userId != null) {
+      loadUserProfile(userId!); // 加载不是当前用户的资料
+      getFollowStatus(userId!); // 获取两人的关注状态
+    } else {
+      loadCurrentUserProfile(); // 加载当前用户的资料
+    }
 
     // 获取用户信息成功后再获取漂流瓶
     ever(user, (value) {
@@ -29,6 +42,85 @@ class ProfileController extends GetxController {
         fetchPrivateBottles(refresh: true);
       }
     });
+  }
+
+  Future<void> loadUserProfile(int userId) async {
+    // 加载指定用户资料的逻辑
+    getUserInfoByUid(userId);
+  }
+
+  Future<void> loadCurrentUserProfile() async {
+    // 加载当前用户资料的逻辑
+    fetchUserInfo();
+  }
+
+  // 根据uid 获取用户信息
+  Future<void> getUserInfoByUid(int uid) async {
+    try {
+      isLoading.value = true;
+      final response = await _userApi.getUserInfoByUid(uid);
+
+      if (response.success) {
+        user.value = response.data;
+        // 获取用户信息成功后再获取漂流瓶
+        await fetchPublicBottles(refresh: true);
+      } else {
+        Get.snackbar('错误', response.message ?? '获取用户信息失败');
+      }
+    } catch (e) {
+      print('Fetch user info error: $e');
+      Get.snackbar('错误', '获取用户信息失败');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // 获取两人的关注状态
+  Future<void> getFollowStatus(int userId) async {
+    final response = await _userApi.getFollowStatus(userId);
+    if (response.success) {
+      print('response.data 关注状态----------> : ${response.data}');
+      followStatus.value = response.data ?? '';
+    }
+  }
+
+  // 关注用户
+  Future<void> followUser(int userId) async {
+    final response = await _userApi.followUser(userId);
+    if (response.success) {
+      followStatus.value = 'following';
+    }
+  }
+
+  // 取消关注用户
+  Future<void> unfollowUser(int userId) async {
+    try {
+      final response = await _userApi.unfollowUser(userId);
+      if (response.success) {
+        followStatus.value = 'not_following';
+      } else {
+        Get.snackbar('提示', response.message ?? '取消关注失败');
+      }
+    } catch (e) {
+      print('Unfollow error: $e');
+      Get.snackbar('提示', '取消关注失败，请稍后重试');
+    }
+  }
+
+  // 获取用户关注的人
+  Future<void> getFollowers(int userId) async {
+    final response = await _userApi.getFollowers(userId);
+    if (response.success) {
+      followers.value = response.data ?? [];
+    }
+  }
+
+  // 获取用户粉丝
+  Future<void> getFans(int userId) async {
+    final response = await _userApi.getFans(userId);
+    if (response.success) {
+      following.value = response.data ?? [];
+    }
   }
 
   // 获取用户信息
@@ -86,17 +178,38 @@ class ProfileController extends GetxController {
       );
 
       if (response.success) {
-        await fetchUserInfo(); // 更新成功后重新获取用户信息
+        // 直接更新本地用户数据
+        if (user.value != null) {
+          user.value = user.value!.copyWith(
+            nickname: nickname ?? user.value!.nickname,
+            avatar: avatar ?? user.value!.avatar,
+            sex: sex ?? user.value!.sex,
+          );
+        }
         Get.snackbar('成功', '更新用户信息成功');
       } else {
         Get.snackbar('错误', response.message ?? '更新用户信息失败');
+        throw Exception(response.message);
       }
     } catch (e) {
       print('Update user info error: $e');
       Get.snackbar('错误', '更新用户信息失败');
+      rethrow;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // 刷新用户信息
+  Future<void> refreshUserInfo() async {
+    if (userId != null) {
+      await loadUserProfile(userId!);
+    } else {
+      await loadCurrentUserProfile();
+    }
+    // 同时刷新漂流瓶列表
+    await refreshBottles();
+    await refreshPrivateBottles();
   }
 
   // 获取用户公开的漂流瓶
@@ -186,5 +299,15 @@ class ProfileController extends GetxController {
   // 加载更多漂流瓶
   Future<void> loadMoreBottles() async {
     await fetchPublicBottles();
+  }
+
+  // 刷新用户关注列表
+  Future<void> refreshFollowers(int userId) async {
+    await getFollowers(userId);
+  }
+
+  // 刷新用户粉丝列表
+  Future<void> refreshFans(int userId) async {
+    await getFans(userId);
   }
 }

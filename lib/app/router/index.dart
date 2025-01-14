@@ -1,17 +1,18 @@
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/views/favorite_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/follow_list_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/ocean_square_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/resonated_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
-import 'package:fangkong_xinsheng/app/pages/home/index.dart';
 import 'package:fangkong_xinsheng/app/pages/login/index.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
-import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
 import 'package:fangkong_xinsheng/app/pages/square/index.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
@@ -82,6 +83,8 @@ class AppRoutes {
   static const RESONATED_BOTTLE = '/resonated_bottle';
   static const FAVORITED_BOTTLE = '/favorited_bottle';
   static const OCEANSQUARE = '/ocean_square';
+  static const FOLLOWERS = '/followers';
+  static const FOLLOWING = '/following';
 
   /// 路由
   static final routes = <AppRoute>[
@@ -121,7 +124,7 @@ class AppRoutes {
     // 我的
     AppRoute(
       name: '/profile',
-      page: () => ProfilePage(),
+      page: () => const ProfilePage(),
     ),
 
     // ----------------------------------- 二级页面-----------------------------------
@@ -134,11 +137,6 @@ class AppRoutes {
     AppRoute(
       name: WRITE_LETTER,
       page: () => const WriteLetterPage(),
-    ),
-    // 设置
-    AppRoute(
-      name: setting,
-      page: () => const SettingPage(),
     ),
 
     AppRoute(
@@ -186,6 +184,28 @@ class AppRoutes {
       name: OCEANSQUARE,
       page: () => OceanSquarePage(),
     ),
+
+    // 粉丝列表
+    AppRoute(
+      name: FOLLOWERS,
+      page: () => FollowListPage(
+        title: '粉丝',
+        isFollowers: true,
+        userId: Get.arguments['userId'] as int,
+      ),
+      middlewares: [AuthMiddleware()],
+    ),
+
+    // 关注列表
+    AppRoute(
+      name: FOLLOWING,
+      page: () => FollowListPage(
+        title: '关注',
+        isFollowers: false,
+        userId: Get.arguments['userId'] as int,
+      ),
+      middlewares: [AuthMiddleware()],
+    ),
   ];
 
   /// 获取所有GetPage路由
@@ -213,5 +233,8 @@ class AppRoutes {
     Get.back<T>(result: result);
   }
 
-  static const INITIAL = AppRoutes.login; // 设置初始路由为登录页
+  static String get INITIAL {
+    final token = TokenService().getToken();
+    return token != null && token.isNotEmpty ? home : login;
+  }
 }

@@ -6,7 +6,6 @@ import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
 import 'package:fangkong_xinsheng/app/pages/views/not_found.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
-import 'package:fangkong_xinsheng/app/pages/setting/view.dart';
 import 'package:fangkong_xinsheng/app/pages/square/index.dart';
 import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:fangkong_xinsheng/app/core/translations/translations.dart';
@@ -16,9 +15,13 @@ import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_not
 import 'package:fangkong_xinsheng/app/pages/time_post_office/view.dart';
 import 'package:fangkong_xinsheng/app/pages/time_post_office/controller.dart';
 import 'package:fangkong_xinsheng/app/pages/publish/view.dart';
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 确保在获取初始路由前已初始化存储
+  await Get.putAsync(() => TokenService().init());
 
   // 初始化服务
   await Get.putAsync(() => StorageService().init());

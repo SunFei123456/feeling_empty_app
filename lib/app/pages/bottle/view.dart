@@ -25,13 +25,15 @@ class _BottlePageState extends State<BottlePage> {
   @override
   void initState() {
     super.initState();
-    if (!Get.isRegistered<ProfileController>()) {
-      Get.put(ProfileController());
-    }
+    _profileController = Get.put(
+      ProfileController(),
+      tag: 'current_user',
+      permanent: true,
+    );
+    
     if (!Get.isRegistered<TopicController>()) {
       Get.put(TopicController());
     }
-    _profileController = Get.find<ProfileController>();
     _topicController = Get.find<TopicController>();
   }
 
@@ -658,6 +660,9 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                                     width: 46,
                                     height: 46,
                                     fit: BoxFit.cover,
+                                    headers: const {
+                                      'Cache-Control': 'no-cache',
+                                    },
                                     loadingBuilder:
                                         (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;

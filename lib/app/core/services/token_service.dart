@@ -1,6 +1,7 @@
 import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 
-class TokenService {
+class TokenService extends GetxService {
   static final TokenService _instance = TokenService._internal();
   factory TokenService() => _instance;
   TokenService._internal();
@@ -8,6 +9,11 @@ class TokenService {
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
   final _storage = GetStorage();
+
+  Future<TokenService> init() async {
+    await GetStorage.init();
+    return this;
+  }
 
   // 获取 token
   String? getToken() {
