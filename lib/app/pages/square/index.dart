@@ -1,6 +1,6 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/views/controller/view_history_controller.dart';
-import 'package:fangkong_xinsheng/app/utils/index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
@@ -9,7 +9,7 @@ import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class SquarePage extends StatefulWidget {
-  const SquarePage({Key? key}) : super(key: key);
+  const SquarePage({super.key});
 
   @override
   State<SquarePage> createState() => _SquarePageState();
@@ -92,7 +92,8 @@ class _SquarePageState extends State<SquarePage> {
                   Expanded(
                     child: Obx(() {
                       if (squareController.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                            child: CupertinoActivityIndicator());
                       }
 
                       return CardSwiper(
@@ -129,31 +130,6 @@ class _SquarePageState extends State<SquarePage> {
 
   Widget _buildStoryItem(int index) {
     final items = [
-      // {
-      //   'id': 1,
-      //   'name': '梦想海域',
-      //   'bg':
-      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu1.png'
-      // },
-      // {
-      //   'id': 2,
-      //   'name': '希望之海',
-      //   'bg':
-      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
-      // },
-      // {
-      //   'id': 3,
-      //   'name': '宁静港湾',
-      //   'bg':
-      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
-      // },
-      // {
-      //   'id': 4,
-      //   'name': '勇气之渊',
-      //   'bg':
-      //       'https://fkxs-1321402197.cos.ap-guangzhou.myqcloud.com/haiyu_bg%2Fhaiyu2.png'
-      // },
-
       {'id': 1, 'name': '梦想海域', 'bg': 'https://picsum.photos/100/100?random=1'},
       {'id': 2, 'name': '希望之海', 'bg': 'https://picsum.photos/100/100?random=2'},
       {'id': 3, 'name': '宁静港湾', 'bg': 'https://picsum.photos/100/100?random=3'},
@@ -205,7 +181,6 @@ class _SquarePageState extends State<SquarePage> {
     // 判断瓶子类型
     bool isImageBottle = bottle.imageUrl.isNotEmpty;
     bool isAudioBottle = bottle.audioUrl.isNotEmpty;
-    bool isTextBottle = !isImageBottle && !isAudioBottle;
 
     // 定义渐变背景颜色
     List<Color> getGradientColors() {

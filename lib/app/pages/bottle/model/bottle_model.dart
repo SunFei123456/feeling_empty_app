@@ -10,14 +10,14 @@ class BottleModel {
   final String mood;
   final int topicId;
   final UserInfo user;
-  final bool isResonated;
-  final bool isFavorited;
-  final int views;
-  final int resonates;
-  final int favorites;
-  final int shares;
+  int resonates;
+  int views;
+  int favorites;
+  int shares;
+  bool isResonated;
+  bool isFavorited;
 
-  const BottleModel({
+  BottleModel({
     required this.id,
     this.audioUrl = '',
     this.content = '',
@@ -82,5 +82,28 @@ class BottleModel {
       'is_resonated': isResonated,
       'is_favorited': isFavorited,
     };
+  }
+
+  BottleModel copyWith({
+    bool? isResonated,
+    int? resonates,
+  }) {
+    return BottleModel(
+      id: id,
+      audioUrl: audioUrl,
+      content: content,
+      title: title,
+      createdAt: createdAt,
+      imageUrl: imageUrl,
+      mood: mood,
+      topicId: topicId,
+      user: user,
+      isResonated: isResonated ?? this.isResonated,
+      resonates: resonates ?? this.resonates,
+      isFavorited: isFavorited,
+      views: views,
+      favorites: favorites,
+      shares: shares,
+    );
   }
 }
