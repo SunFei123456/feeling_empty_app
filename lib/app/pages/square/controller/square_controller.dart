@@ -13,6 +13,7 @@ class SquareController extends GetxController {
     fetchRandomBottles();
   }
 
+  // 获取随机的漂流瓶
   Future<void> fetchRandomBottles() async {
     try {
       if (isLoading.value) return; // 防止重复请求
@@ -33,6 +34,31 @@ class SquareController extends GetxController {
       Get.snackbar('错误', '获取漂流瓶失败');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // 添加更新瓶子共振状态的方法
+  void updateBottleResonateStatus(int bottleId, {required bool isResonated, required int resonates}) {
+    final index = bottles.indexWhere((bottle) => bottle.id == bottleId);
+    if (index != -1) {
+      bottles[index].isResonated = isResonated;
+      bottles[index].resonates = resonates;
+      bottles.refresh();  // 刷新列表触发UI更新
+    }
+  }
+
+  // 获取瓶子的当前状态
+  BottleModel? getBottleStatus(int bottleId) {
+    return bottles.firstWhereOrNull((bottle) => bottle.id == bottleId);
+  }
+
+  // 更新瓶子的收藏状态
+  void updateBottleFavoriteStatus(int bottleId, {required bool isFavorited, required int favorites}) {
+    final index = bottles.indexWhere((bottle) => bottle.id == bottleId);
+    if (index != -1) {
+      bottles[index].isFavorited = isFavorited;
+      bottles[index].favorites = favorites;
+      bottles.refresh();
     }
   }
 }

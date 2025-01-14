@@ -1,6 +1,10 @@
 import 'dart:ui';
+import 'dart:typed_data';
+import 'package:screenshot/screenshot.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
+import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +12,7 @@ import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
 
 import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
-
+import 'package:fangkong_xinsheng/app/widgets/share_card_widget.dart';
 // 凡是进入到 瓶子的详情页,  走这个页面 BottleCardDetail
 // ignore: must_be_immutable
 class BottleCardDetail extends StatefulWidget {
@@ -20,7 +24,7 @@ class BottleCardDetail extends StatefulWidget {
   final String? audioUrl;
   final UserInfo? user;
   int resonates;
-  final int favorites;
+  int favorites;
   final int shares;
   final int views;
   bool isResonated;
@@ -49,29 +53,52 @@ class BottleCardDetail extends StatefulWidget {
 
 class _BottleCardDetailState extends State<BottleCardDetail> {
   final _api = BottleInteractionApiService();
+  final _screenshotController = ScreenshotController();
 
+  final squareController = Get.put(SquareController());
   @override
   void initState() {
     super.initState();
+    // 同步瓶子状态
+    final bottleStatus = squareController.getBottleStatus(widget.id);
+    if (bottleStatus != null) {
+      setState(() {
+        widget.isResonated = bottleStatus.isResonated;
+        widget.resonates = bottleStatus.resonates;
+        widget.isFavorited = bottleStatus.isFavorited;
+        widget.favorites = bottleStatus.favorites;
+      });
+    }
   }
 
   Future<void> _handleResonate() async {
     try {
       if (widget.isResonated) {
+        // 改回原来的逻辑
         final response = await _api.unresonateBottle(widget.id);
         if (response.success) {
           setState(() {
-            widget.isResonated = false;
             widget.resonates--;
+            widget.isResonated = false;
           });
+          squareController.updateBottleResonateStatus(
+            widget.id,
+            isResonated: false,
+            resonates: widget.resonates,
+          );
         }
       } else {
         final response = await _api.resonateBottle(widget.id);
         if (response.success) {
           setState(() {
-            widget.isResonated = true;
             widget.resonates++;
+            widget.isResonated = true;
           });
+          squareController.updateBottleResonateStatus(
+            widget.id,
+            isResonated: true,
+            resonates: widget.resonates,
+          );
         }
       }
     } catch (e) {
@@ -84,16 +111,73 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
       if (widget.isFavorited) {
         final response = await _api.unfavoriteBottle(widget.id);
         if (response.success) {
-          setState(() => widget.isFavorited = false);
+          setState(() {
+            widget.favorites--;
+            widget.isFavorited = false;
+          });
+          squareController.updateBottleFavoriteStatus(
+            widget.id,
+            isFavorited: false,
+            favorites: widget.favorites,
+          );
         }
       } else {
         final response = await _api.favoriteBottle(widget.id);
         if (response.success) {
-          setState(() => widget.isFavorited = true);
+          setState(() {
+            widget.favorites++;
+            widget.isFavorited = true;
+          });
+          squareController.updateBottleFavoriteStatus(
+            widget.id,
+            isFavorited: true,
+            favorites: widget.favorites,
+          );
         }
       }
     } catch (e) {
       Get.snackbar('错误', '操作失败，请稍后重试');
+    }
+  }
+
+  Future<void> _saveToLocal() async {
+    try {
+      // 截取分享卡片
+      final Uint8List? imageBytes = await _screenshotController.captureFromWidget(
+        MediaQuery(
+          data: MediaQueryData.fromView(View.of(context)),
+          child: ShareCardWidget(
+            title: widget.title,
+            content: widget.content,
+            imageUrl: widget.imageUrl,
+            audioUrl: widget.audioUrl,
+            createdAt: widget.createdAt,
+            userAvatar: widget.user?.avatar,
+            userNickname: widget.user?.nickname,
+          ),
+        ),
+        delay: const Duration(milliseconds: 10),
+        pixelRatio: 3.0,
+        context: context,
+      );
+
+      if (imageBytes != null) {
+        // 保存到相册
+        final result = await ImageGallerySaver.saveImage(
+          imageBytes,
+          quality: 100,
+          name: "bottle_${DateTime.now().millisecondsSinceEpoch}",
+        );
+
+        if (result['isSuccess']) {
+          Get.back();
+          Get.snackbar('成功', '图片已保存到相册');
+        } else {
+          Get.snackbar('错误', '保存失败，请重试');
+        }
+      }
+    } catch (e) {
+      Get.snackbar('错误', '保存失败：$e');
     }
   }
 
@@ -120,10 +204,10 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
         InkWell(
           onTap: () {},
           child: _buildInteractionButton(
-              Icons.view_agenda_outlined, widget.views, Colors.grey[700]),
+              Icons.remove_red_eye_outlined, widget.views, Colors.grey[700]),
         ),
         InkWell(
-          onTap: () {},
+          onTap: _showShareOptions,
           child: _buildInteractionButton(
               Icons.share, widget.shares, Colors.grey[700]),
         ),
@@ -144,6 +228,34 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showShareOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => ShareBottomSheet(
+        shareCard: ShareCardWidget(
+          title: widget.title,
+          content: widget.content,
+          imageUrl: widget.imageUrl,
+          audioUrl: widget.audioUrl,
+          createdAt: widget.createdAt,
+          userAvatar: widget.user?.avatar,
+          userNickname: widget.user?.nickname,
+        ),
+        onSaveLocal: _saveToLocal,
+        onShareWechat: () {
+          // TODO: 实现微信分享
+          Get.back();
+        },
+        onShareTimeline: () {
+          // TODO: 实现朋友圈分享
+          Get.back();
+        },
+      ),
     );
   }
 
