@@ -4,13 +4,13 @@ import '../../core/services/app_service.dart';
 
 class SettingController extends GetxController {
   final _appService = Get.find<AppService>();
-  
+
   // 当前主题模式
   bool get isDarkMode => _appService.isDarkMode;
-  
+
   // 当前语言
   Locale get currentLocale => _appService.currentLocale;
-  
+
   // 支持的语言列表
   final List<Map<String, dynamic>> languages = [
     {'name': '简体中文', 'locale': const Locale('zh', 'CN')},
@@ -28,4 +28,4 @@ class SettingController extends GetxController {
     _appService.updateLocale(locale);
     update();
   }
-} 
+}

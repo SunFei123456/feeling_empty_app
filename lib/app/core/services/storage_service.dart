@@ -1,13 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 存储键名管理
-class StorageKeys {
-  static const isDarkMode = 'isDarkMode';
-  static const languageCode = 'languageCode';
-  static const countryCode = 'countryCode';
-}
-
 /// 本地存储服务
 class StorageService extends GetxService {
   late final SharedPreferences _prefs;

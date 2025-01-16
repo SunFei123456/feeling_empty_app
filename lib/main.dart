@@ -20,6 +20,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:flutter/foundation.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -56,8 +57,8 @@ class MyApp extends StatelessWidget {
       getPages: AppRoutes.getPages(),
       unknownRoute: GetPage(name: "/notfound", page: () => const NotFound()),
 
-      darkTheme: ThemeData.dark(), // 保留深色主题配置
-      themeMode: ThemeMode.light, // 强制使用亮色主题
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.system,
 
       // 国际化配置
       translations: AppTranslations(),
