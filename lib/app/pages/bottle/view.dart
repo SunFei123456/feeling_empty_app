@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:fangkong_xinsheng/app/core/services/app_service.dart';
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -12,7 +14,7 @@ import 'package:fangkong_xinsheng/app/pages/bottle/widget/hot_topics.dart';
 import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
 
 class BottlePage extends StatefulWidget {
-  const BottlePage({Key? key}) : super(key: key);
+  const BottlePage({super.key});
 
   @override
   State<BottlePage> createState() => _BottlePageState();
@@ -20,7 +22,7 @@ class BottlePage extends StatefulWidget {
 
 class _BottlePageState extends State<BottlePage> {
   late final ProfileController _profileController;
-  late final TopicController _topicController;
+  final _appService = Get.find<AppService>();
 
   @override
   void initState() {
@@ -30,63 +32,62 @@ class _BottlePageState extends State<BottlePage> {
       tag: 'current_user',
       permanent: true,
     );
-    
+
     if (!Get.isRegistered<TopicController>()) {
       Get.put(TopicController());
     }
-    _topicController = Get.find<TopicController>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // 海洋动态背景
-          _buildOceanBackground(),
+    return Obx(() => Scaffold(
+          body: Stack(
+            children: [
+              // 海洋动态背景
+              _buildOceanBackground(),
 
-          // 主要内容
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // 顶部AppBar
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: BottleHeaderDelegate(_profileController),
-              ),
-
-              // 内容区域
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-
-                      // 漂流瓶动画展示区
-                      _buildBottleShowcase(),
-                      const SizedBox(height: 30),
-
-                      // 快捷操作区
-                      _buildQuickActions(),
-                      const SizedBox(height: 30),
-
-                      // 热门话题区
-                      _buildHotTopics(),
-                      const SizedBox(height: 20),
-
-                      // 最近漂流瓶
-                      _buildRecentBottles(),
-                    ],
+              // 主要内容
+              CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  // 顶部AppBar
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: BottleHeaderDelegate(_profileController),
                   ),
-                ),
+
+                  // 内容区域
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+
+                          // 漂流瓶动画展示区
+                          _buildBottleShowcase(),
+                          const SizedBox(height: 30),
+
+                          // 快捷操作区
+                          _buildQuickActions(_appService.isDarkMode),
+                          const SizedBox(height: 30),
+
+                          // 热门话题区
+                          _buildHotTopics(),
+                          const SizedBox(height: 20),
+
+                          // 推荐的漂流瓶
+                          _buildRecentBottles(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildOceanBackground() {
@@ -283,7 +284,7 @@ class _BottlePageState extends State<BottlePage> {
                     const Spacer(),
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -299,7 +300,7 @@ class _BottlePageState extends State<BottlePage> {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(bool isDarkMode) {
     final actions = [
       {
         'icon': Icons.local_fire_department,
@@ -352,7 +353,7 @@ class _BottlePageState extends State<BottlePage> {
               Text(
                 action['label'] as String,
                 style: TextStyle(
-                  color: Colors.grey[700],
+                  color: isDarkMode ? Colors.white : Colors.black,
                   fontSize: 12,
                 ),
               ),

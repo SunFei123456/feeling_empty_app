@@ -95,13 +95,12 @@ class CustomDrawer extends StatelessWidget {
                               MenuItem(
                                 icon: Icons.dark_mode,
                                 title: 'dark_mode'.tr,
-                                trailing: Obx(() => Switch(
-                                  activeColor: Colors.blue,
+                                trailing: Switch(
+                                  activeColor:Colors.blue ,
                                   value: settingController.isDarkMode,
-                                  onChanged: (bool value) {
-                                    settingController.toggleTheme();
-                                  },
-                                )),
+                                  onChanged: (_) =>
+                                      settingController.toggleTheme(),
+                                ),
                               ),
                               MenuItem(
                                 icon: Icons.language,
