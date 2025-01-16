@@ -29,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage>
   late final SettingController _settingController;
   late final ProfileController _profileController;
   late final bool _isCurrentUser;
+  final currentUserId = TokenService().getUserId();
 
   @override
   void initState() {
@@ -37,8 +38,7 @@ class _ProfilePageState extends State<ProfilePage>
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
 
-    // 获取当前用户ID
-    final currentUserId = TokenService().getUserId();
+
 
     // 在这里处理用户身份校验
     _isCurrentUser = widget.userId == null || isCurrentUser(widget.userId!);
@@ -397,7 +397,7 @@ class _ProfilePageState extends State<ProfilePage>
                   // 公开照片瀑布流
                   RefreshIndicator(
                     onRefresh: () =>
-                        _profileController.refreshBottles(widget.userId!),
+                        _profileController.refreshBottles(widget.userId ?? currentUserId! ),
                     child: Obx(() {
                       return MasonryGridView.count(
                         padding: const EdgeInsets.all(16),
@@ -534,7 +534,7 @@ class _ProfilePageState extends State<ProfilePage>
                   // 私密漂流瓶
                   RefreshIndicator(
                     onRefresh: () => _profileController
-                        .refreshPrivateBottles(widget.userId!),
+                        .refreshPrivateBottles(widget.userId ?? currentUserId! ),
                     child: Obx(() {
                       print(
                           'Private bottles count: ${_profileController.privateBottles.length}');
