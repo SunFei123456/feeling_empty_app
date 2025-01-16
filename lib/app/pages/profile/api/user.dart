@@ -3,6 +3,7 @@ import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/follower.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/model/user_stat.dart';
 
 class UserApiService extends BaseApiService {
   // 根据uid 获取用户信息
@@ -127,7 +128,21 @@ class UserApiService extends BaseApiService {
     );
   }
 
-  // 获取用户公开的漂流瓶
+  // 获取用户的社交数据(粉丝量 漂流瓶 关注量)
+  Future<ApiResponse<UserStat>> getUserStat(int userId) async {
+    try {
+      final response = await BaseApiService.dio.get('/users/stat/$userId');
+      return ApiResponse.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => UserStat.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      print('Get user stat error: $e');
+      rethrow;
+    }
+  }
+
+  // 获取用户公开or私密的漂流瓶
   Future<ApiResponse<List<BottleModel>>> getBottles({
     required int userId,
     required int page,
@@ -136,16 +151,13 @@ class UserApiService extends BaseApiService {
   }) async {
     try {
       final response = await BaseApiService.dio.get(
-        '/bottles',
+        '/bottles/$userId',
         queryParameters: {
           'is_public': isPublic,
           'page': page,
           'page_size': pageSize,
-          'user_id': userId,
         },
       );
-
-      print('Get public bottles response: ${response.data}');
 
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
@@ -154,7 +166,7 @@ class UserApiService extends BaseApiService {
             .toList(),
       );
     } catch (e) {
-      print('Get public bottles error: $e');
+      print('Get bottles error: $e');
       rethrow;
     }
   }

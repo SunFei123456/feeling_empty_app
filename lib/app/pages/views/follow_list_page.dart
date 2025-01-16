@@ -1,9 +1,9 @@
+import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/views/profile_page.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/model/follower.dart';
-import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 
 class FollowListPage extends StatefulWidget {
@@ -12,11 +12,11 @@ class FollowListPage extends StatefulWidget {
   final int? userId;
 
   const FollowListPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.isFollowers,
     this.userId,
-  }) : super(key: key);
+  });
 
   @override
   State<FollowListPage> createState() => _FollowListPageState();
@@ -24,14 +24,17 @@ class FollowListPage extends StatefulWidget {
 
 class _FollowListPageState extends State<FollowListPage> {
   late ProfileController profileController;
+  late bool isCurrentUser; // 用于判断是否是当前用户 --> 当前页面主要用于控制 关注状态的显示, 非当前用户即查看他人的粉丝/关注列表则不应展示其状态操作
 
   @override
   void initState() {
+    isCurrentUser = TokenService().getUserId() == widget.userId;
     super.initState();
     if (widget.userId == null) {
       Get.back();
       return;
     }
+    
     profileController = Get.put(
       ProfileController(userId: widget.userId),
     );
@@ -112,8 +115,7 @@ class _FollowListPageState extends State<FollowListPage> {
         child: Row(
           children: [
             // 头像
-            CircleAvatar(
-                radius: 24, backgroundImage: NetworkImage(user.avatar)),
+            CircleAvatar(radius: 24, backgroundImage: NetworkImage(user.avatar)),
             const SizedBox(width: 12),
             // 用户信息
             Expanded(
@@ -149,8 +151,8 @@ class _FollowListPageState extends State<FollowListPage> {
                 ],
               ),
             ),
-            // 关注状态/操作按钮
-            _buildFollowButton(follower.followStatus, user.id, isDark),
+            // 只有当是当前用户的列表时才显示关注按钮
+            if (isCurrentUser) _buildFollowButton(follower.followStatus, user.id, isDark),
           ],
         ),
       ),

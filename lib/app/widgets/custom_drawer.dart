@@ -120,6 +120,7 @@ class CustomDrawer extends StatelessWidget {
                                 title: '退出登录',
                                 textColor: Colors.red,
                                 onTap: () async {
+                                  await  Get.delete<ProfileController>(force: true);
                                   await TokenService().clearAuth();
                                   AppRoutes.offAll(AppRoutes.login);
                                 },

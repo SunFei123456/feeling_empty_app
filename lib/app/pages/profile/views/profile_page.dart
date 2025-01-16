@@ -1,28 +1,23 @@
 import 'dart:ui';
-import 'dart:io';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
-import 'package:fangkong_xinsheng/app/pages/home/model/user.dart';
-import 'package:fangkong_xinsheng/app/pages/login/model/login.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:fangkong_xinsheng/app/webview/index.dart';
 import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fangkong_xinsheng/app/pages/setting/controller.dart';
 import 'package:fangkong_xinsheng/app/widgets/custom_drawer.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
 import 'package:fangkong_xinsheng/app/router/index.dart';
-import 'package:fangkong_xinsheng/app/pages/profile/views/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final int? userId;
 
-  const ProfilePage({Key? key, this.userId}) : super(key: key);
+  const ProfilePage({super.key, this.userId});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -42,12 +37,18 @@ class _ProfilePageState extends State<ProfilePage>
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
 
+    // 获取当前用户ID
+    final currentUserId = TokenService().getUserId();
+
     // 在这里处理用户身份校验
     _isCurrentUser = widget.userId == null || isCurrentUser(widget.userId!);
 
-    // 根据是否是当前用户决定使用哪个 tag
+    // 根据是否是当前用户决定使用哪个 tag 和 userId
     _profileController = Get.put(
-      ProfileController(userId: _isCurrentUser ? null : widget.userId),
+      ProfileController(
+        // 如果是当前用户页面，使用 currentUserId，否则使用 widget.userId
+        userId: widget.userId ?? currentUserId,
+      ),
       tag: _isCurrentUser ? 'current_user' : widget.userId.toString(),
     );
   }
@@ -311,7 +312,8 @@ class _ProfilePageState extends State<ProfilePage>
 
                                             if (result == true) {
                                               await _profileController
-                                                  .refreshUserInfo();
+                                                  .refreshUserInfo(
+                                                      widget.userId!);
                                             }
                                           },
                                           child: Container(
@@ -394,138 +396,148 @@ class _ProfilePageState extends State<ProfilePage>
                 children: [
                   // 公开照片瀑布流
                   RefreshIndicator(
-                    onRefresh: _profileController.refreshBottles,
-                    child: MasonryGridView.count(
-                      padding: const EdgeInsets.all(16),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      itemCount: _profileController.publicBottles.length,
-                      itemBuilder: (context, index) {
-                        if (index >= _profileController.publicBottles.length) {
-                          return const SizedBox();
-                        }
+                    onRefresh: () =>
+                        _profileController.refreshBottles(widget.userId!),
+                    child: Obx(() {
+                      return MasonryGridView.count(
+                        padding: const EdgeInsets.all(16),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        itemCount: _profileController.publicBottles.length,
+                        itemBuilder: (context, index) {
+                          if (index >=
+                              _profileController.publicBottles.length) {
+                            return const SizedBox();
+                          }
 
-                        final bottle = _profileController.publicBottles[index];
+                          final bottle =
+                              _profileController.publicBottles[index];
 
-                        return GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => BottleCardDetail(
-                                id: bottle.id,
-                                imageUrl: bottle.imageUrl.isNotEmpty
-                                    ? bottle.imageUrl
-                                    : 'https://picsum.photos/500/800',
-                                title: bottle.title,
-                                content: bottle.content,
-                                createdAt: bottle.createdAt,
-                                audioUrl: bottle.audioUrl,
-                                user: bottle.user,
-                              ),
-                              transition: Transition.fadeIn,
-                            );
-                          },
-                          onLongPress: () => _showBottomDrawer(context, bottle),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.black.withAlpha(200)
-                                    : Colors.white.withAlpha(200),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (bottle.imageUrl.isNotEmpty)
-                                    AspectRatio(
-                                      aspectRatio: 1,
-                                      child: Image.network(
-                                        bottle.imageUrl,
-                                        fit: BoxFit.cover,
-                                      ),
+                          return GestureDetector(
+                            onTap: () {
+                              Get.to(
+                                () => BottleCardDetail(
+                                  id: bottle.id,
+                                  imageUrl: bottle.imageUrl.isNotEmpty
+                                      ? bottle.imageUrl
+                                      : 'https://picsum.photos/500/800',
+                                  title: bottle.title,
+                                  content: bottle.content,
+                                  createdAt: bottle.createdAt,
+                                  audioUrl: bottle.audioUrl,
+                                  user: bottle.user,
+                                ),
+                                transition: Transition.fadeIn,
+                              );
+                            },
+                            onLongPress: () =>
+                                _showBottomDrawer(context, bottle),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.black.withAlpha(200)
+                                      : Colors.white.withAlpha(200),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
                                     ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          bottle.title,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (bottle.imageUrl.isNotEmpty)
+                                      AspectRatio(
+                                        aspectRatio: 1,
+                                        child: Image.network(
+                                          bottle.imageUrl,
+                                          fit: BoxFit.cover,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          bottle.content,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                            height: 1.2,
+                                      ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            bottle.title,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.remove_red_eye,
-                                                  size: 12,
-                                                  color: Colors.grey[400],
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '${bottle.views}',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            bottle.content,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[600],
+                                              height: 1.2,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.remove_red_eye,
+                                                    size: 12,
                                                     color: Colors.grey[400],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            Text(
-                                              bottle.createdAt.substring(0, 10),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey[400],
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${bottle.views}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                              Text(
+                                                bottle.createdAt
+                                                    .substring(0, 10),
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[400],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      );
+                    }),
                   ),
 
                   // 私密漂流瓶
                   RefreshIndicator(
-                    onRefresh: _profileController.refreshPrivateBottles,
+                    onRefresh: () => _profileController
+                        .refreshPrivateBottles(widget.userId!),
                     child: Obx(() {
+                      print(
+                          'Private bottles count: ${_profileController.privateBottles.length}');
                       if (_profileController.isLoadingPrivate.value &&
                           _profileController.privateBottles.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
@@ -730,9 +742,11 @@ class _ProfilePageState extends State<ProfilePage>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildStatItem(
-          '${0}',
-          '漂流瓶',
+        Obx(
+          () => _buildStatItem(
+            '${_profileController.userStat.value.bottles}',
+            '漂流瓶',
+          ),
         ),
         _buildStatDivider(),
         // 关注数量，可点击
@@ -744,7 +758,7 @@ class _ProfilePageState extends State<ProfilePage>
             },
           ),
           child: _buildStatItem(
-            '${0}',
+            '${_profileController.userStat.value.follows}',
             '关注',
           ),
         ),
@@ -758,7 +772,7 @@ class _ProfilePageState extends State<ProfilePage>
             },
           ),
           child: _buildStatItem(
-            '${0}',
+            '${_profileController.userStat.value.followers}',
             '粉丝',
           ),
         ),
@@ -832,7 +846,8 @@ class _ProfilePageState extends State<ProfilePage>
                           await BottleApiService().deleteBottle(bottle.id);
                       if (response.success) {
                         Get.snackbar('成功', '删除成功');
-                        _profileController.refreshBottles();
+                        _profileController
+                            .refreshBottles(TokenService().getUserId()!);
                       } else {
                         Get.snackbar('错误', response.message ?? '删除失败');
                       }
@@ -852,8 +867,9 @@ class _ProfilePageState extends State<ProfilePage>
                 // 修改可见性逻辑
                 BottleApiService().updateBottleVisibility(bottle.id, false);
                 // 修改后刷新列表
-                _profileController.refreshBottles();
-                _profileController.refreshPrivateBottles();
+                _profileController.refreshBottles(TokenService().getUserId()!);
+                _profileController
+                    .refreshPrivateBottles(TokenService().getUserId()!);
               },
             ),
             ListTile(

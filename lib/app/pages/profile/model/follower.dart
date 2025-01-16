@@ -1,7 +1,5 @@
 
-
-import 'package:fangkong_xinsheng/app/pages/home/model/user.dart';
-import 'package:fangkong_xinsheng/app/pages/login/model/login.dart';
+import 'package:fangkong_xinsheng/app/pages/profile/model/user.dart';
 
 class Follower {
   String? followeeId;
