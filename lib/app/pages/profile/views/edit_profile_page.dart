@@ -125,7 +125,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       // 显示加载状态
       setState(() => _profileController.isLoading.value = true);
-      
+
       await _profileController.updateUserInfo(
         avatar: _tempAvatarUrl,
         nickname: _nicknameController.text,
@@ -134,7 +134,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       // 确保更新成功后再返回
       await _profileController.fetchUserInfo();
-      
+
       // 使用 AppRoutes.back 而不是 Get.back
       AppRoutes.back(result: true);
     } catch (e) {
@@ -154,9 +154,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
         title: Text(
-          '修改信息',
+          'edit_profile_info'.tr,
           style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
+              color: isDark ? Colors.white : const Color(0xFF1A1A1A),
               fontSize: 20,
               fontWeight: FontWeight.bold),
         ),
@@ -170,7 +170,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           TextButton.icon(
             onPressed: _saveProfile,
             label: Text(
-              '保存',
+              'save'.tr,
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.black87,
               ),
@@ -262,7 +262,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               // 昵称
               Text(
-                '昵称',
+                'nickname'.tr,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -307,7 +307,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               // 性别选择
               Text(
-                '性别',
+                'sex'.tr,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -320,7 +320,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Expanded(
                     child: _buildGenderCard(
                       icon: Icons.male,
-                      label: '男生',
+                      label: 'male'.tr,
                       value: 1,
                       color: Colors.blue,
                       isDark: isDark,
@@ -330,7 +330,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Expanded(
                     child: _buildGenderCard(
                       icon: Icons.female,
-                      label: '女生',
+                      label: 'female'.tr,
                       value: 2,
                       color: Colors.pink,
                       isDark: isDark,

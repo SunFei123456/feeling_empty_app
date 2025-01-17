@@ -15,7 +15,7 @@ class HotTopicsWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '热门话题',
+          'trending_topics'.tr,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,

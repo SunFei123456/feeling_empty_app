@@ -13,9 +13,9 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '浏览记录',
-          style: TextStyle(
+        title: Text(
+          'browsing_history'.tr,
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -29,10 +29,10 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
             icon: Icon(Icons.delete_outline_rounded),
             onPressed: () => {
               ConfirmDialog.show(
-                title: '删除确认',
-                content: '确定要删除所有浏览记录吗？',
-                confirmText: '确认',
-                cancelText: '取消',
+                title: 'delete_confirm',
+                content: 'delete_all_history',
+                confirmText: 'confirm',
+                cancelText: 'cancel',
                 onConfirm: () {
                   Get.find<ViewHistoryController>().clearHistory();
                 },
@@ -113,7 +113,8 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                 onRefresh: () => controller.loadViewHistory(refresh: true),
                 color: Theme.of(context).primaryColor,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: controller.historyItems.length,
                   itemBuilder: (context, index) {
                     if (index == controller.historyItems.length - 1) {
@@ -125,7 +126,7 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                       background: Container(
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
-                        color: Colors.red,
+                        color: Colors.redAccent,
                         child: const Icon(
                           Icons.delete_outline,
                           color: Colors.white,
@@ -136,18 +137,20 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text('确认删除'),
-                              content: const Text('确定要删除这条浏览记录吗？'),
+                              title: Text('delete_confirm'.tr),
+                              content: Text('delete_one_history'.tr),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
-                                  child: const Text('取消'),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: Text('cancel'.tr),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(true),
-                                  child: const Text(
-                                    '删除',
-                                    style: TextStyle(color: Colors.red),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: Text(
+                                    'delete'.tr,
+                                    style: const TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],

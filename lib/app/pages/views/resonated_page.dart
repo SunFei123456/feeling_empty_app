@@ -38,7 +38,7 @@ class _ResonatedPageState extends State<ResonatedPage> {
         page: currentPage,
         pageSize: pageSize,
       );
-      
+
       if (response.success) {
         final newItems = response.data ?? [];
         if (newItems.isEmpty) {
@@ -61,9 +61,9 @@ class _ResonatedPageState extends State<ResonatedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '我的共鸣',
-          style: TextStyle(
+        title: Text(
+          'my_resonance'.tr,
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -80,7 +80,8 @@ class _ResonatedPageState extends State<ResonatedPage> {
               : Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -96,7 +97,9 @@ class _ResonatedPageState extends State<ResonatedPage> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withOpacity(0.1),
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -121,7 +124,8 @@ class _ResonatedPageState extends State<ResonatedPage> {
                       child: RefreshIndicator(
                         onRefresh: () => _loadResonatedItems(refresh: true),
                         child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                           itemCount: resonatedItems.length,
                           itemBuilder: (context, index) {
                             final item = resonatedItems[index];
@@ -154,4 +158,4 @@ class _ResonatedPageState extends State<ResonatedPage> {
       ),
     );
   }
-} 
+}

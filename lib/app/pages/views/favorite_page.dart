@@ -38,7 +38,7 @@ class _FavoritePageState extends State<FavoritePage> {
         page: currentPage,
         pageSize: pageSize,
       );
-      
+
       if (response.success) {
         final newItems = response.data ?? [];
         if (newItems.isEmpty) {
@@ -61,9 +61,9 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '我的收藏',
-          style: TextStyle(
+        title: Text(
+          'my_favorites'.tr,
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -81,7 +81,8 @@ class _FavoritePageState extends State<FavoritePage> {
                   children: [
                     // 顶部统计栏
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -97,7 +98,9 @@ class _FavoritePageState extends State<FavoritePage> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withOpacity(0.1),
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -123,7 +126,8 @@ class _FavoritePageState extends State<FavoritePage> {
                       child: RefreshIndicator(
                         onRefresh: () => _loadFavorites(refresh: true),
                         child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                           itemCount: favorites.length,
                           itemBuilder: (context, index) {
                             final item = favorites[index];
@@ -156,4 +160,4 @@ class _FavoritePageState extends State<FavoritePage> {
       ),
     );
   }
-} 
+}

@@ -15,10 +15,10 @@ class PublishPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         elevation: 0,
         title: Text(
-          '发布',
+          'publish'.tr,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 20,
@@ -35,7 +35,7 @@ class PublishPage extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
               Text(
-                '你想分享什么？',
+                "${'today_write_question'.tr} 🤔",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -44,7 +44,7 @@ class PublishPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '选择一种方式开始分享你的故事',
+                '${'empty_voice_choice'.tr} 🎉',
                 style: TextStyle(
                   fontSize: 14,
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -56,8 +56,8 @@ class PublishPage extends StatelessWidget {
                   _buildTypeButton(
                     context: context,
                     icon: Icons.message,
-                    label: '漂流瓶',
-                    description: '写下你的心情，让它随波逐流',
+                    label: 'bottle_title'.tr,
+                    description: 'write_mood_flow'.tr,
                     color: const Color(0xFF6B4CE6),
                     onTap: () => Get.to(
                       () => const WriteBottlePage(),
@@ -68,8 +68,8 @@ class PublishPage extends StatelessWidget {
                   _buildTypeButton(
                     context: context,
                     icon: Icons.mail,
-                    label: '时光信件',
-                    description: '写给未来的自己或是特别的人',
+                    label: 'time_letter'.tr,
+                    description: 'write_to_future'.tr,
                     color: const Color(0xFF4ECDC4),
                     onTap: () => Get.to(
                       () => const WriteLetterPage(),
@@ -153,7 +153,7 @@ class PublishPage extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '开始创作',
+                    'start_creating'.tr,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

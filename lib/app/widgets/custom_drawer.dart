@@ -11,10 +11,10 @@ class CustomDrawer extends StatelessWidget {
   final ProfileController profileController;
 
   const CustomDrawer({
-    Key? key,
+    super.key,
     required this.settingController,
     required this.profileController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,29 +62,25 @@ class CustomDrawer extends StatelessWidget {
                             isDark,
                             items: [
                               MenuItem(
-                                icon: Icons.edit,
-                                title: '修改资料',
-                                onTap: () =>
-                                    AppRoutes.to(AppRoutes.EDIT_PROFILE),
-                              ),
+                                  icon: Icons.edit,
+                                  title: 'edit_profile'.tr,
+                                  onTap: () =>
+                                      AppRoutes.to(AppRoutes.EDIT_PROFILE)),
                               MenuItem(
-                                icon: Icons.history,
-                                title: '浏览历史',
-                                onTap: () =>
-                                    AppRoutes.to(AppRoutes.VIEW_HISTORY),
-                              ),
+                                  icon: Icons.history,
+                                  title: 'browsing_history'.tr,
+                                  onTap: () =>
+                                      AppRoutes.to(AppRoutes.VIEW_HISTORY)),
                               MenuItem(
-                                icon: Icons.bookmark,
-                                title: '我的收藏',
-                                onTap: () =>
-                                    AppRoutes.to(AppRoutes.FAVORITED_BOTTLE),
-                              ),
+                                  icon: Icons.bookmark,
+                                  title: 'my_favorites'.tr,
+                                  onTap: () =>
+                                      AppRoutes.to(AppRoutes.FAVORITED_BOTTLE)),
                               MenuItem(
-                                icon: Icons.favorite,
-                                title: '我的共鸣',
-                                onTap: () =>
-                                    AppRoutes.to(AppRoutes.RESONATED_BOTTLE),
-                              ),
+                                  icon: Icons.favorite,
+                                  title: 'my_resonance'.tr,
+                                  onTap: () =>
+                                      AppRoutes.to(AppRoutes.RESONATED_BOTTLE)),
                             ],
                           ),
                           _buildDivider(isDark),
@@ -96,7 +92,7 @@ class CustomDrawer extends StatelessWidget {
                                 icon: Icons.dark_mode,
                                 title: 'dark_mode'.tr,
                                 trailing: Switch(
-                                  activeColor:Colors.blue ,
+                                  activeColor: Colors.blue,
                                   value: settingController.isDarkMode,
                                   onChanged: (_) =>
                                       settingController.toggleTheme(),
@@ -117,10 +113,11 @@ class CustomDrawer extends StatelessWidget {
                             items: [
                               MenuItem(
                                 icon: Icons.logout,
-                                title: '退出登录',
+                                title: 'log_out'.tr,
                                 textColor: Colors.red,
                                 onTap: () async {
-                                  await  Get.delete<ProfileController>(force: true);
+                                  await Get.delete<ProfileController>(
+                                      force: true);
                                   await TokenService().clearAuth();
                                   AppRoutes.offAll(AppRoutes.login);
                                 },

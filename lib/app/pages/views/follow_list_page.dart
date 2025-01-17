@@ -51,7 +51,7 @@ class _FollowListPageState extends State<FollowListPage> {
       backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       appBar: AppBar(
         title: Text(
-          widget.title,
+          (widget.title).tr,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,

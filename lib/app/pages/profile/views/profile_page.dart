@@ -38,8 +38,6 @@ class _ProfilePageState extends State<ProfilePage>
     _tabController = TabController(length: 2, vsync: this);
     _settingController = Get.find<SettingController>();
 
-
-
     // 在这里处理用户身份校验
     _isCurrentUser = widget.userId == null || isCurrentUser(widget.userId!);
 
@@ -371,7 +369,7 @@ class _ProfilePageState extends State<ProfilePage>
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
                               ),
-                              child: const Center(child: Text('公开')),
+                              child: Center(child: Text('public'.tr)),
                             ),
                           ),
                           Tab(
@@ -379,7 +377,7 @@ class _ProfilePageState extends State<ProfilePage>
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
                               ),
-                              child: const Center(child: Text('私密')),
+                              child: Center(child: Text('private'.tr)),
                             ),
                           ),
                         ],
@@ -396,8 +394,8 @@ class _ProfilePageState extends State<ProfilePage>
                 children: [
                   // 公开照片瀑布流
                   RefreshIndicator(
-                    onRefresh: () =>
-                        _profileController.refreshBottles(widget.userId ?? currentUserId! ),
+                    onRefresh: () => _profileController
+                        .refreshBottles(widget.userId ?? currentUserId!),
                     child: Obx(() {
                       return MasonryGridView.count(
                         padding: const EdgeInsets.all(16),
@@ -534,10 +532,8 @@ class _ProfilePageState extends State<ProfilePage>
                   // 私密漂流瓶
                   RefreshIndicator(
                     onRefresh: () => _profileController
-                        .refreshPrivateBottles(widget.userId ?? currentUserId! ),
+                        .refreshPrivateBottles(widget.userId ?? currentUserId!),
                     child: Obx(() {
-                      print(
-                          'Private bottles count: ${_profileController.privateBottles.length}');
                       if (_profileController.isLoadingPrivate.value &&
                           _profileController.privateBottles.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
@@ -549,10 +545,10 @@ class _ProfilePageState extends State<ProfilePage>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.lock_outline,
-                                  size: 64, color: Colors.grey[300]),
+                                  size: 64, color: Colors.grey[400]),
                               const SizedBox(height: 16),
                               Text(
-                                '暂无私密漂流瓶',
+                                'no_private_bottles'.tr,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[400],
@@ -745,7 +741,7 @@ class _ProfilePageState extends State<ProfilePage>
         Obx(
           () => _buildStatItem(
             '${_profileController.userStat.value.bottles}',
-            '漂流瓶',
+            'bottle_title'.tr,
           ),
         ),
         _buildStatDivider(),
@@ -759,7 +755,7 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           child: _buildStatItem(
             '${_profileController.userStat.value.follows}',
-            '关注',
+            'following'.tr,
           ),
         ),
         _buildStatDivider(),
@@ -773,7 +769,7 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           child: _buildStatItem(
             '${_profileController.userStat.value.followers}',
-            '粉丝',
+            'follower'.tr,
           ),
         ),
       ],

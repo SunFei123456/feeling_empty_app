@@ -100,7 +100,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
@@ -110,7 +110,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          '写漂流瓶',
+          'write_a_drift_bottle'.tr,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 18,
@@ -122,7 +122,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           TextButton(
             onPressed: _handleSubmit,
             child: Text(
-              '发布',
+              'publish'.tr,
               style: TextStyle(
                 color: isDark ? Colors.blue[200] : Colors.blue,
                 fontSize: 16,
@@ -151,7 +151,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               child: TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  hintText: '给漂流瓶起个标题吧...',
+                  hintText: 'publish_bottle_title'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -174,21 +174,21 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                   _buildTypeButton(
                     type: BottleType.text,
                     icon: Icons.text_fields,
-                    label: '文字',
+                    label: 'bottle_type_text',
                     isDark: isDark,
                   ),
                   const SizedBox(width: 12),
                   _buildTypeButton(
                     type: BottleType.image,
                     icon: Icons.image,
-                    label: '图文',
+                    label: 'bottle_type_image',
                     isDark: isDark,
                   ),
                   const SizedBox(width: 12),
                   _buildTypeButton(
                     type: BottleType.audio,
                     icon: Icons.mic,
-                    label: '音文',
+                    label: 'bottle_type_voice',
                     isDark: isDark,
                   ),
                 ],
@@ -215,7 +215,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                       color: isDark ? Colors.white : Colors.black,
                     ),
                     decoration: InputDecoration(
-                      hintText: '写下你想说的话...',
+                      hintText: 'write_words'.tr,
                       hintStyle: TextStyle(
                         color: isDark ? Colors.grey[600] : Colors.grey[400],
                       ),
@@ -274,7 +274,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               ),
               const SizedBox(height: 4),
               Text(
-                label,
+                label.tr,
                 style: TextStyle(
                   fontSize: 12,
                   color: isSelected
@@ -473,49 +473,49 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     final List<Map<String, dynamic>> moods = [
       {
         'emoji': '😊',
-        'label': '开心',
+        'label': 'happy',
         'value': BottleMood.happy.name,
         'color': Colors.yellow
       },
       {
         'emoji': '😢',
-        'label': '难过',
+        'label': 'sad',
         'value': BottleMood.sad.name,
         'color': Colors.blue
       },
       {
         'emoji': '🤔',
-        'label': '思考',
+        'label': 'thinking',
         'value': BottleMood.thinking.name,
         'color': Colors.purple
       },
       {
         'emoji': '😠',
-        'label': '生气',
+        'label': 'angry',
         'value': BottleMood.angry.name,
         'color': Colors.red
       },
       {
         'emoji': '🥳',
-        'label': '期待',
+        'label': 'excited',
         'value': BottleMood.excited.name,
         'color': Colors.orange
       },
       {
         'emoji': '😴',
-        'label': '疲惫',
+        'label': 'tired',
         'value': BottleMood.tired.name,
         'color': Colors.grey
       },
       {
         'emoji': '🥰',
-        'label': '喜欢',
+        'label': 'love',
         'value': BottleMood.love.name,
         'color': Colors.pink
       },
       {
         'emoji': '😮',
-        'label': '惊讶',
+        'label': 'surprised',
         'value': BottleMood.surprised.name,
         'color': Colors.green
       },
@@ -525,7 +525,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '选择心情',
+          'choose_mood'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -646,7 +646,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '选择话题',
+              'choose_topic'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -663,7 +663,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                   builder: (context) => AlertDialog(
                     backgroundColor: isDark ? Colors.grey[900] : Colors.white,
                     title: Text(
-                      '添加自定义话题',
+                      'add_customize_topic'.tr,
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black,
                       ),
@@ -674,7 +674,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         color: isDark ? Colors.white : Colors.black,
                       ),
                       decoration: InputDecoration(
-                        hintText: '输入话题名称（不超过6个字）',
+                        hintText: 'input_topic_name'.tr,
                         hintStyle: TextStyle(
                           color: isDark ? Colors.grey[400] : Colors.grey[600],
                         ),
@@ -690,7 +690,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                       TextButton(
                         onPressed: () => Navigator.pop(context),
                         child: Text(
-                          '取消',
+                          'cancel'.tr,
                           style: TextStyle(
                             color: isDark ? Colors.grey[400] : Colors.grey[600],
                           ),
@@ -718,7 +718,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                           }
                         },
                         child: Text(
-                          '确定',
+                          'confirm'.tr,
                           style: TextStyle(
                             color: isDark ? Colors.blue[200] : Colors.blue,
                           ),
@@ -734,7 +734,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                 color: isDark ? Colors.blue[200] : Colors.blue,
               ),
               label: Text(
-                '自定义话题',
+                'customize_topic'.tr,
                 style: TextStyle(
                   fontSize: 14,
                   color: isDark ? Colors.blue[200] : Colors.blue,
@@ -949,7 +949,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '公开漂流瓶',
+            'public_drift_bottle',
             style: TextStyle(
               fontSize: 16,
               color: isDark ? Colors.white : Colors.black,
@@ -970,7 +970,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '选择投放海域',
+          'choose_drop_sea_area'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,

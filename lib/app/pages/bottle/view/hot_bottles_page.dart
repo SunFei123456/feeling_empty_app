@@ -11,6 +11,8 @@ class HotBottlesPage extends GetView<BottleController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     Get.put(BottleController());
 
     controller.loadDayHotBottles(); // 默认加载24小时热门
@@ -20,9 +22,9 @@ class HotBottlesPage extends GetView<BottleController> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            '热门漂流瓶',
-            style: TextStyle(
+          title: Text(
+            'hot_bottles'.tr,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -31,7 +33,7 @@ class HotBottlesPage extends GetView<BottleController> {
           elevation: 0,
           bottom: TabBar(
             isScrollable: true,
-            labelColor: Colors.black,
+            labelColor: isDarkMode ? Colors.white : Colors.black,
             unselectedLabelColor: Colors.grey[400],
             labelStyle: const TextStyle(
               fontSize: 15,
@@ -41,7 +43,7 @@ class HotBottlesPage extends GetView<BottleController> {
               fontSize: 15,
               fontWeight: FontWeight.normal,
             ),
-            indicatorColor: Colors.black,
+            indicatorColor: isDarkMode ? Colors.white : Colors.black,
             indicatorWeight: 2,
             indicatorSize: TabBarIndicatorSize.label,
             onTap: (index) {
@@ -57,10 +59,10 @@ class HotBottlesPage extends GetView<BottleController> {
                   break;
               }
             },
-            tabs: const [
-              Tab(text: '24小时热门'),
-              Tab(text: '本周热门'),
-              Tab(text: '本月热门'),
+            tabs:  [
+              Tab(text: 'trending_24h'.tr),
+              Tab(text: 'trending_week'.tr),
+              Tab(text: 'trending_month'.tr),
             ],
           ),
         ),
@@ -152,7 +154,7 @@ class HotBottlesPage extends GetView<BottleController> {
             resonates: bottle.resonates,
           ),
         );
-        
+
         try {
           final viewHistoryController = Get.put(ViewHistoryController());
           await viewHistoryController.createViewHistory(bottle.id);
@@ -254,7 +256,9 @@ class HotBottlesPage extends GetView<BottleController> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            bottle.title.isNotEmpty ? bottle.title : bottle.mood,
+                            bottle.title.isNotEmpty
+                                ? bottle.title
+                                : bottle.mood,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

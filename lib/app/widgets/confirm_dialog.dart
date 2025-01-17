@@ -12,22 +12,22 @@ class ConfirmDialog extends StatelessWidget {
   final bool barrierDismissible;
 
   const ConfirmDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
-    this.confirmText = '确认',
-    this.cancelText = '取消',
+    this.confirmText = 'confirm',
+    this.cancelText = 'cancel',
     this.onConfirm,
     this.onCancel,
     this.confirmColor = Colors.redAccent,
     this.barrierDismissible = false,
-  }) : super(key: key);
+  });
 
   static Future<bool?> show({
-    String title = '确认',
+    String title = 'confirm',
     required String content,
-    String confirmText = '确认',
-    String cancelText = '取消',
+    String confirmText = 'confirm',
+    String cancelText = 'cancel',
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
     Color? confirmColor = Colors.redAccent,
@@ -50,6 +50,7 @@ class ConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkModel = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -60,19 +61,19 @@ class ConfirmDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              title,
-              style: const TextStyle(
+              title.tr,
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDarkModel ? Colors.white70 : Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              content,
-              style: const TextStyle(
+              content.tr,
+              style: TextStyle(
                 fontSize: 15,
-                color: Colors.black54,
+                color: isDarkModel ? Colors.white70 : Colors.black87,
               ),
               textAlign: TextAlign.center,
             ),
@@ -86,7 +87,7 @@ class ConfirmDialog extends StatelessWidget {
                       onCancel?.call();
                     },
                     child: Text(
-                      cancelText,
+                      cancelText.tr,
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -105,7 +106,7 @@ class ConfirmDialog extends StatelessWidget {
                       onConfirm?.call();
                     },
                     child: Text(
-                      confirmText,
+                      confirmText.tr,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
@@ -117,4 +118,4 @@ class ConfirmDialog extends StatelessWidget {
       ),
     );
   }
-} 
+}

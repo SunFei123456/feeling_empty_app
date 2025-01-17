@@ -1,28 +1,94 @@
 const Map<String, String> zhCN = {
-  'settings': '设置',
-  'dark_mode': '深色模式',
-  'language': '语言',
-  'version': '版本',
   'home': '首页',
   'go_to_settings': '前往设置',
   // 底部导航栏
   'nav_bottle': '漂流瓶',
   'nav_square': '广场',
+  'nav_publish': '发布',
   'nav_time': '时光机',
   'nav_mine': '我的',
-  //
+
+  // 通用 且频率高
+  'cancel': '取消',
+  'confirm': '确认',
+  'publish': '发布',
+  'save': '保存',
+  'delete': '删除',
+
+  // 首页
+  'explore_the_world': '探索世界',
+  'explore_more_content': '发现更多精彩内容',
+  'write_a_drift_bottle': '写漂流瓶',
+  'trending_bottles': '热门瓶子',
+  'trending': '热门',
+  'resonance': '共振',
+  'favorites': '收藏',
+  'history': '历史',
+  'trending_topics': '热门话题',
+  'recommended_drift_bottles': '推荐的漂流瓶',
+  'view_more': '查看更多',
+
+  // 发布页面
+  "today_write_question": "今天写点什么呢？",
+  "empty_voice_choice": "选择一种下方一种方式去将心声放空！",
+  "start_creating": "开始创作",
+  "write_mood_flow": "写下你的心情，让它随波逐流",
+  "time_letter": "时光信件",
+  "write_to_future": "写给未来的自己或是特别的人",
+
+  // 发布漂流瓶页面
+  'bottle_type_text': '文字',
+  'bottle_type_image': '图片',
+  'bottle_type_voice': '语音',
+  'publish_bottle_title': "给漂流瓶起个标题吧...",
+  'write_words': '写下你想说的话...',
+  "choose_mood": "选择心情",
+  "choose_topic": "选择话题",
+  "choose_drop_sea_area": "选择投放海域",
+  "public_drift_bottle": "公开漂流瓶",
+  "customize_topic": "自定义话题",
+  "add_customize_topic": "添加自定义话题",
+  "input_topic_name": "输入话题名称（不超过 6 个字）",
+
+  // 热门话语
+  'trending_24h': '24小时热门',
+  'trending_week': '本周热门',
+  'trending_month': '本月热门',
+  'latest': '最新',
+  'hottest': '最热',
+
+  // 话题相关
+  'content': '内容',
+  'participates': '参与',
+  'views': '浏览',
+  'join_topic': '参与话题',
+
+  // 情绪:
+  'happy': '开心',
+  'sad': '难过',
+  'thinking': '思考',
+  'angry': '生气',
+  'excited': '兴奋',
+  'tired': '疲惫',
+  'love': '喜爱',
+  'surprised': '惊讶',
+
+  // 删除弹框
+  'delete_confirm': '删除确认',
+  'delete_all_history': '确定要删除所有浏览记录吗？',
+  'delete_one_history': '确定要删除这条浏览记录吗？',
+
   'bottle_title': '漂流瓶',
+  'hot_bottles': '热门漂流瓶',
   'bottle_card_title': '神秘瓶子',
   'bottle_card_subtitle': '点击查看内容',
   'bottle_list_title': '漂流瓶',
   'bottle_list_subtitle': '来自远方的消息...',
   'throw_bottle': '扔一个漂流瓶',
   'bottle_empty': '暂无漂流瓶',
-  'bottle_type_text': '文字',
-  'bottle_type_image': '图片',
-  'bottle_type_voice': '语音',
+
   'bottle_ocean_title': '漂流瓶海洋',
-  'recent_bottles': '最近的漂流瓶',
+  'commended_bottles': '推荐的漂流瓶',
   'bottle_message_title': '神秘消息',
   'bottle_message_preview': '点击查看内容...',
   'search_bottle': '搜索漂流瓶...',
@@ -31,7 +97,7 @@ const Map<String, String> zhCN = {
   'bottle_types': '漂流瓶类型',
   'welcome': '欢迎回来',
   'login_subtitle': '请使用手机号登录',
-  'phone_hint': '请输��手机号',
+  'phone_hint': '请输入手机号',
   'verification_code_hint': '请输入验证码',
   'get_code': '获取验证码',
   'login': '登录',
@@ -45,15 +111,38 @@ const Map<String, String> zhCN = {
   'view_all': '查看全部',
   'messages': '消息',
   'friends': '好友',
-  'favorites': '收藏',
   'update_title': '系统通知',
   'update_subtitle': '您有新的消息待查看',
-  'happy': '开心',
-  'sad': '难过',
-  'angry': '生气',
-  'thinking': '思考',
-  'love': '喜欢',
+
   'other': '其他',
   'bottle_title_example': '今天的心情',
   'bottle_content_example': '今天发生了很多事情，有开心的也有不开心的。但是总的来说，这是一个值得记住的日子...',
-}; 
+
+  // 个人页
+  'following_count': '关注',
+  'followers_count': '粉丝',
+  'follow': '关注',
+  'follower': '粉丝',
+  'following': '已关注',
+  'public': '公开',
+  'private': '私密',
+  'no_private_bottles': '暂无私密漂流瓶',
+
+  // 个人信息编辑页面
+  'edit_profile_info': '修改信息',
+  'nickname': '昵称',
+  'sex': '性别',
+  'male': '男生',
+  'female': '女生',
+
+  // 设置页面 Drawer
+  'edit_profile': '修改资料',
+  'browsing_history': '浏览历史',
+  'my_favorites': '我的收藏',
+  'my_resonance': '我的共鸣',
+  'log_out': '退出登录',
+  'settings': '设置',
+  'dark_mode': '深色模式',
+  'language': '语言',
+  'version': '版本',
+};

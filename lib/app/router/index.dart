@@ -189,7 +189,7 @@ class AppRoutes {
     AppRoute(
       name: FOLLOWERS,
       page: () => FollowListPage(
-        title: '粉丝',
+        title: 'follower',
         isFollowers: true,
         userId: Get.arguments['userId'] as int,
       ),
@@ -200,7 +200,7 @@ class AppRoutes {
     AppRoute(
       name: FOLLOWING,
       page: () => FollowListPage(
-        title: '关注',
+        title: 'following',
         isFollowers: false,
         userId: Get.arguments['userId'] as int,
       ),

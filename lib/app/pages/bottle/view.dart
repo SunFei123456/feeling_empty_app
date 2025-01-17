@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fangkong_xinsheng/app/core/services/app_service.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
@@ -178,9 +179,9 @@ class _BottlePageState extends State<BottlePage> {
                             size: 32,
                           ),
                           const Spacer(),
-                          const Text(
-                            '探索世界',
-                            style: TextStyle(
+                          Text(
+                            'explore_the_world'.tr,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -188,7 +189,7 @@ class _BottlePageState extends State<BottlePage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '发现更多精彩内容',
+                            'explore_more_content'.tr,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
@@ -209,14 +210,14 @@ class _BottlePageState extends State<BottlePage> {
               children: [
                 _buildSmallCard(
                   icon: Icons.create,
-                  title: '写漂流瓶',
+                  title: 'write_a_drift_bottle'.tr,
                   color: Colors.purple,
                   onTap: () => AppRoutes.to(AppRoutes.WRITE_BOTTLE),
                 ),
                 const SizedBox(height: 8),
                 _buildSmallCard(
                   icon: Icons.local_fire_department,
-                  title: '热门瓶子',
+                  title: 'trending_bottles'.tr,
                   color: Colors.orange,
                   onTap: () => AppRoutes.to(AppRoutes.HOT_BOTTLE),
                 ),
@@ -304,25 +305,25 @@ class _BottlePageState extends State<BottlePage> {
     final actions = [
       {
         'icon': Icons.local_fire_department,
-        'label': '热门',
+        'label': 'trending',
         'color': Colors.orange,
         'page_url': AppRoutes.HOT_BOTTLE
       },
       {
         'icon': Icons.explore,
-        'label': '共振',
+        'label': 'resonance',
         'color': Colors.lightGreen,
         'page_url': AppRoutes.RESONATED_BOTTLE
       },
       {
         'icon': Icons.collections_bookmark,
-        'label': '收藏',
+        'label': 'favorites',
         'color': Colors.red,
         'page_url': AppRoutes.FAVORITED_BOTTLE
       },
       {
         'icon': Icons.history,
-        'label': '历史',
+        'label': 'history',
         'color': Colors.purple,
         'page_url': AppRoutes.VIEW_HISTORY
       },
@@ -351,9 +352,9 @@ class _BottlePageState extends State<BottlePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                action['label'] as String,
+                (action['label'] as String).tr,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: isDarkMode ? Colors.black : Colors.white,
                   fontSize: 12,
                 ),
               ),
@@ -369,6 +370,23 @@ class _BottlePageState extends State<BottlePage> {
   }
 
   Widget _buildRecentBottles() {
+    // 模拟数据
+    final List<Map<String, dynamic>> mockBottles = List.generate(
+      10,
+      (index) => {
+        'id': index,
+        'title': '这是一个漂流瓶标题 ${index + 1}',
+        'content': '这是漂流瓶的预览内容，可能包含一些文字描述...',
+        'createdAt': '2024-03-${10 + index}',
+        'views': Random().nextInt(1000),
+        'imageUrl': index % 2 == 0
+            ? 'https://picsum.photos/500/${300 + index * 50}'
+            : '',
+        'user': null,
+        'audioUrl': '',
+      },
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -376,19 +394,16 @@ class _BottlePageState extends State<BottlePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'recent_bottles'.tr,
+              'recommended_drift_bottles'.tr,
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800]),
             ),
             TextButton(
-              onPressed: () {
-                // 查看更多逻辑
-              },
+              onPressed: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
               child: Text(
-                '查看更多',
+                'view_more'.tr,
                 style: TextStyle(
                   color: Colors.blue[400],
                   fontSize: 14,
@@ -397,156 +412,126 @@ class _BottlePageState extends State<BottlePage> {
             ),
           ],
         ),
-        AnimationLimiter(
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: const Duration(milliseconds: 500),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: _buildBottleCard(context, index),
+        MasonryGridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          itemCount: mockBottles.length,
+          itemBuilder: (context, index) {
+            final bottle = mockBottles[index];
+
+            return GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => BottleCardDetail(
+                    id: bottle['id'],
+                    imageUrl: bottle['imageUrl'].isNotEmpty
+                        ? bottle['imageUrl']
+                        : 'https://picsum.photos/500/800',
+                    title: bottle['title'],
+                    content: bottle['content'],
+                    createdAt: bottle['createdAt'],
+                    audioUrl: bottle['audioUrl'],
+                    user: bottle['user'],
                   ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottleCard(BuildContext context, int index) {
-    // 模拟数据
-    final bottleData = {
-      'title': '这是一个漂流瓶标题 ${index + 1}',
-      'subtitle': '这是漂流瓶的预览内容，可能包含一些文字描述...',
-      'time': '2024-03-${index + 10}',
-      'location': '来自未知的海域',
-      'imageUrl': 'https://picsum.photos/500/300?random=$index',
-    };
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Get.to(
-              () => BottleCardDetail(
-                id: index,
-                imageUrl: bottleData['imageUrl']!,
-                title: bottleData['title']!,
-                content: bottleData['subtitle']!,
-                createdAt: bottleData['time']!,
-              ),
-              transition: Transition.fadeIn,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 左侧图片
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Hero(
-                    tag: 'bottle_card_image_${bottleData['imageUrl']}',
-                    child: Image.network(
-                      bottleData['imageUrl']!,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
+                  transition: Transition.fadeIn,
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _appService.isDarkMode
+                        ? Colors.black.withAlpha(200)
+                        : Colors.white.withAlpha(200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 16),
-
-                // 右侧内容
-                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        bottleData['title']!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      if (bottle['imageUrl'].isNotEmpty)
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: Image.network(
+                            bottle['imageUrl'],
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        bottleData['subtitle']!,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            bottleData['time']!,
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Icon(
-                            Icons.location_on,
-                            size: 14,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              bottleData['location']!,
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 12,
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              bottle['title'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              bottle['content'],
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                                height: 1.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.remove_red_eye,
+                                      size: 12,
+                                      color: Colors.grey[400],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${bottle['views']}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[400],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  bottle['createdAt'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
-      ),
+      ],
     );
   }
 }

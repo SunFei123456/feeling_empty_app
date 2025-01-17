@@ -173,19 +173,19 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                               Obx(() => _buildStatItem(
                                     value:
                                         '${_topicController.topicDetail.value.contentCount}',
-                                    label: '内容',
+                                    label: 'content'.tr,
                                   )),
                               const SizedBox(width: 30),
                               Obx(() => _buildStatItem(
                                     value:
                                         '${_topicController.topicDetail.value.participantCount}',
-                                    label: '参与',
+                                    label: 'participates'.tr,
                                   )),
                               const SizedBox(width: 30),
                               Obx(() => _buildStatItem(
                                     value:
                                         '${_topicController.topicDetail.value.views}',
-                                    label: '浏览',
+                                    label: 'views'.tr,
                                   )),
                               const Spacer(),
                               ElevatedButton(
@@ -210,9 +210,10 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text(
-                                  '参与话题',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                child: Text(
+                                  'join_topic'.tr,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
@@ -244,9 +245,9 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   indicatorPadding: const EdgeInsets.only(bottom: 4, top: 2),
                   indicatorWeight: 1,
-                  tabs: const [
-                    Tab(text: '最热'),
-                    Tab(text: '最新'),
+                  tabs: [
+                    Tab(text: 'hottest'.tr),
+                    Tab(text: 'latest'.tr),
                   ],
                 ),
               ),

@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Colors.black
                   : Colors.white,
             ),
-            itemLabel: 'nav_bottle'.tr,
+            itemLabel: 'home'.tr,
           ),
           BottomBarItem(
             inActiveItem: Icon(
@@ -193,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Colors.black
                   : Colors.white,
             ),
-            itemLabel: '发布'.tr,
+            itemLabel: 'nav_publish'.tr,
           ),
           BottomBarItem(
             inActiveItem: Icon(
