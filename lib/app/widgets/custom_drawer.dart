@@ -216,6 +216,7 @@ class CustomDrawer extends StatelessWidget {
   }
 
   Widget _buildLanguageDropdown(BuildContext context, bool isDark) {
+    print("当前的语言模式:${settingController.currentLocale}");
     return Theme(
       data: Theme.of(context).copyWith(
         dropdownMenuTheme: DropdownMenuThemeData(

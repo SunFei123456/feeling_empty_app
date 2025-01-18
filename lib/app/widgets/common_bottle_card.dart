@@ -5,11 +5,11 @@ import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class CommonBottleCard extends StatelessWidget {
   final ViewHistoryItem bottle;
-  
+
   const CommonBottleCard({
-    Key? key, 
+    super.key,
     required this.bottle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,55 +58,56 @@ class CommonBottleCard extends StatelessWidget {
             AspectRatio(
               aspectRatio: 2 / 1,
               child: isImageBottle
-                ? Image.network(
-                    bottle.imageUrl,
-                    fit: BoxFit.cover,
-                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: frame != null
-                            ? child
-                            : Container(
-                                color: Colors.grey[100],
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).primaryColor,
+                  ? Image.network(
+                      bottle.imageUrl,
+                      fit: BoxFit.cover,
+                      frameBuilder:
+                          (context, child, frame, wasSynchronouslyLoaded) {
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: frame != null
+                              ? child
+                              : Container(
+                                  color: Colors.grey[100],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Theme.of(context).primaryColor,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[100],
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[100],
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.grey[400],
+                            size: 40,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: getGradientColors(),
+                        ),
+                      ),
                       child: Center(
                         child: Icon(
-                          Icons.broken_image_rounded,
-                          color: Colors.grey[400],
+                          isAudioBottle
+                              ? Icons.audiotrack_rounded
+                              : Icons.format_quote_rounded,
                           size: 40,
+                          color: Colors.white.withOpacity(0.3),
                         ),
                       ),
                     ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: getGradientColors(),
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        isAudioBottle
-                            ? Icons.audiotrack_rounded
-                            : Icons.format_quote_rounded,
-                        size: 40,
-                        color: Colors.white.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
             ),
             Positioned.fill(
               child: DecoratedBox(
@@ -146,7 +147,11 @@ class CommonBottleCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isImageBottle ? '图片' : isAudioBottle ? '语音' : '文字',
+                      isImageBottle
+                          ? '图片'
+                          : isAudioBottle
+                              ? '语音'
+                              : '文字',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -324,4 +329,4 @@ class CommonBottleCard extends StatelessWidget {
       return '${date.month}月${date.day}日';
     }
   }
-} 
+}

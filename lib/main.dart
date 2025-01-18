@@ -29,7 +29,7 @@ void main() async {
 
   // 初始化服务
   await Get.putAsync(() => StorageService().init());
-  await Get.putAsync(() => AppService().init());
+  final appService = await Get.putAsync(() => AppService().init());
   await dotenv.load(fileName: ".env");
   Get.put(SettingController());
 
@@ -44,11 +44,21 @@ void main() async {
     WebViewPlatform.instance = platform;
   }
 
-  runApp(const MyApp());
+  runApp(MyApp(
+    initialLocale: appService.currentLocale,
+    initialTheme: appService.currentThemeMode,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Locale initialLocale;
+  final ThemeMode initialTheme;
+
+  const MyApp({
+    super.key,
+    required this.initialLocale,
+    required this.initialTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +67,14 @@ class MyApp extends StatelessWidget {
       getPages: AppRoutes.getPages(),
       unknownRoute: GetPage(name: "/notfound", page: () => const NotFound()),
 
+      theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: initialTheme,
 
       // 国际化配置
       translations: AppTranslations(),
-      locale: Get.deviceLocale,
-      fallbackLocale: const Locale('en', 'US'),
+      locale: initialLocale,
+      fallbackLocale: const Locale('zh', 'CN'),
       initialRoute: AppRoutes.INITIAL,
     );
   }
