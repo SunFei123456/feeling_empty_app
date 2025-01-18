@@ -4,8 +4,6 @@ import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../api/index.dart';
-import '../model/login.dart';
-import 'package:dio/dio.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 
 class LoginController extends GetxController {
@@ -63,10 +61,11 @@ class LoginController extends GetxController {
         final loginResponse = response.data!;
         isLoading.value = false;
 
-        // 存储token
+        // 存储token + 用户id + 过期时间
         await Future.wait([
           TokenService().saveToken(loginResponse.token),
           TokenService().saveUserId(loginResponse.user.id),
+          TokenService().saveExp(loginResponse.exp),
         ]);
 
         Get.offAllNamed(AppRoutes.home);

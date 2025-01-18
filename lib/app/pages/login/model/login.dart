@@ -20,15 +20,18 @@ class LoginModel {
 class LoginResponse {
   final String token;
   final UserInfo user;
+  final int exp;
 
   LoginResponse({
     required this.token, 
     required this.user,
+    required this.exp,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
     token: json['token'] as String? ?? '',
     user: UserInfo.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
+    exp: json['exp'] as int? ?? 0,
   );
 }
 

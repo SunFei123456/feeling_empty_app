@@ -8,6 +8,7 @@ class TokenService extends GetxService {
 
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
+  static const String _expKey = 'exp';
   final _storage = GetStorage();
 
   Future<TokenService> init() async {
@@ -40,14 +41,25 @@ class TokenService extends GetxService {
     await _storage.write(_userIdKey, userId);
   }
 
+  // 保存过期时间
+  Future<void> saveExp(int exp) async {
+    await _storage.write(_expKey, exp);
+  }
+
   // 获取用户ID
   int? getUserId() {
     return _storage.read<int>(_userIdKey);
+  }
+
+  // 获取过期时间
+  int? getExp() {
+    return _storage.read<int>(_expKey);
   }
 
   // 清除所有认证信息
   Future<void> clearAuth() async {
     await _storage.remove(_tokenKey);
     await _storage.remove(_userIdKey);
+    await _storage.remove(_expKey);
   }
-} 
+}
