@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/api/view_history_api.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
@@ -5,7 +6,7 @@ import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 class ViewHistoryController extends GetxController {
   final ViewHistoryApiService _apiService = ViewHistoryApiService();
 
-  final RxList<ViewHistoryItem> historyItems = <ViewHistoryItem>[].obs;
+  final RxList<BottleModel> historyItems = <BottleModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxInt currentPage = 1.obs;
   final RxInt totalItems = 0.obs;
@@ -40,10 +41,6 @@ class ViewHistoryController extends GetxController {
         page: currentPage.value,
         pageSize: pageSize,
       );
-/* 
-      print('API Response: ${response.data?.data.length} items');
-      print('Current items: ${historyItems.length}');
-      print('Total items: ${response.data?.total}'); */
 
       if (response.data != null) {
         if (response.data!.data.isEmpty) {
@@ -99,4 +96,3 @@ class ViewHistoryController extends GetxController {
     }
   }
 }
-

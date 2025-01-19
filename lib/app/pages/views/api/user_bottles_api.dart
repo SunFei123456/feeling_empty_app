@@ -1,10 +1,10 @@
 import 'package:fangkong_xinsheng/app/core/http/api_response.dart';
 import 'package:fangkong_xinsheng/app/core/services/api_service.dart';
-import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 
 class BottleInteractionApiService extends BaseApiService {
   // 获取用户收藏的漂流瓶
-  Future<ApiResponse<List<ViewHistoryItem>>> getFavoritedBottles({
+  Future<ApiResponse<List<BottleModel>>> getFavoritedBottles({
     int page = 1,
     int pageSize = 10,
   }) async {
@@ -20,7 +20,7 @@ class BottleInteractionApiService extends BaseApiService {
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
         (json) => (json as List)
-            .map((item) => ViewHistoryItem.fromJson(item as Map<String, dynamic>))
+            .map((item) => BottleModel.fromJson(item as Map<String, dynamic>))
             .toList(),
       );
     } catch (e) {
@@ -30,7 +30,7 @@ class BottleInteractionApiService extends BaseApiService {
   }
 
   // 获取用户共振的漂流瓶
-  Future<ApiResponse<List<ViewHistoryItem>>> getResonatedBottles({
+  Future<ApiResponse<List<BottleModel>>> getResonatedBottles({
     int page = 1,
     int pageSize = 20,
   }) async {
@@ -46,7 +46,7 @@ class BottleInteractionApiService extends BaseApiService {
       return ApiResponse.fromJson(
         response.data as Map<String, dynamic>,
         (json) => (json as List)
-            .map((item) => ViewHistoryItem.fromJson(item as Map<String, dynamic>))
+            .map((item) => BottleModel.fromJson(item as Map<String, dynamic>))
             .toList(),
       );
     } catch (e) {

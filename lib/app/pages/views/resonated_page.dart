@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
@@ -11,7 +12,7 @@ class ResonatedPage extends StatefulWidget {
 
 class _ResonatedPageState extends State<ResonatedPage> {
   final _api = BottleInteractionApiService();
-  final List<ViewHistoryItem> resonatedItems = [];
+  final List<BottleModel> resonatedItems = [];
   bool isLoading = false;
   int currentPage = 1;
   bool hasMore = true;

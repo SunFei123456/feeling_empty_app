@@ -1,10 +1,11 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/view_history.dart';
 
 class CommonBottleCard extends StatelessWidget {
-  final ViewHistoryItem bottle;
+  final BottleModel bottle;
 
   const CommonBottleCard({
     super.key,
@@ -269,7 +270,7 @@ class CommonBottleCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomStats(ViewHistoryItem bottle) {
+  Widget _buildBottomStats(BottleModel bottle) {
     return Row(
       children: [
         Icon(
@@ -293,7 +294,7 @@ class CommonBottleCard extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          '${bottle.resonances}',
+          '${bottle.resonates}',
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 12,
@@ -301,7 +302,7 @@ class CommonBottleCard extends StatelessWidget {
         ),
         const Spacer(),
         Text(
-          _formatDate(bottle.createdAt),
+          _formatDate(DateTime.parse(bottle.createdAt)),
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 12,

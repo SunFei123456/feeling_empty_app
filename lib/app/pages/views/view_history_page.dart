@@ -115,11 +115,23 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                 child: ListView.builder(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  itemCount: controller.historyItems.length,
+                  itemCount: controller.historyItems.length +
+                      (controller.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index == controller.historyItems.length - 1) {
-                      controller.loadViewHistory();
+                    if (index == controller.historyItems.length - 3 &&
+                        controller.hasMore) {
+                      Future.microtask(() => controller.loadViewHistory());
                     }
+
+                    if (index == controller.historyItems.length) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
                     return Dismissible(
                       key: Key(controller.historyItems[index].id.toString()),
                       direction: DismissDirection.endToStart,

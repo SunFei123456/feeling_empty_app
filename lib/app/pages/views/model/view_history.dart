@@ -1,5 +1,7 @@
+import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
+
 class ViewHistoryResponse {
-  final List<ViewHistoryItem> data;
+  final List<BottleModel> data;
   final int total;
   final int page;
   final int size;
@@ -13,9 +15,7 @@ class ViewHistoryResponse {
 
   factory ViewHistoryResponse.fromJson(Map<String, dynamic> json) {
     return ViewHistoryResponse(
-      data: (json['data'] as List)
-          .map((item) => ViewHistoryItem.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      data: (json['data'] as List).map((item) => BottleModel.fromJson(item)).toList(),
       total: json['total'] as int,
       page: json['page'] as int,
       size: json['size'] as int,
@@ -23,52 +23,6 @@ class ViewHistoryResponse {
   }
 }
 
-class ViewHistoryItem {
-  final int id;
-  final String title;
-  final String content;
-  final String imageUrl;
-  final String audioUrl;
-  final String mood;
-  final int views;
-  final int resonances;
-  final int favorites;
-  final DateTime createdAt;
-  final UserInfo user;
-  final int? topicId;
-
-  ViewHistoryItem({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.imageUrl,
-    required this.audioUrl,
-    required this.mood,
-    required this.views,
-    required this.resonances,
-    required this.favorites,
-    required this.createdAt,
-    required this.user,
-    this.topicId,
-  });
-
-  factory ViewHistoryItem.fromJson(Map<String, dynamic> json) {
-    return ViewHistoryItem(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      content: json['content'] as String,
-      imageUrl: json['image_url'] as String? ?? '',
-      audioUrl: json['audio_url'] as String? ?? '',
-      mood: json['mood'] as String,
-      views: json['views'] as int,
-      resonances: json['resonances'] as int,
-      favorites: json['favorites'] as int? ?? 0,
-      createdAt: DateTime.parse(json['created_at']),
-      user: UserInfo.fromJson(json['user'] as Map<String, dynamic>),
-      topicId: json['topic_id'] as int?,
-    );
-  }
-}
 
 class UserInfo {
   final int id;
@@ -100,4 +54,4 @@ class UserInfo {
       'sex': sex,
     };
   }
-} 
+}
