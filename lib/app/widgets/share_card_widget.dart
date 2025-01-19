@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:get/get.dart';
@@ -41,68 +42,52 @@ class ShareCardWidget extends StatelessWidget {
             spreadRadius: 1,
           ),
         ],
-        image: isImageBottle ? DecorationImage(
-          image: NetworkImage(imageUrl!),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.2),
-            BlendMode.darken,
-          ),
-        ) : null,
-        gradient: !isImageBottle ? LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isAudioBottle ? [
-            const Color(0xFFFF8C61),
-            const Color(0xFFFF6B6B),
-          ] : [
-            const Color(0xFF4FACFE),
-            const Color(0xFF00F2FE),
-          ],
-        ) : null,
+        image: isImageBottle
+            ? DecorationImage(
+                image: NetworkImage(imageUrl!),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.2),
+                  BlendMode.darken,
+                ),
+              )
+            : null,
+        gradient: !isImageBottle
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isAudioBottle
+                    ? [
+                        const Color(0xFFFF8C61),
+                        const Color(0xFFFF6B6B),
+                      ]
+                    : [
+                        const Color(0xFF4FACFE),
+                        const Color(0xFF00F2FE),
+                      ],
+              )
+            : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isImageBottle) Icon(
-            isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded,
-            size: 40,
-            color: Colors.white.withOpacity(0.3),
-          ),
+          if (!isImageBottle) Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 40, color: Colors.white.withOpacity(0.3)),
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isImageBottle ? Colors.white : Colors.black87,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isImageBottle ? Colors.white : Colors.black87),
           ),
           const SizedBox(height: 12),
-          Text(
-            content,
-            style: TextStyle(
-              fontSize: 16,
-              color: isImageBottle ? Colors.white.withOpacity(0.9) : Colors.black87,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
+          Text(content, style: TextStyle(fontSize: 16, color: isImageBottle ? Colors.white.withOpacity(0.9) : Colors.black87), maxLines: 10, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 16),
           Row(
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(userAvatar ?? ''),
-                radius: 16,
-              ),
+              CacheUserAvatar(avatarUrl: userAvatar!, size: 40),
               const SizedBox(width: 8),
               Text(
                 userNickname ?? '匿名用户',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isImageBottle ? Colors.white70 : Colors.grey,
-                ),
+                style: TextStyle(fontSize: 14, color: isImageBottle ? Colors.white70 : Colors.grey),
               ),
               const Spacer(),
               Text(
@@ -166,9 +151,7 @@ class ShareBottomSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.light
-              ? Colors.white
-              : Colors.grey[900],
+          color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.grey[900],
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -206,4 +189,4 @@ class ShareBottomSheet extends StatelessWidget {
       ),
     );
   }
-} 
+}

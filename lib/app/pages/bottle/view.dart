@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:fangkong_xinsheng/app/core/services/app_service.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -303,30 +304,10 @@ class _BottlePageState extends State<BottlePage> {
 
   Widget _buildQuickActions(bool isDarkMode) {
     final actions = [
-      {
-        'icon': Icons.local_fire_department,
-        'label': 'trending',
-        'color': Colors.orange,
-        'page_url': AppRoutes.HOT_BOTTLE
-      },
-      {
-        'icon': Icons.explore,
-        'label': 'resonance',
-        'color': Colors.lightGreen,
-        'page_url': AppRoutes.RESONATED_BOTTLE
-      },
-      {
-        'icon': Icons.collections_bookmark,
-        'label': 'favorites',
-        'color': Colors.red,
-        'page_url': AppRoutes.FAVORITED_BOTTLE
-      },
-      {
-        'icon': Icons.history,
-        'label': 'history',
-        'color': Colors.purple,
-        'page_url': AppRoutes.VIEW_HISTORY
-      },
+      {'icon': Icons.local_fire_department, 'label': 'trending', 'color': Colors.orange, 'page_url': AppRoutes.HOT_BOTTLE},
+      {'icon': Icons.explore, 'label': 'resonance', 'color': Colors.lightGreen, 'page_url': AppRoutes.RESONATED_BOTTLE},
+      {'icon': Icons.collections_bookmark, 'label': 'favorites', 'color': Colors.red, 'page_url': AppRoutes.FAVORITED_BOTTLE},
+      {'icon': Icons.history, 'label': 'history', 'color': Colors.purple, 'page_url': AppRoutes.VIEW_HISTORY},
     ];
 
     return Row(
@@ -379,9 +360,7 @@ class _BottlePageState extends State<BottlePage> {
         'content': '这是漂流瓶的预览内容，可能包含一些文字描述...',
         'createdAt': '2024-03-${10 + index}',
         'views': Random().nextInt(1000),
-        'imageUrl': index % 2 == 0
-            ? 'https://picsum.photos/500/${300 + index * 50}'
-            : '',
+        'imageUrl': index % 2 == 0 ? 'https://picsum.photos/500/${300 + index * 50}' : '',
         'user': null,
         'audioUrl': '',
       },
@@ -395,10 +374,7 @@ class _BottlePageState extends State<BottlePage> {
           children: [
             Text(
               'recommended_drift_bottles'.tr,
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800]),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800]),
             ),
             TextButton(
               onPressed: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
@@ -427,14 +403,13 @@ class _BottlePageState extends State<BottlePage> {
                 Get.to(
                   () => BottleCardDetail(
                     id: bottle['id'],
-                    imageUrl: bottle['imageUrl'].isNotEmpty
-                        ? bottle['imageUrl']
-                        : 'https://picsum.photos/500/800',
+                    imageUrl: bottle['imageUrl'].isNotEmpty ? bottle['imageUrl'] : 'https://picsum.photos/500/800',
                     title: bottle['title'],
                     content: bottle['content'],
                     createdAt: bottle['createdAt'],
                     audioUrl: bottle['audioUrl'],
                     user: bottle['user'],
+                    mood: bottle['mood'],
                   ),
                   transition: Transition.fadeIn,
                 );
@@ -443,9 +418,7 @@ class _BottlePageState extends State<BottlePage> {
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: _appService.isDarkMode
-                        ? Colors.black.withAlpha(200)
-                        : Colors.white.withAlpha(200),
+                    color: _appService.isDarkMode ? Colors.black.withAlpha(200) : Colors.white.withAlpha(200),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -563,8 +536,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
   BottleHeaderDelegate(this.profileController);
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     // 计算滚动进度 (0.0 到 1.0)
     final progress = shrinkOffset / maxExtent;
     final fontSize = lerpDouble(28, 20, progress) ?? 28;
@@ -572,9 +544,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
 
     return Container(
       decoration: BoxDecoration(
-        color: shrinkOffset > 0
-            ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9)
-            : Colors.transparent,
+        color: shrinkOffset > 0 ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9) : Colors.transparent,
         boxShadow: [
           if (shrinkOffset > 0)
             BoxShadow(
@@ -638,47 +608,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                         ),
                         child: Obx(() {
                           final user = profileController.user.value;
-                          return ClipOval(
-                            child: user?.avatar != null &&
-                                    user!.avatar.isNotEmpty
-                                ? Image.network(
-                                    user.avatar,
-                                    width: 46,
-                                    height: 46,
-                                    fit: BoxFit.cover,
-                                    headers: const {
-                                      'Cache-Control': 'no-cache',
-                                    },
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                          strokeWidth: 2,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder:
-                                        (context, error, stackTrace) => Icon(
-                                      Icons.person,
-                                      size: 20,
-                                      color: Colors.blue[400],
-                                    ),
-                                  )
-                                : Icon(
-                                    Icons.person,
-                                    size: 20,
-                                    color: Colors.blue[400],
-                                  ),
-                          );
+                          return CacheUserAvatar(avatarUrl: user?.avatar ?? '',);
                         }),
                       ),
                     ),
@@ -699,6 +629,5 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => 80.0;
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      true;
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => true;
 }

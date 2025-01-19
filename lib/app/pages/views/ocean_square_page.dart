@@ -153,15 +153,12 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
                                 vertical: 12,
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     ocean.name,
                                     style: TextStyle(
-                                      fontWeight: ocean.id == _currentOcean?.id
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
+                                      fontWeight: ocean.id == _currentOcean?.id ? FontWeight.bold : FontWeight.normal,
                                       color: Colors.white,
                                       fontSize: 15,
                                     ),
@@ -346,6 +343,13 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
                     audioUrl: bottle.audioUrl,
                     createdAt: bottle.createdAt,
                     user: bottle.user,
+                    mood: bottle.mood,
+                    isFavorited: bottle.isFavorited,
+                    isResonated: bottle.isResonated,
+                    views: bottle.views,
+                    shares: bottle.shares,
+                    favorites: bottle.favorites,
+                    resonates: bottle.resonates,
                   ),
                 );
               });
@@ -374,10 +378,7 @@ class _OceanSquarePageState extends State<OceanSquarePage> {
                   color: Colors.blue[300],
                   child: Center(
                     child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
+                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
                     ),
                   ),
                 );

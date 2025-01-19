@@ -59,7 +59,7 @@ class HotBottlesPage extends GetView<BottleController> {
                   break;
               }
             },
-            tabs:  [
+            tabs: [
               Tab(text: 'trending_24h'.tr),
               Tab(text: 'trending_week'.tr),
               Tab(text: 'trending_month'.tr),
@@ -80,8 +80,7 @@ class HotBottlesPage extends GetView<BottleController> {
 
   Widget _buildBottleGrid(String timeRange) {
     return Obx(() {
-      if (controller.isLoadingHotBottles.value &&
-          controller.hotBottles.isEmpty) {
+      if (controller.isLoadingHotBottles.value && controller.hotBottles.isEmpty) {
         return const Center(child: CircularProgressIndicator());
       }
 
@@ -141,18 +140,20 @@ class HotBottlesPage extends GetView<BottleController> {
       onTap: () async {
         Get.to(
           () => BottleCardDetail(
-            id: bottle.id,
-            imageUrl: bottle.imageUrl.isEmpty
-                ? 'https://picsum.photos/500/800'
-                : bottle.imageUrl,
-            title: bottle.title.isNotEmpty ? bottle.title : "暂无标题",
-            content: bottle.content,
-            createdAt: bottle.createdAt,
-            audioUrl: bottle.audioUrl,
-            user: bottle.user,
-            views: bottle.views,
-            resonates: bottle.resonates,
-          ),
+              id: bottle.id,
+              imageUrl: bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
+              title: bottle.title.isNotEmpty ? bottle.title : "暂无标题",
+              content: bottle.content,
+              createdAt: bottle.createdAt,
+              audioUrl: bottle.audioUrl,
+              user: bottle.user,
+              views: bottle.views,
+              resonates: bottle.resonates,
+              favorites: bottle.favorites,
+              shares: bottle.shares,
+              isResonated: bottle.isResonated,
+              isFavorited: bottle.isFavorited,
+              mood: bottle.mood),
         );
 
         try {
@@ -182,12 +183,9 @@ class HotBottlesPage extends GetView<BottleController> {
               // 背景
               if (isImageBottle)
                 Image.network(
-                  bottle.imageUrl.isEmpty
-                      ? 'https://picsum.photos/500/800'
-                      : bottle.imageUrl,
+                  bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error),
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                 )
               else
                 // 纯色渐变背景
@@ -201,9 +199,7 @@ class HotBottlesPage extends GetView<BottleController> {
                   ),
                   child: Center(
                     child: Icon(
-                      isAudioBottle
-                          ? Icons.audiotrack
-                          : Icons.format_quote_rounded,
+                      isAudioBottle ? Icons.audiotrack : Icons.format_quote_rounded,
                       size: 48,
                       color: Colors.white.withOpacity(0.3),
                     ),
@@ -256,9 +252,7 @@ class HotBottlesPage extends GetView<BottleController> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            bottle.title.isNotEmpty
-                                ? bottle.title
-                                : bottle.mood,
+                            bottle.title.isNotEmpty ? bottle.title : bottle.mood,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -282,8 +276,7 @@ class HotBottlesPage extends GetView<BottleController> {
                     // 底部数据栏
                     Row(
                       children: [
-                        Icon(Icons.remove_red_eye,
-                            size: 16, color: Colors.white.withOpacity(0.9)),
+                        Icon(Icons.remove_red_eye, size: 16, color: Colors.white.withOpacity(0.9)),
                         const SizedBox(width: 4),
                         Text(
                           '${bottle.views}',

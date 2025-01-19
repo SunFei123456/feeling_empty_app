@@ -46,10 +46,7 @@ class _SquarePageState extends State<SquarePage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [
-                      Colors.purple.withOpacity(0.2),
-                      Colors.transparent
-                    ],
+                    colors: [Colors.purple.withOpacity(0.2), Colors.transparent],
                   ),
                 ),
               ),
@@ -67,8 +64,7 @@ class _SquarePageState extends State<SquarePage> {
 
                         Text(
                           'nav_square'.tr,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         // 消息通知
                         const Icon(Icons.notifications),
@@ -92,8 +88,7 @@ class _SquarePageState extends State<SquarePage> {
                   Expanded(
                     child: Obx(() {
                       if (squareController.isLoading.value) {
-                        return const Center(
-                            child: CupertinoActivityIndicator());
+                        return const Center(child: CupertinoActivityIndicator());
                       }
 
                       return CardSwiper(
@@ -107,10 +102,7 @@ class _SquarePageState extends State<SquarePage> {
                         onEnd: () {
                           squareController.fetchRandomBottles();
                         },
-                        cardBuilder: (BuildContext context,
-                            int index,
-                            int horizontalOffsetPercentage,
-                            int verticalOffsetPercentage) {
+                        cardBuilder: (BuildContext context, int index, int horizontalOffsetPercentage, int verticalOffsetPercentage) {
                           final bottle = squareController.bottles[index];
                           return _buildCard(
                             bottle: bottle,
@@ -147,10 +139,7 @@ class _SquarePageState extends State<SquarePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
-                colors: [
-                  Colors.purple.withOpacity(0.5),
-                  Colors.orange.withOpacity(0.5)
-                ],
+                colors: [Colors.purple.withOpacity(0.5), Colors.orange.withOpacity(0.5)],
               ),
             ),
             child: Container(
@@ -211,18 +200,15 @@ class _SquarePageState extends State<SquarePage> {
             content: bottle.content,
             createdAt: bottle.createdAt,
             audioUrl: bottle.audioUrl,
-            user: UserInfo(
-              id: bottle.user.id,
-              sex: bottle.user.sex,
-              nickname: bottle.user.nickname,
-              avatar: bottle.user.avatar,
-            ),
+            user: UserInfo(id: bottle.user.id, sex: bottle.user.sex, nickname: bottle.user.nickname, avatar: bottle.user.avatar),
             views: bottle.views,
             resonates: bottle.resonates,
             favorites: bottle.favorites,
             shares: bottle.shares,
             isResonated: bottle.isResonated,
             isFavorited: bottle.isFavorited,
+            mood: bottle.mood,
+            
           ),
           transition: Transition.cupertino,
         );
@@ -253,8 +239,7 @@ class _SquarePageState extends State<SquarePage> {
                   fit: BoxFit.cover,
                   height: double.infinity,
                   width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.error),
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                 ),
               )
             else
@@ -269,9 +254,7 @@ class _SquarePageState extends State<SquarePage> {
                 ),
                 child: Center(
                   child: Icon(
-                    isAudioBottle
-                        ? Icons.audiotrack
-                        : Icons.format_quote_rounded,
+                    isAudioBottle ? Icons.audiotrack : Icons.format_quote_rounded,
                     size: 48,
                     color: Colors.white.withOpacity(0.3),
                   ),
@@ -376,10 +359,8 @@ class _SquarePageState extends State<SquarePage> {
     );
   }
 
-  bool _onSwipe(
-      int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-    print(
-        'Card swiped from index $previousIndex to $currentIndex in direction $direction');
+  bool _onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
+    print('Card swiped from index $previousIndex to $currentIndex in direction $direction');
     return true;
   }
 }

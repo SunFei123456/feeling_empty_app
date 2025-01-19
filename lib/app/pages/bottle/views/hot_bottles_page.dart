@@ -1,4 +1,3 @@
-
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -77,8 +76,7 @@ class HotBottlesPage extends GetView<BottleController> {
 
   Widget _buildBottleGrid(String timeRange) {
     return Obx(() {
-      if (controller.isLoadingHotBottles.value &&
-          controller.hotBottles.isEmpty) {
+      if (controller.isLoadingHotBottles.value && controller.hotBottles.isEmpty) {
         return const Center(child: CircularProgressIndicator());
       }
 
@@ -117,19 +115,19 @@ class HotBottlesPage extends GetView<BottleController> {
         Get.to(
           () => BottleCardDetail(
             id: bottle.id,
-            imageUrl: bottle.imageUrl.isEmpty
-                ? 'https://picsum.photos/500/800'
-                : bottle.imageUrl,
+            imageUrl: bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
             title: bottle.title.isNotEmpty ? bottle.title : bottle.mood,
             content: bottle.content,
             createdAt: bottle.createdAt,
             audioUrl: bottle.audioUrl,
-            user: UserInfo(
-              id: bottle.user.id,
-              nickname: bottle.user.nickname,
-              avatar: bottle.user.avatar,
-              sex: bottle.user.sex,
-            ),
+            user: UserInfo(id: bottle.user.id, nickname: bottle.user.nickname, avatar: bottle.user.avatar, sex: bottle.user.sex),
+            mood: bottle.mood,
+            isFavorited: bottle.isFavorited,
+            isResonated: bottle.isResonated,
+            views: bottle.views,
+            shares: bottle.shares,
+            favorites: bottle.favorites,
+            resonates: bottle.resonates,
           ),
         );
       },
@@ -152,9 +150,7 @@ class HotBottlesPage extends GetView<BottleController> {
             children: [
               // 背景图片
               Image.network(
-                bottle.imageUrl.isEmpty
-                    ? 'https://picsum.photos/500/800'
-                    : bottle.imageUrl,
+                bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -162,12 +158,8 @@ class HotBottlesPage extends GetView<BottleController> {
                     color: Colors.grey[800],
                     child: Center(
                       child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.white),
+                        value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
                   );
@@ -211,8 +203,7 @@ class HotBottlesPage extends GetView<BottleController> {
                     Row(
                       children: [
                         // 浏览量
-                        Icon(Icons.remove_red_eye,
-                            size: 14, color: Colors.white.withOpacity(0.8)),
+                        Icon(Icons.remove_red_eye, size: 14, color: Colors.white.withOpacity(0.8)),
                         const SizedBox(width: 4),
                         Text(
                           '${bottle.views}',

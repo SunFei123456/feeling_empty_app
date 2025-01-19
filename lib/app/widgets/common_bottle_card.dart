@@ -36,9 +36,7 @@ class CommonBottleCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => Get.to(
@@ -50,6 +48,7 @@ class CommonBottleCard extends StatelessWidget {
             createdAt: bottle.createdAt.toString(),
             audioUrl: bottle.audioUrl,
             user: bottle.user,
+            mood: bottle.mood,
           ),
           transition: Transition.cupertino,
         ),
@@ -61,8 +60,7 @@ class CommonBottleCard extends StatelessWidget {
                   ? Image.network(
                       bottle.imageUrl,
                       fit: BoxFit.cover,
-                      frameBuilder:
-                          (context, child, frame, wasSynchronouslyLoaded) {
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           child: frame != null
@@ -100,9 +98,7 @@ class CommonBottleCard extends StatelessWidget {
                       ),
                       child: Center(
                         child: Icon(
-                          isAudioBottle
-                              ? Icons.audiotrack_rounded
-                              : Icons.format_quote_rounded,
+                          isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded,
                           size: 40,
                           color: Colors.white.withOpacity(0.3),
                         ),

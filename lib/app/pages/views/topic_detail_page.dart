@@ -24,8 +24,7 @@ class TopicDetailPage extends StatefulWidget {
   State<TopicDetailPage> createState() => _TopicDetailPageState();
 }
 
-class _TopicDetailPageState extends State<TopicDetailPage>
-    with TickerProviderStateMixin {
+class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderStateMixin {
   late final TabController _tabController;
   late final PageController _pageController;
   final TopicController _topicController = Get.find<TopicController>();
@@ -93,9 +92,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                               Container(
                                 width: 80,
                                 height: 80,
-                                decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20)),
+                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
                                 child: Icon(
                                   Icons.tag,
                                   size: 40,
@@ -108,41 +105,28 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Obx(
-                                      () => _topicController
-                                              .isDetailLoading.value
-                                          ? const Center(
-                                              child:
-                                                  CircularProgressIndicator())
+                                      () => _topicController.isDetailLoading.value
+                                          ? const Center(child: CircularProgressIndicator())
                                           : Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Obx(() => Text(
-                                                      _topicController
-                                                          .topicDetail
-                                                          .value
-                                                          .title,
+                                                      _topicController.topicDetail.value.title,
                                                       style: const TextStyle(
                                                         color: Colors.white,
                                                         fontSize: 24,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        fontWeight: FontWeight.bold,
                                                       ),
                                                     )),
                                                 const SizedBox(height: 8),
                                                 Obx(() => Text(
-                                                      _topicController
-                                                          .topicDetail
-                                                          .value
-                                                          .desc,
+                                                      _topicController.topicDetail.value.desc,
                                                       style: TextStyle(
-                                                        color: Colors.white
-                                                            .withOpacity(0.9),
+                                                        color: Colors.white.withOpacity(0.9),
                                                         fontSize: 13,
                                                       ),
                                                       maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                                                      overflow: TextOverflow.ellipsis,
                                                     )),
                                               ],
                                             ),
@@ -156,8 +140,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                         const Spacer(),
                         // 底部数据统计
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
@@ -171,20 +154,17 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                           child: Row(
                             children: [
                               Obx(() => _buildStatItem(
-                                    value:
-                                        '${_topicController.topicDetail.value.contentCount}',
+                                    value: '${_topicController.topicDetail.value.contentCount}',
                                     label: 'content'.tr,
                                   )),
                               const SizedBox(width: 30),
                               Obx(() => _buildStatItem(
-                                    value:
-                                        '${_topicController.topicDetail.value.participantCount}',
+                                    value: '${_topicController.topicDetail.value.participantCount}',
                                     label: 'participates'.tr,
                                   )),
                               const SizedBox(width: 30),
                               Obx(() => _buildStatItem(
-                                    value:
-                                        '${_topicController.topicDetail.value.views}',
+                                    value: '${_topicController.topicDetail.value.views}',
                                     label: 'views'.tr,
                                   )),
                               const Spacer(),
@@ -192,8 +172,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                 onPressed: () {
                                   Get.to(
                                     () => WriteBottlePage(
-                                      defaultTopic: _topicController
-                                          .topicDetail.value.title,
+                                      defaultTopic: _topicController.topicDetail.value.title,
                                       defaultTopicId: widget.topicId,
                                     ),
                                   );
@@ -212,8 +191,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                                 ),
                                 child: Text(
                                   'join_topic'.tr,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
@@ -236,8 +214,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                   controller: _tabController,
                   isScrollable: true,
                   labelColor: isDark ? Colors.white : Colors.black,
-                  labelStyle: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                  labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   unselectedLabelColor: isDark ? Colors.grey[600] : Colors.grey,
                   indicatorColor: isDark ? Colors.white : Colors.black,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -326,6 +303,9 @@ class _TopicDetailPageState extends State<TopicDetailPage>
             resonates: bottle.resonates,
             isResonated: bottle.isResonated,
             isFavorited: bottle.isFavorited,
+            favorites: bottle.favorites,
+            shares: bottle.shares,
+            mood: bottle.mood,
           ),
         );
       },
@@ -361,8 +341,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                       Image.network(
                         bottle.imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.error),
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                       )
                     else
                       // 纯色渐变背景
@@ -376,9 +355,7 @@ class _TopicDetailPageState extends State<TopicDetailPage>
                         ),
                         child: Center(
                           child: Icon(
-                            isAudioBottle
-                                ? Icons.audiotrack
-                                : Icons.format_quote_rounded,
+                            isAudioBottle ? Icons.audiotrack : Icons.format_quote_rounded,
                             size: 48,
                             color: Colors.white.withOpacity(0.3),
                           ),

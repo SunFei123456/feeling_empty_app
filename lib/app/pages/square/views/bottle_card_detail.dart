@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'dart:typed_data';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
+import 'package:fangkong_xinsheng/app/widgets/mood_chip.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
@@ -13,6 +15,7 @@ import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
 
 import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
 import 'package:fangkong_xinsheng/app/widgets/share_card_widget.dart';
+
 // 凡是进入到 瓶子的详情页,  走这个页面 BottleCardDetail
 // ignore: must_be_immutable
 class BottleCardDetail extends StatefulWidget {
@@ -23,6 +26,7 @@ class BottleCardDetail extends StatefulWidget {
   final String createdAt;
   final String? audioUrl;
   final UserInfo? user;
+  final String? mood;
   int resonates;
   int favorites;
   final int shares;
@@ -45,6 +49,7 @@ class BottleCardDetail extends StatefulWidget {
     this.shares = 0, // 分享数量
     this.isResonated = false,
     this.isFavorited = false,
+    this.mood,
   });
 
   @override
@@ -203,13 +208,11 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
         ),
         InkWell(
           onTap: () {},
-          child: _buildInteractionButton(
-              Icons.remove_red_eye_outlined, widget.views, Colors.grey[700]),
+          child: _buildInteractionButton(Icons.remove_red_eye_outlined, widget.views, Colors.grey[700]),
         ),
         InkWell(
           onTap: _showShareOptions,
-          child: _buildInteractionButton(
-              Icons.share, widget.shares, Colors.grey[700]),
+          child: _buildInteractionButton(Icons.share, widget.shares, Colors.grey[700]),
         ),
       ],
     );
@@ -323,8 +326,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       ? Image.network(
                           widget.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                          errorBuilder: (context, error, stackTrace) => Container(
                             color: Colors.grey[100],
                             child: Center(
                               child: Icon(
@@ -344,13 +346,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                             ),
                           ),
                           child: Center(
-                            child: Icon(
-                              isAudioBottle
-                                  ? Icons.audiotrack_rounded
-                                  : Icons.format_quote_rounded,
-                              size: 80,
-                              color: Colors.white.withOpacity(0.3),
-                            ),
+                            child: Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 80, color: Colors.white.withOpacity(0.3)),
                           ),
                         ),
                 ),
@@ -363,81 +359,70 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 类型标识
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isImageBottle
-                                  ? Icons.image
-                                  : isAudioBottle
-                                      ? Icons.audiotrack
-                                      : Icons.text_fields,
-                              color: Colors.black54,
-                              size: 14,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          // 类型标识
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: Colors.black.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                    isImageBottle
+                                        ? Icons.image
+                                        : isAudioBottle
+                                            ? Icons.audiotrack
+                                            : Icons.text_fields,
+                                    color: Colors.black54,
+                                    size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isImageBottle
+                                      ? '图片'
+                                      : isAudioBottle
+                                          ? '语音'
+                                          : '文字',
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              isImageBottle
-                                  ? '图片'
-                                  : isAudioBottle
-                                      ? '语音'
-                                      : '文字',
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 8),
+                          // 情绪标识
+                          buildMoodChip(widget.mood),
+                        ],
                       ),
                       const SizedBox(height: 16),
+
                       // 标题
                       Text(
                         widget.title,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
 
                       // 发布时间
                       Row(
                         children: [
-                          Icon(Icons.timeline,
-                              size: 12, color: Colors.grey[600]),
+                          Icon(Icons.date_range_outlined, size: 14, color: Colors.grey[600]),
                           const SizedBox(width: 4),
-                          Text(
-                            formatTime(widget.createdAt),
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black.withOpacity(0.7)),
-                          ),
+                          Text(formatTime(widget.createdAt), style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7))),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 14),
 
                       // 正文内容
                       Text(
                         widget.content,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[800],
-                          height: 1.5,
-                        ),
+                        style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.5),
                       ),
                       const SizedBox(height: 20),
-                      if (widget.audioUrl != null &&
-                          widget.audioUrl!.isNotEmpty)
-                        AudioPlayerWidget(audioUrl: widget.audioUrl!),
+                      if (widget.audioUrl != null && widget.audioUrl!.isNotEmpty) AudioPlayerWidget(audioUrl: widget.audioUrl!),
                       // 互动按钮
                       _buildInteractionButtons(),
                     ],
@@ -448,46 +433,22 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
               // 评论输入框
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
+                decoration: const BoxDecoration(color: Colors.transparent),
                 child: Row(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/avatar.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                    CacheUserAvatar(avatarUrl: widget.user?.avatar ?? '', size: 40),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100]?.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey[100]?.withOpacity(0.5), borderRadius: BorderRadius.circular(10)),
                         child: TextField(
                           decoration: InputDecoration(
-                            hintText: 'Write comment here',
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
+                            hintText: '说点什么吧...',
+                            hintStyle: TextStyle(fontSize: 14, color: Colors.grey[600]),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 5,
-                            ),
-                            suffixIcon: Icon(
-                              Icons.send,
-                              color: Colors.blue[400],
-                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                            suffixIcon: Icon(Icons.send, color: Colors.blue[400]),
                           ),
                         ),
                       ),
@@ -530,31 +491,11 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       // 用户头像
                       InkWell(
                         onTap: () {
-                          if (widget.user?.id != null && widget.user!.id != 0) {
-                            Get.to(
-                              () => ProfilePage(userId: widget.user!.id),
-                              transition: Transition.fadeIn,
-                            );
+                          if (widget.user?.id != null) {
+                            Get.to(() => ProfilePage(userId: widget.user!.id), transition: Transition.rightToLeft);
                           }
                         },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            shape: BoxShape.rectangle,
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2,
-                            ),
-                            image: DecorationImage(
-                              image: NetworkImage(widget.user?.avatar ?? ''),
-                              fit: BoxFit.cover,
-                              onError: (_, __) =>
-                                  const Icon(Icons.person), // 添加错误处理
-                            ),
-                          ),
-                        ),
+                        child: CacheUserAvatar(avatarUrl: widget.user?.avatar ?? '', size: 50),
                       ),
                       const SizedBox(width: 16),
                       // 用户名和认证标识
@@ -566,11 +507,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                             children: [
                               Text(
                                 widget.user?.nickname ?? '',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black.withOpacity(0.9),
-                                ),
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.9)),
                               ),
                               const SizedBox(width: 8),
                               Icon(

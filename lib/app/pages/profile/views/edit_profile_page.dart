@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fangkong_xinsheng/app/router/index.dart';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -107,8 +108,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
 
       if (image != null) {
-        final String? uploadedUrl =
-            await _profileController.uploadAvatar(File(image.path));
+        final String? uploadedUrl = await _profileController.uploadAvatar(File(image.path));
         if (uploadedUrl != null) {
           setState(() {
             _tempAvatarUrl = uploadedUrl;
@@ -153,27 +153,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       appBar: AppBar(
-        title: Text(
-          'edit_profile_info'.tr,
-          style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1A1A1A),
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-        ),
+        title: Text('edit_profile_info'.tr, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1A1A1A), fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: isDark ? Colors.black : Colors.white,
-        iconTheme: IconThemeData(
-          color: isDark ? Colors.white : Colors.black,
-        ),
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
         actions: [
           TextButton.icon(
             onPressed: _saveProfile,
             label: Text(
               'save'.tr,
-              style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.black87,
-              ),
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
             ),
           ),
         ],
@@ -183,9 +173,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         if (isLoading) {
           return Center(
-            child: CircularProgressIndicator(
-              color: isDark ? Colors.white70 : Colors.black87,
-            ),
+            child: CircularProgressIndicator(color: isDark ? Colors.white70 : Colors.black87),
           );
         }
 
@@ -200,33 +188,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     GestureDetector(
                       onTap: _showImagePickerBottomSheet,
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: _tempAvatarUrl != null &&
-                                    _tempAvatarUrl!.isNotEmpty
-                                ? NetworkImage(_tempAvatarUrl!)
-                                : const AssetImage('assets/images/avatar.jpg')
-                                    as ImageProvider,
-                            fit: BoxFit.cover,
-                          ),
-                          border: Border.all(
-                            color: isDark ? Colors.white24 : Colors.orange,
-                            width: 4,
-                          ),
-                          boxShadow: [
-                            if (!isDark)
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                          ],
-                        ),
-                      ),
+                      child: CacheUserAvatar(avatarUrl: _tempAvatarUrl ?? _profileController.user.value!.avatar, size: 100),
                     ),
                     Positioned(
                       right: 0,
@@ -272,8 +234,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color:
-                      isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
+                  color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
@@ -284,9 +245,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   decoration: InputDecoration(
                     hintText: '请输入昵称',
                     hintStyle: TextStyle(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.5)
-                          : Colors.grey[500],
+                      color: isDark ? Colors.white.withOpacity(0.5) : Colors.grey[500],
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -359,14 +318,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? color.withOpacity(0.2) : color.withOpacity(0.1))
-              : (isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]),
+          color: isSelected ? (isDark ? color.withOpacity(0.2) : color.withOpacity(0.1)) : (isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? (isDark ? color.withOpacity(0.5) : color)
-                : Colors.transparent,
+            color: isSelected ? (isDark ? color.withOpacity(0.5) : color) : Colors.transparent,
             width: 2,
           ),
         ),
@@ -375,17 +330,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Icon(
               icon,
               size: 32,
-              color: isSelected
-                  ? (isDark ? color.withOpacity(0.9) : color)
-                  : (isDark ? Colors.white38 : Colors.grey),
+              color: isSelected ? (isDark ? color.withOpacity(0.9) : color) : (isDark ? Colors.white38 : Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected
-                    ? (isDark ? color.withOpacity(0.9) : color)
-                    : (isDark ? Colors.white38 : Colors.grey[600]),
+                color: isSelected ? (isDark ? color.withOpacity(0.9) : color) : (isDark ? Colors.white38 : Colors.grey[600]),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

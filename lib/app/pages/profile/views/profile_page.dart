@@ -1,10 +1,12 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:fangkong_xinsheng/app/webview/index.dart';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:fangkong_xinsheng/app/widgets/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,8 +25,7 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
-    with SingleTickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late final SettingController _settingController;
   late final ProfileController _profileController;
@@ -104,9 +105,7 @@ class _ProfilePageState extends State<ProfilePage>
                               Obx(() => Text(
                                     '@${_profileController.user.value?.nickname ?? ""}',
                                     style: TextStyle(
-                                      color: isDark
-                                          ? Colors.white
-                                          : const Color(0xFF1A1A1A),
+                                      color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -122,24 +121,11 @@ class _ProfilePageState extends State<ProfilePage>
                                           barrierDismissible: true,
                                           barrierLabel: '',
                                           barrierColor: Colors.black54,
-                                          transitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          pageBuilder: (context, animation,
-                                              secondaryAnimation) {
+                                          transitionDuration: const Duration(milliseconds: 300),
+                                          pageBuilder: (context, animation, secondaryAnimation) {
                                             return SlideTransition(
-                                              position: Tween<Offset>(
-                                                begin: const Offset(1, 0),
-                                                end: Offset.zero,
-                                              ).animate(CurvedAnimation(
-                                                parent: animation,
-                                                curve: Curves.easeInOut,
-                                              )),
-                                              child: CustomDrawer(
-                                                settingController:
-                                                    _settingController,
-                                                profileController:
-                                                    _profileController,
-                                              ),
+                                              position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut)),
+                                              child: CustomDrawer(settingController: _settingController, profileController: _profileController),
                                             );
                                           },
                                         );
@@ -154,22 +140,15 @@ class _ProfilePageState extends State<ProfilePage>
                           margin: const EdgeInsets.all(16),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.black.withAlpha(200)
-                                : Colors.white.withAlpha(200),
+                            color: isDark ? Colors.black.withAlpha(200) : Colors.white.withAlpha(200),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
+                              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
                             ],
                           ),
                           child: Obx(() {
                             final user = _profileController.user.value;
-                            final isLoading =
-                                _profileController.isLoading.value;
+                            final isLoading = _profileController.isLoading.value;
 
                             if (isLoading) {
                               return const Center(
@@ -185,52 +164,22 @@ class _ProfilePageState extends State<ProfilePage>
                                 Column(
                                   children: [
                                     // 头像
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        image: DecorationImage(
-                                          image: user.avatar.isNotEmpty
-                                              ? NetworkImage(user.avatar)
-                                              : const AssetImage(
-                                                      'assets/images/avatar.jpg')
-                                                  as ImageProvider,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
+                                    CacheUserAvatar(avatarUrl: user.avatar, size: 80),
                                     const SizedBox(height: 12),
-
                                     // 用户名和认证标记
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           user.nickname,
-                                          style: TextStyle(
-                                            color: isDark
-                                                ? Colors.white
-                                                : const Color(0xFF1A1A1A),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1A1A1A), fontSize: 20, fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(width: 4),
                                         InkWell(
                                           onTap: () {
-                                            WebViewPage.navigate(
-                                              title: "抖音网页版",
-                                              context: context,
-                                              url: 'https://www.douyin.com/',
-                                            );
+                                            WebViewPage.navigate(title: "抖音网页版", context: context, url: 'https://www.douyin.com/');
                                           },
-                                          child: Icon(
-                                            Icons.verified,
-                                            size: 20,
-                                            color: Colors.blue[400],
-                                          ),
+                                          child: Icon(Icons.verified, size: 20, color: Colors.blue[400]),
                                         ),
                                       ],
                                     ),
@@ -239,12 +188,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     // 描述
                                     Text(
                                       'Twice K-Pop Idol Group Member',
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                        fontSize: 14,
-                                      ),
+                                      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
                                     ),
                                     const SizedBox(height: 20),
 
@@ -258,38 +202,22 @@ class _ProfilePageState extends State<ProfilePage>
                                             width: double.infinity,
                                             child: ElevatedButton(
                                                 onPressed: () {
-                                                  if (_profileController
-                                                          .followStatus.value ==
-                                                      'not_following') {
-                                                    _profileController
-                                                        .followUser(
-                                                            widget.userId!);
+                                                  if (_profileController.followStatus.value == 'not_following') {
+                                                    _profileController.followUser(widget.userId!);
                                                   } else {
-                                                    _profileController
-                                                        .unfollowUser(
-                                                            widget.userId!);
+                                                    _profileController.unfollowUser(widget.userId!);
                                                   }
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                   // 互相关注 浅灰半透明色
                                                   // 已关注 橙色
                                                   // 未关注 蓝色
-                                                  backgroundColor:
-                                                      getFollowStatusColor(
-                                                          _profileController
-                                                              .followStatus
-                                                              .value),
+                                                  backgroundColor: getFollowStatusColor(_profileController.followStatus.value),
                                                   foregroundColor: Colors.white,
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
+                                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                                 ),
-                                                child: Text(getFollowStatusText(
-                                                    _profileController
-                                                        .followStatus.value))),
+                                                child: Text(getFollowStatusText(_profileController.followStatus.value))),
                                           )
                                         : const SizedBox(),
                                   ],
@@ -302,35 +230,22 @@ class _ProfilePageState extends State<ProfilePage>
                                         top: 0,
                                         child: GestureDetector(
                                           onTap: () async {
-                                            final result = await AppRoutes.to(
-                                                AppRoutes.EDIT_PROFILE,
-                                                arguments: _isCurrentUser
-                                                    ? 'current_user'
-                                                    : widget.userId.toString());
+                                            final result = await AppRoutes.to(AppRoutes.EDIT_PROFILE, arguments: _isCurrentUser ? 'current_user' : widget.userId.toString());
 
                                             if (result == true) {
-                                              await _profileController
-                                                  .refreshUserInfo(
-                                                      widget.userId!);
+                                              await _profileController.refreshUserInfo(widget.userId!);
                                             }
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.all(8),
                                             decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              borderRadius:
-                                                  const BorderRadius.only(
+                                              color: isDark ? Colors.white : Colors.black,
+                                              borderRadius: const BorderRadius.only(
                                                 topLeft: Radius.circular(20),
-                                                bottomRight:
-                                                    Radius.circular(20),
+                                                bottomRight: Radius.circular(20),
                                               ),
                                             ),
-                                            child: Icon(Icons.edit,
-                                                color: isDark
-                                                    ? Colors.black
-                                                    : Colors.white),
+                                            child: Icon(Icons.edit, color: isDark ? Colors.black : Colors.white),
                                           ),
                                         ),
                                       )
@@ -394,8 +309,7 @@ class _ProfilePageState extends State<ProfilePage>
                 children: [
                   // 公开照片瀑布流
                   RefreshIndicator(
-                    onRefresh: () => _profileController
-                        .refreshBottles(widget.userId ?? currentUserId!),
+                    onRefresh: () => _profileController.refreshBottles(widget.userId ?? currentUserId!),
                     child: Obx(() {
                       return MasonryGridView.count(
                         padding: const EdgeInsets.all(16),
@@ -404,40 +318,40 @@ class _ProfilePageState extends State<ProfilePage>
                         crossAxisSpacing: 16,
                         itemCount: _profileController.publicBottles.length,
                         itemBuilder: (context, index) {
-                          if (index >=
-                              _profileController.publicBottles.length) {
+                          if (index >= _profileController.publicBottles.length) {
                             return const SizedBox();
                           }
 
-                          final bottle =
-                              _profileController.publicBottles[index];
+                          final bottle = _profileController.publicBottles[index];
 
                           return GestureDetector(
                             onTap: () {
                               Get.to(
                                 () => BottleCardDetail(
                                   id: bottle.id,
-                                  imageUrl: bottle.imageUrl.isNotEmpty
-                                      ? bottle.imageUrl
-                                      : 'https://picsum.photos/500/800',
+                                  imageUrl: bottle.imageUrl.isNotEmpty ? bottle.imageUrl : 'https://picsum.photos/500/800',
                                   title: bottle.title,
                                   content: bottle.content,
                                   createdAt: bottle.createdAt,
                                   audioUrl: bottle.audioUrl,
                                   user: bottle.user,
+                                  mood: bottle.mood,
+                                  isFavorited: bottle.isFavorited,
+                                  isResonated: bottle.isResonated,
+                                  views: bottle.views,
+                                  shares: bottle.shares,
+                                  favorites: bottle.favorites,
+                                  resonates: bottle.resonates,
                                 ),
                                 transition: Transition.fadeIn,
                               );
                             },
-                            onLongPress: () =>
-                                _showBottomDrawer(context, bottle),
+                            onLongPress: () => _showBottomDrawer(context, bottle),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: isDark
-                                      ? Colors.black.withAlpha(200)
-                                      : Colors.white.withAlpha(200),
+                                  color: isDark ? Colors.black.withAlpha(200) : Colors.white.withAlpha(200),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.1),
@@ -461,8 +375,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     Padding(
                                       padding: const EdgeInsets.all(12.0),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             bottle.title,
@@ -486,8 +399,7 @@ class _ProfilePageState extends State<ProfilePage>
                                           ),
                                           const SizedBox(height: 12),
                                           Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
                                                 children: [
@@ -507,8 +419,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 ],
                                               ),
                                               Text(
-                                                bottle.createdAt
-                                                    .substring(0, 10),
+                                                bottle.createdAt.substring(0, 10),
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey[400],
@@ -531,11 +442,9 @@ class _ProfilePageState extends State<ProfilePage>
 
                   // 私密漂流瓶
                   RefreshIndicator(
-                    onRefresh: () => _profileController
-                        .refreshPrivateBottles(widget.userId ?? currentUserId!),
+                    onRefresh: () => _profileController.refreshPrivateBottles(widget.userId ?? currentUserId!),
                     child: Obx(() {
-                      if (_profileController.isLoadingPrivate.value &&
-                          _profileController.privateBottles.isEmpty) {
+                      if (_profileController.isLoadingPrivate.value && _profileController.privateBottles.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
@@ -544,8 +453,7 @@ class _ProfilePageState extends State<ProfilePage>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.lock_outline,
-                                  size: 64, color: Colors.grey[400]),
+                              Icon(Icons.lock_outline, size: 64, color: Colors.grey[400]),
                               const SizedBox(height: 16),
                               Text(
                                 'no_private_bottles'.tr,
@@ -567,28 +475,31 @@ class _ProfilePageState extends State<ProfilePage>
                         crossAxisSpacing: 16,
                         itemCount: _profileController.privateBottles.length,
                         itemBuilder: (context, index) {
-                          final bottle =
-                              _profileController.privateBottles[index];
+                          final bottle = _profileController.privateBottles[index];
 
                           return GestureDetector(
                             onTap: () {
                               Get.to(
                                 () => BottleCardDetail(
                                   id: bottle.id,
-                                  imageUrl: bottle.imageUrl.isNotEmpty
-                                      ? bottle.imageUrl
-                                      : 'https://picsum.photos/500/800',
+                                  imageUrl: bottle.imageUrl.isNotEmpty ? bottle.imageUrl : 'https://picsum.photos/500/800',
                                   title: bottle.title,
                                   content: bottle.content,
                                   createdAt: bottle.createdAt,
                                   audioUrl: bottle.audioUrl,
                                   user: bottle.user,
+                                  mood: bottle.mood,
+                                  isFavorited: bottle.isFavorited,
+                                  isResonated: bottle.isResonated,
+                                  views: bottle.views,
+                                  shares: bottle.shares,
+                                  favorites: bottle.favorites,
+                                  resonates: bottle.resonates,
                                 ),
                                 transition: Transition.fadeIn,
                               );
                             },
-                            onLongPress: () =>
-                                _showBottomDrawer(context, bottle),
+                            onLongPress: () => _showBottomDrawer(context, bottle),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
@@ -605,8 +516,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 child: Stack(
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         if (bottle.imageUrl.isNotEmpty)
@@ -620,8 +530,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         Padding(
                                           padding: const EdgeInsets.all(12.0),
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 bottle.title,
@@ -645,9 +554,7 @@ class _ProfilePageState extends State<ProfilePage>
                                               ),
                                               const SizedBox(height: 12),
                                               Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Row(
                                                     children: [
@@ -661,15 +568,13 @@ class _ProfilePageState extends State<ProfilePage>
                                                         '${bottle.views}',
                                                         style: TextStyle(
                                                           fontSize: 12,
-                                                          color:
-                                                              Colors.grey[400],
+                                                          color: Colors.grey[400],
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                   Text(
-                                                    bottle.createdAt
-                                                        .substring(0, 10),
+                                                    bottle.createdAt.substring(0, 10),
                                                     style: TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.grey[400],
@@ -693,8 +598,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.6),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -838,12 +742,10 @@ class _ProfilePageState extends State<ProfilePage>
                   cancelText: "取消",
                   onConfirm: () async {
                     try {
-                      final response =
-                          await BottleApiService().deleteBottle(bottle.id);
+                      final response = await BottleApiService().deleteBottle(bottle.id);
                       if (response.success) {
                         Get.snackbar('成功', '删除成功');
-                        _profileController
-                            .refreshBottles(TokenService().getUserId()!);
+                        _profileController.refreshBottles(TokenService().getUserId()!);
                       } else {
                         Get.snackbar('错误', response.message ?? '删除失败');
                       }
@@ -856,16 +758,14 @@ class _ProfilePageState extends State<ProfilePage>
             ),
             ListTile(
               leading: const Icon(Icons.visibility_off, color: Colors.orange),
-              title:
-                  const Text('修改可见性', style: TextStyle(color: Colors.orange)),
+              title: const Text('修改可见性', style: TextStyle(color: Colors.orange)),
               onTap: () {
                 Navigator.pop(context);
                 // 修改可见性逻辑
                 BottleApiService().updateBottleVisibility(bottle.id, false);
                 // 修改后刷新列表
                 _profileController.refreshBottles(TokenService().getUserId()!);
-                _profileController
-                    .refreshPrivateBottles(TokenService().getUserId()!);
+                _profileController.refreshPrivateBottles(TokenService().getUserId()!);
               },
             ),
             ListTile(
@@ -897,8 +797,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 44;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
