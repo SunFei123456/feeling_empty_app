@@ -1,4 +1,5 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
+import 'package:fangkong_xinsheng/app/widgets/mood_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
@@ -17,7 +18,6 @@ class CommonBottleCard extends StatelessWidget {
     // 判断瓶子类型
     bool isImageBottle = bottle.imageUrl.isNotEmpty;
     bool isAudioBottle = bottle.audioUrl.isNotEmpty;
-    bool isTextBottle = !isImageBottle && !isAudioBottle;
 
     // 定义渐变背景颜色
     List<Color> getGradientColors() {
@@ -50,6 +50,12 @@ class CommonBottleCard extends StatelessWidget {
             audioUrl: bottle.audioUrl,
             user: bottle.user,
             mood: bottle.mood,
+            resonates: bottle.resonates,
+            favorites: bottle.favorites,
+            isFavorited: bottle.isFavorited,
+            isResonated: bottle.isFavorited,
+            views: bottle.views,
+            shares: bottle.shares,
           ),
           transition: Transition.cupertino,
         ),
@@ -81,28 +87,16 @@ class CommonBottleCard extends StatelessWidget {
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey[100],
                         child: Center(
-                          child: Icon(
-                            Icons.broken_image_rounded,
-                            color: Colors.grey[400],
-                            size: 40,
-                          ),
+                          child: Icon(Icons.broken_image_rounded, color: Colors.grey[400], size: 40),
                         ),
                       ),
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: getGradientColors(),
-                        ),
+                        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: getGradientColors()),
                       ),
                       child: Center(
-                        child: Icon(
-                          isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded,
-                          size: 40,
-                          color: Colors.white.withOpacity(0.3),
-                        ),
+                        child: Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 40, color: Colors.white.withOpacity(0.3)),
                       ),
                     ),
             ),
@@ -112,11 +106,7 @@ class CommonBottleCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.3),
-                      Colors.black.withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.3), Colors.black.withOpacity(0.7)],
                   ),
                 ),
               ),
@@ -134,14 +124,13 @@ class CommonBottleCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isImageBottle
-                          ? Icons.image
-                          : isAudioBottle
-                              ? Icons.audiotrack
-                              : Icons.text_fields,
-                      color: Colors.white,
-                      size: 14,
-                    ),
+                        isImageBottle
+                            ? Icons.image
+                            : isAudioBottle
+                                ? Icons.audiotrack
+                                : Icons.text_fields,
+                        color: Colors.white,
+                        size: 14),
                     const SizedBox(width: 4),
                     Text(
                       isImageBottle
@@ -183,31 +172,19 @@ class CommonBottleCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (bottle.mood.isNotEmpty) _buildMoodChip(bottle.mood),
+                      if (bottle.mood.isNotEmpty) buildMoodChip(bottle.mood, size: 15),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
                     bottle.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (bottle.content.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(
-                      bottle.content,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(bottle.content, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.8)), maxLines: 2, overflow: TextOverflow.ellipsis),
                   ],
                   const SizedBox(height: 8),
                   _buildBottomStats(bottle),
@@ -215,56 +192,6 @@ class CommonBottleCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMoodChip(String mood) {
-    // 定义心情对应的图标
-    final moodIcons = {
-      '开心': '😊',
-      '伤心': '😢',
-      '愤怒': '😠',
-      '平静': '😌',
-      '焦虑': '😰',
-      '兴奋': '🤩',
-      '疲惫': '😫',
-      '困惑': '🤔',
-      '害怕': '😨',
-      '惊讶': '😲',
-      '无聊': '😑',
-      '孤独': '🥺',
-      '感激': '🙏',
-      '期待': '🤗',
-      'happy': '😊',
-      'sad': '😢',
-      'angry': '😠',
-      'calm': '😌',
-      'anxious': '😰',
-      'excited': '🤩',
-      'tired': '😫',
-      'confused': '🤔',
-      'scared': '😨',
-      'surprised': '😲',
-      'bored': '😑',
-      'lonely': '🥺',
-      'grateful': '🙏',
-      'hopeful': '🤗',
-    };
-
-    final emoji = moodIcons[mood] ?? '😶'; // 如果没有匹配的心情，使用默认表情
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        emoji,
-        style: const TextStyle(
-          fontSize: 16,
         ),
       ),
     );
@@ -287,19 +214,13 @@ class CommonBottleCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Icon(
-          Icons.favorite_border_rounded,
-          size: 16,
-          color: Colors.white.withOpacity(0.7),
-        ),
+        Icon(Icons.favorite_outline_outlined, size: 16, color: bottle.isResonated ? Colors.redAccent : Colors.white.withOpacity(0.7)),
         const SizedBox(width: 4),
-        Text(
-          '${bottle.resonates}',
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 12,
-          ),
-        ),
+        Text('${bottle.resonates}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+        const SizedBox(width: 16),
+        Icon(Icons.collections_bookmark_outlined, size: 16, color: bottle.isFavorited ? Colors.blueAccent : Colors.white.withOpacity(0.7)),
+        const SizedBox(width: 4),
+        Text('${bottle.favorites}', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
         const Spacer(),
         Text(
           _formatDate(DateTime.parse(bottle.createdAt)),

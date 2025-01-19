@@ -22,11 +22,9 @@ class ViewHistoryController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    print('ViewHistoryController onReady');
   }
 
   Future<void> loadViewHistory({bool refresh = false}) async {
-    print('Loading history... refresh: $refresh');
     if (refresh) {
       currentPage.value = 1;
       historyItems.clear();

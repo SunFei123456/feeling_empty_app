@@ -64,10 +64,7 @@ class _ResonatedPageState extends State<ResonatedPage> {
       appBar: AppBar(
         title: Text(
           'my_resonance'.tr,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
         ),
         centerTitle: true,
         elevation: 0,
@@ -81,42 +78,24 @@ class _ResonatedPageState extends State<ResonatedPage> {
               : Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            offset: const Offset(0, 1),
-                            blurRadius: 2,
-                          ),
+                          BoxShadow(color: Colors.black.withOpacity(0.05), offset: const Offset(0, 1), blurRadius: 2),
                         ],
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.favorite_rounded,
-                              color: Theme.of(context).primaryColor,
-                              size: 20,
-                            ),
+                            decoration: BoxDecoration(color: Theme.of(context).primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                            child: Icon(Icons.favorite_rounded, color: Theme.of(context).primaryColor, size: 20),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             '共 ${resonatedItems.length} 条共鸣',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: const TextStyle(fontSize: 15, color: Colors.black87, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -125,8 +104,7 @@ class _ResonatedPageState extends State<ResonatedPage> {
                       child: RefreshIndicator(
                         onRefresh: () => _loadResonatedItems(refresh: true),
                         child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           itemCount: resonatedItems.length,
                           itemBuilder: (context, index) {
                             final item = resonatedItems[index];

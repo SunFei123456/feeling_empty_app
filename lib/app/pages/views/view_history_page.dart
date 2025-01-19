@@ -43,9 +43,7 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.historyItems.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (controller.historyItems.isEmpty) {
@@ -75,35 +73,20 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  ),
+                  BoxShadow(color: Colors.black.withOpacity(0.05), offset: const Offset(0, 1), blurRadius: 2),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.history_rounded,
-                      color: Theme.of(context).primaryColor,
-                      size: 20,
-                    ),
+                    decoration: BoxDecoration(color: Theme.of(context).primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                    child: Icon(Icons.history_rounded, color: Theme.of(context).primaryColor, size: 20),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     '共 ${controller.totalItems} 条记录',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: const TextStyle(fontSize: 15, color: Colors.black87, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -113,22 +96,17 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                 onRefresh: () => controller.loadViewHistory(refresh: true),
                 color: Theme.of(context).primaryColor,
                 child: ListView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  itemCount: controller.historyItems.length +
-                      (controller.hasMore ? 1 : 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  itemCount: controller.historyItems.length + (controller.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index == controller.historyItems.length - 3 &&
-                        controller.hasMore) {
+                    if (index == controller.historyItems.length - 3 && controller.hasMore) {
                       Future.microtask(() => controller.loadViewHistory());
                     }
 
                     if (index == controller.historyItems.length) {
                       return const Padding(
                         padding: EdgeInsets.all(16.0),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: Center(child: CircularProgressIndicator()),
                       );
                     }
 
@@ -139,10 +117,7 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
                         color: Colors.redAccent,
-                        child: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.delete_outline, color: Colors.white),
                       ),
                       confirmDismiss: (direction) async {
                         return await showDialog(
@@ -153,13 +128,11 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                               content: Text('delete_one_history'.tr),
                               actions: [
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
+                                  onPressed: () => Navigator.of(context).pop(false),
                                   child: Text('cancel'.tr),
                                 ),
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
+                                  onPressed: () => Navigator.of(context).pop(true),
                                   child: Text(
                                     'delete'.tr,
                                     style: const TextStyle(color: Colors.red),

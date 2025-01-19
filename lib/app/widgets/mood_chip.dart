@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget buildMoodChip(String? mood) {
+Widget buildMoodChip(String? mood, {double? size = 12.0}) {
   // 定义心情对应的图标
   final moodIcons = {
     '开心': '😊',
@@ -41,6 +41,6 @@ Widget buildMoodChip(String? mood) {
       color: Colors.black.withOpacity(0.1),
       borderRadius: BorderRadius.circular(4),
     ),
-    child: Text(emoji, style: const TextStyle(fontSize: 12)),
+    child: Text(emoji, style: TextStyle(fontSize: size)),
   );
 }
