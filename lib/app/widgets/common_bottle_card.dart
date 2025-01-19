@@ -112,7 +112,7 @@ class CommonBottleCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 12,
+              right: 12,
               top: 12,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -182,10 +182,6 @@ class CommonBottleCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (bottle.content.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(bottle.content, style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.8)), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  ],
                   const SizedBox(height: 8),
                   _buildBottomStats(bottle),
                 ],

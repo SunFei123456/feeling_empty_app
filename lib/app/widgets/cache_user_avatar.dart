@@ -16,7 +16,7 @@ class CacheUserAvatar extends StatelessWidget {
       placeholder: (context, url) => const Icon(Icons.person), // 占位符
       errorWidget: (context, url, error) => const Icon(Icons.person), // 错误时显示的图标
       imageBuilder: (context, imageProvider) => Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.purple[200]!, width: 3), image: DecorationImage(image: imageProvider, fit: BoxFit.cover)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), image: DecorationImage(image: imageProvider, fit: BoxFit.cover)),
       ),
     );
   }

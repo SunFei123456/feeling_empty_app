@@ -367,23 +367,17 @@ class _BottlePageState extends State<BottlePage> {
     );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'recommended_drift_bottles'.tr,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800]),
-            ),
+            Text('recommended_drift_bottles'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800])),
             TextButton(
               onPressed: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
               child: Text(
                 'view_more'.tr,
-                style: TextStyle(
-                  color: Colors.blue[400],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.blue[400], fontSize: 14),
               ),
             ),
           ],
@@ -608,7 +602,9 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                         ),
                         child: Obx(() {
                           final user = profileController.user.value;
-                          return CacheUserAvatar(avatarUrl: user?.avatar ?? '',);
+                          return CacheUserAvatar(
+                            avatarUrl: user?.avatar ?? '',
+                          );
                         }),
                       ),
                     ),
