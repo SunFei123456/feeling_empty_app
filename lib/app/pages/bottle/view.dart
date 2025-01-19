@@ -101,11 +101,7 @@ class _BottlePageState extends State<BottlePage> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.blue[200]!.withOpacity(0.3),
-                Colors.blue[400]!.withOpacity(0.2),
-                Colors.purple[200]!.withOpacity(0.1),
-              ],
+              colors: [Colors.blue[200]!.withOpacity(0.4), Colors.blue[400]!.withOpacity(0.3), Colors.purple[200]!.withOpacity(0.2)],
             ),
           ),
         ),

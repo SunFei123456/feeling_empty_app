@@ -27,11 +27,7 @@ class _SquarePageState extends State<SquarePage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.withOpacity(0.3),
-              Colors.purple.withOpacity(0.2),
-              Colors.pink.withOpacity(0.15),
-            ],
+            colors: [Colors.blue.withOpacity(0.3), Colors.purple.withOpacity(0.2), Colors.pink.withOpacity(0.15)],
             stops: const [0.2, 0.6, 0.9],
           ),
         ),
@@ -60,8 +56,7 @@ class _SquarePageState extends State<SquarePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // logo
-
+                      
                         Text(
                           'nav_square'.tr,
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -208,7 +203,6 @@ class _SquarePageState extends State<SquarePage> {
             isResonated: bottle.isResonated,
             isFavorited: bottle.isFavorited,
             mood: bottle.mood,
-            
           ),
           transition: Transition.cupertino,
         );

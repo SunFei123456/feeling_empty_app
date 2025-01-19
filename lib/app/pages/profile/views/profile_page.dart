@@ -62,29 +62,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       body: Stack(
         children: [
-          // 背景渐变模糊效果
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.blue.withOpacity(0.5),
-                  Colors.pink.withOpacity(0.1),
-                  Colors.white.withOpacity(0.2),
-                ],
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                color: Colors.white.withOpacity(0.2),
-              ),
-            ),
-          ),
-
           // 主要内容
           SafeArea(
             child: NestedScrollView(
@@ -104,11 +84,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                               ),
                               Obx(() => Text(
                                     '@${_profileController.user.value?.nickname ?? ""}',
-                                    style: TextStyle(
-                                      color: isDark ? Colors.white : const Color(0xFF1A1A1A),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1A1A1A), fontSize: 18, fontWeight: FontWeight.w600),
                                   )),
                               const Spacer(),
                               !_isCurrentUser
@@ -143,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                             color: isDark ? Colors.black.withAlpha(200) : Colors.white.withAlpha(200),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
+                              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(5, 5)),
                             ],
                           ),
                           child: Obx(() {
