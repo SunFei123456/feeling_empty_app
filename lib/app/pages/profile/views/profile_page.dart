@@ -36,16 +36,20 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 2, vsync: this);
-    _settingController = Get.find<SettingController>();
-
-    // 在这里处理用户身份校验
+    // 先初始化 _isCurrentUser
     _isCurrentUser = widget.userId == null || isCurrentUser(widget.userId!);
+
+    // 然后再使用 _isCurrentUser 初始化 _tabController
+    _tabController = TabController(
+      length: _isCurrentUser ? 2 : 1, 
+      vsync: this
+    );
+    
+    _settingController = Get.find<SettingController>();
 
     // 根据是否是当前用户决定使用哪个 tag 和 userId
     _profileController = Get.put(
       ProfileController(
-        // 如果是当前用户页面，使用 currentUserId，否则使用 widget.userId
         userId: widget.userId ?? currentUserId,
       ),
       tag: _isCurrentUser ? 'current_user' : widget.userId.toString(),
@@ -127,9 +131,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                             final isLoading = _profileController.isLoading.value;
 
                             if (isLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              return const Center(child: CircularProgressIndicator());
                             }
                             if (user == null) {
                               return const Center(child: Text('用户不存在'));
@@ -151,6 +153,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                                           style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1A1A1A), fontSize: 20, fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(width: 4),
+                                        //性别
+                                        Icon(user.sex == 1 ? Icons.male : Icons.female, size: 20, color: user.sex == 1 ? Colors.blue : Colors.pink),
                                         InkWell(
                                           onTap: () {
                                             WebViewPage.navigate(title: "抖音网页版", context: context, url: 'https://www.douyin.com/');
@@ -238,37 +242,24 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     delegate: _SliverAppBarDelegate(
                       TabBar(
                         controller: _tabController,
-                        indicator: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
+                        indicator: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(25)),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        labelStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        unselectedLabelStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.black.withOpacity(0.7),
                         padding: const EdgeInsets.all(3),
                         tabs: [
                           Tab(
                             child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Center(child: Text('public'.tr)),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
+                              child: Center(child: Text('public'.tr))
                             ),
                           ),
-                          Tab(
+                          if (_isCurrentUser) Tab(
                             child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Center(child: Text('private'.tr)),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
+                              child: Center(child: Text('private'.tr))
                             ),
                           ),
                         ],
@@ -416,8 +407,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     }),
                   ),
 
-                  // 私密漂流瓶
-                  RefreshIndicator(
+                  // 只有当前用户才显示私密漂流瓶
+                  if (_isCurrentUser) RefreshIndicator(
                     onRefresh: () => _profileController.refreshPrivateBottles(widget.userId ?? currentUserId!),
                     child: Obx(() {
                       if (_profileController.isLoadingPrivate.value && _profileController.privateBottles.isEmpty) {
