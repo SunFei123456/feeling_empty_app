@@ -24,13 +24,17 @@ import 'package:flutter/foundation.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 确保在获取初始路由前已初始化存储
-  await Get.putAsync(() => TokenService().init());
-
-  // 初始化服务
-  await Get.putAsync(() => StorageService().init());
-  final appService = await Get.putAsync(() => AppService().init());
+  // 确保按正确顺序初始化所有服务
   await dotenv.load(fileName: ".env");
+  
+  // 先初始化存储服务
+  await Get.putAsync(() => StorageService().init());
+  
+  // 然后初始化 token 服务
+  await Get.putAsync(() => TokenService().init());
+  
+  // 最后初始化其他服务
+  final appService = await Get.putAsync(() => AppService().init());
   Get.put(SettingController());
 
   // 初始化 WebView

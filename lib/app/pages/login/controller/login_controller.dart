@@ -59,15 +59,15 @@ class LoginController extends GetxController {
 
       if (response.success && response.data != null) {
         final loginResponse = response.data!;
+        
+        // 使用 await 确保所有存储操作完成
+        await TokenService().saveToken(loginResponse.token);
+        await TokenService().saveUserId(loginResponse.user.id);
+        await TokenService().saveExp(loginResponse.exp);
+        
         isLoading.value = false;
-
-        // 存储token + 用户id + 过期时间
-        await Future.wait([
-          TokenService().saveToken(loginResponse.token),
-          TokenService().saveUserId(loginResponse.user.id),
-          TokenService().saveExp(loginResponse.exp),
-        ]);
-
+        
+        // 确保存储完成后再跳转
         Get.offAllNamed(AppRoutes.home);
       } else {
         isLoading.value = false;
