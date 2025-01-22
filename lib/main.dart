@@ -1,3 +1,4 @@
+import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fangkong_xinsheng/app/core/services/event_bus_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +29,10 @@ void main() async {
   // 确保按正确顺序初始化所有服务
   await dotenv.load(fileName: ".env");
   
-  // 先初始化存储服务
+  // 先初始化事件总线服务
+  Get.put(EventBusService());
+  
+  // 然后初始化存储服务
   await Get.putAsync(() => StorageService().init());
   
   // 然后初始化 token 服务
@@ -36,6 +41,7 @@ void main() async {
   // 最后初始化其他服务
   final appService = await Get.putAsync(() => AppService().init());
   Get.put(SettingController());
+  Get.put(SquareController());
 
   // 初始化 WebView
   late final WebViewPlatform platform;

@@ -1,6 +1,8 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/square/api/index.dart';
+import 'package:fangkong_xinsheng/app/core/events/bottle_events.dart';
+import 'package:fangkong_xinsheng/app/core/services/event_bus_service.dart';
 
 class SquareController extends GetxController {
   final _squareApi = SquareApiService();
@@ -11,13 +13,30 @@ class SquareController extends GetxController {
   void onInit() {
     super.onInit();
     fetchRandomBottles();
+    
+    // 监听瓶子状态更新事件
+    EventBusService.to.eventBus.on<BottleEvent>().listen((event) {
+      final index = bottles.indexWhere((b) => b.id == event.bottleId);
+      if (index != -1) {
+        if (event.isResonated != null) bottles[index].isResonated = event.isResonated!;
+        if (event.resonates != null) bottles[index].resonates = event.resonates!;
+        if (event.isFavorited != null) bottles[index].isFavorited = event.isFavorited!;
+        if (event.favorites != null) bottles[index].favorites = event.favorites!;
+        bottles.refresh();
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    EventBusService.to.eventBus.destroy();
+    super.onClose();
   }
 
   // 获取随机的漂流瓶
   Future<void> fetchRandomBottles() async {
     try {
-      if (isLoading.value) return; // 防止重复请求
-
+      if (isLoading.value) return;
       isLoading.value = true;
       final response = await _squareApi.getRandomBottles();
 
@@ -37,14 +56,13 @@ class SquareController extends GetxController {
     }
   }
 
-  // 添加更新瓶子共振状态的方法
+  // 更新共振状态并发送事件
   void updateBottleResonateStatus(int bottleId, {required bool isResonated, required int resonates}) {
-    final index = bottles.indexWhere((bottle) => bottle.id == bottleId);
-    if (index != -1) {
-      bottles[index].isResonated = isResonated;
-      bottles[index].resonates = resonates;
-      bottles.refresh();  // 刷新列表触发UI更新
-    }
+    EventBusService.to.eventBus.fire(BottleEvent(
+      bottleId: bottleId,
+      isResonated: isResonated,
+      resonates: isResonated ? resonates + 1 : resonates - 1,
+    ));
   }
 
   // 获取瓶子的当前状态
@@ -52,13 +70,12 @@ class SquareController extends GetxController {
     return bottles.firstWhereOrNull((bottle) => bottle.id == bottleId);
   }
 
-  // 更新瓶子的收藏状态
+  // 更新收藏状态并发送事件
   void updateBottleFavoriteStatus(int bottleId, {required bool isFavorited, required int favorites}) {
-    final index = bottles.indexWhere((bottle) => bottle.id == bottleId);
-    if (index != -1) {
-      bottles[index].isFavorited = isFavorited;
-      bottles[index].favorites = favorites;
-      bottles.refresh();
-    }
+    EventBusService.to.eventBus.fire(BottleEvent(
+      bottleId: bottleId,
+      isFavorited: isFavorited,
+      favorites: isFavorited ? favorites + 1 : favorites - 1,
+    ));
   }
 }

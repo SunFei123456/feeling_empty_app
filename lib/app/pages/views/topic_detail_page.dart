@@ -1,10 +1,11 @@
 import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
+import 'package:fangkong_xinsheng/app/pages/square/controller/square_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
+import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
-
 
 class TopicDetailPage extends StatefulWidget {
   final String topicName;
@@ -26,7 +27,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
   late final TabController _tabController;
   late final PageController _pageController;
   final TopicController _topicController = Get.find<TopicController>();
-
+  final SquareController squareController = Get.find<SquareController>();
   @override
   void initState() {
     super.initState();
@@ -250,225 +251,205 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
   }
 
   Widget _buildBottleList(bool isHotTab) {
-    return Obx(() => ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return Obx(() {
+      if (_topicController.isLoading.value && _topicController.bottles.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return RefreshIndicator(
+        onRefresh: () => _topicController.loadTopicBottles(widget.topicId, isHot: isHotTab),
+        child: GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.6),
           itemCount: _topicController.bottles.length,
           itemBuilder: (context, index) {
             final bottle = _topicController.bottles[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: _buildBottleCard(context, bottle),
-            );
+            return _buildBottleCard(bottle);
           },
-        ));
+        ),
+      );
+    });
   }
 
-  Widget _buildBottleCard(BuildContext context, BottleModel bottle) {
+  Widget _buildBottleCard(BottleModel bottle) {
+    
     // 判断瓶子类型
     bool isImageBottle = bottle.imageUrl.isNotEmpty;
     bool isAudioBottle = bottle.audioUrl.isNotEmpty;
-    bool isTextBottle = !isImageBottle && !isAudioBottle;
 
     // 定义渐变背景颜色
     List<Color> getGradientColors() {
       if (isAudioBottle) {
-        return [
-          const Color(0xFFFF8C61), // 珊瑚色
-          const Color(0xFFFF6B6B), // 粉红色
-          const Color(0xFFFF5F6D), // 玫瑰色
-        ];
+        return [const Color(0xFFFF8C61), const Color(0xFFFF6B6B), const Color(0xFFFF5F6D)];
       } else {
-        return [
-          const Color(0xFF4FACFE), // 天蓝色
-          const Color(0xFF00F2FE), // 青色
-          const Color(0xFF00DBDE), // 蓝绿色
-        ];
+        return [const Color(0xFF4FACFE), const Color(0xFF00F2FE), const Color(0xFF00DBDE)];
       }
     }
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         Get.to(
           () => BottleCardDetail(
-            id: bottle.id,
-            title: bottle.title,
-            content: bottle.content,
-            imageUrl: bottle.imageUrl,
-            audioUrl: bottle.audioUrl,
-            createdAt: bottle.createdAt,
-            user: bottle.user,
-            views: bottle.views,
-            resonates: bottle.resonates,
-            isResonated: bottle.isResonated,
-            isFavorited: bottle.isFavorited,
-            favorites: bottle.favorites,
-            shares: bottle.shares,
-            mood: bottle.mood,
-          ),
+              id: bottle.id,
+              imageUrl: bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
+              title: bottle.title.isNotEmpty ? bottle.title : "暂无标题",
+              content: bottle.content,
+              createdAt: bottle.createdAt,
+              audioUrl: bottle.audioUrl,
+              user: bottle.user,
+              views: bottle.views,
+              resonates: bottle.resonates,
+              favorites: bottle.favorites,
+              shares: bottle.shares,
+              isResonated: bottle.isResonated,
+              isFavorited: bottle.isFavorited,
+              mood: bottle.mood),
         );
       },
-      child: Container(
-        height: 400,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Expanded(
-              flex: 7,
-              child: Container(
+            // 背景
+            if (isImageBottle)
+              Image.network(
+                bottle.imageUrl.isEmpty ? 'https://picsum.photos/500/800' : bottle.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+              )
+            else
+              // 纯色渐变背景
+              Container(
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(15),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: getGradientColors(),
                   ),
                 ),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // 背景
-                    if (isImageBottle)
-                      Image.network(
-                        bottle.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                      )
-                    else
-                      // 纯色渐变背景
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: getGradientColors(),
-                          ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            isAudioBottle ? Icons.audiotrack : Icons.format_quote_rounded,
-                            size: 48,
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                      ),
+                child: Center(
+                  child: Icon(isAudioBottle ? Icons.audiotrack : Icons.format_quote_rounded, size: 48, color: Colors.white.withOpacity(0.3)),
+                ),
+              ),
 
-                    // 渐变遮罩
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.center,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // 类型标识
-                    Positioned(
-                      left: 16,
-                      top: 16,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          isImageBottle
-                              ? Icons.image
-                              : isAudioBottle
-                                  ? Icons.audiotrack
-                                  : Icons.text_fields,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ],
+            // 渐变遮罩
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.5), Colors.black.withOpacity(0.8)],
+                  stops: const [0.3, 0.5, 0.7, 1.0],
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(16),
+
+            // 内容
+            Padding(
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // 用户信息行
+                  Row(
+                    children: [
+                      // 头像
+                      CacheUserAvatar(avatarUrl: bottle.user.avatar, size: 32),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          bottle.user.nickname,
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500, shadows: [Shadow(offset: Offset(1, 1), blurRadius: 2, color: Colors.black)]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // 标题
                   Text(
-                    bottle.title,
+                    bottle.title.isNotEmpty ? bottle.title : bottle.mood,
+                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, shadows: [Shadow(offset: Offset(1, 1), blurRadius: 3, color: Colors.black)]),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      height: 1.2,
-                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
+                  // 底部数据栏
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_outlined,
-                            size: 16,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            bottle.createdAt,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.remove_red_eye_outlined,
-                            size: 16,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${bottle.views}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Icon(
-                            Icons.favorite_border,
-                            size: 16,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${bottle.resonates}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                      Icon(Icons.remove_red_eye, size: 16, color: Colors.white.withOpacity(0.9)),
+                      const SizedBox(width: 4),
+                      Text('${bottle.views}',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                            shadows: const [Shadow(offset: Offset(1, 1), blurRadius: 2, color: Colors.black)],
+                          )),
+                      const Spacer(),
+                      // 修改这里：用点赞图标和数值替换热度值
+                      GestureDetector(
+                        onTap: () {
+                          squareController.updateBottleResonateStatus(bottle.id, isResonated: !bottle.isResonated, resonates: bottle.resonates);
+                          print("数据更新了------------------------> ${bottle.isResonated}");
+                        },
+                        child: Row(
+                          children: [
+                            Icon(bottle.isResonated ? Icons.favorite : Icons.favorite_border, size: 16, color: bottle.isResonated ? Colors.red : Colors.white.withOpacity(0.9)),
+                            const SizedBox(width: 4),
+                            Text('${bottle.resonates}',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 13,
+                                  shadows: const [Shadow(offset: Offset(1, 1), blurRadius: 2, color: Colors.black)],
+                                )),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ],
+              ),
+            ),
+
+            // 类型标识 - 右上角
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isImageBottle
+                          ? Icons.image
+                          : isAudioBottle
+                              ? Icons.audiotrack
+                              : Icons.text_fields,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isImageBottle
+                          ? '图片'
+                          : isAudioBottle
+                              ? '语音'
+                              : '文字',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

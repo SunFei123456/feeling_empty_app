@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:typed_data';
+import 'package:fangkong_xinsheng/app/core/services/event_bus_service.dart';
 import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:fangkong_xinsheng/app/widgets/mood_chip.dart';
 import 'package:screenshot/screenshot.dart';
@@ -15,6 +16,7 @@ import 'package:fangkong_xinsheng/app/widgets/audio_player_widget.dart';
 
 import 'package:fangkong_xinsheng/app/pages/views/api/user_bottles_api.dart';
 import 'package:fangkong_xinsheng/app/widgets/share_card_widget.dart';
+import 'package:fangkong_xinsheng/app/core/events/bottle_events.dart';
 
 // 凡是进入到 瓶子的详情页,  走这个页面 BottleCardDetail
 // ignore: must_be_immutable
@@ -80,14 +82,21 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
   Future<void> _handleResonate() async {
     try {
       if (widget.isResonated) {
-        // 改回原来的逻辑
         final response = await _api.unresonateBottle(widget.id);
         if (response.success) {
           setState(() {
             widget.resonates--;
             widget.isResonated = false;
           });
-          squareController.updateBottleResonateStatus(widget.id, isResonated: false, resonates: widget.resonates);
+          // 发送状态更新事件
+          EventBusService.to.eventBus.fire(BottleEvent(
+            bottleId: widget.id,
+            isResonated: false,
+            resonates: widget.resonates,
+          ));
+        } else {
+          Get.snackbar('提示', response.message ?? '操作失败');
+          return;
         }
       } else {
         final response = await _api.resonateBottle(widget.id);
@@ -96,10 +105,29 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.resonates++;
             widget.isResonated = true;
           });
-          squareController.updateBottleResonateStatus(widget.id, isResonated: true, resonates: widget.resonates);
+          // 发送状态更新事件
+          EventBusService.to.eventBus.fire(BottleEvent(
+            bottleId: widget.id,
+            isResonated: true,
+            resonates: widget.resonates,
+          ));
+        } else {
+          Get.snackbar('提示', response.message ?? '操作失败');
+          return;
         }
       }
     } catch (e) {
+      print('Resonate error: $e');
+      // 如果操作失败，回滚状态
+      setState(() {
+        if (widget.isResonated) {
+          widget.resonates++;
+          widget.isResonated = true;
+        } else {
+          widget.resonates--;
+          widget.isResonated = false;
+        }
+      });
       Get.snackbar('错误', '操作失败，请稍后重试');
     }
   }
@@ -114,7 +142,15 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.favorites--;
             widget.isFavorited = false;
           });
-          squareController.updateBottleFavoriteStatus(widget.id, isFavorited: false, favorites: widget.favorites);
+          // 发送状态更新事件
+          EventBusService.to.eventBus.fire(BottleEvent(
+            bottleId: widget.id,
+            isFavorited: false,
+            favorites: widget.favorites,
+          ));
+        } else {
+          Get.snackbar('提示', response.message ?? '操作失败');
+          return;
         }
       } else {
         final response = await _api.favoriteBottle(widget.id);
@@ -123,10 +159,29 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.favorites++;
             widget.isFavorited = true;
           });
-          squareController.updateBottleFavoriteStatus(widget.id, isFavorited: true, favorites: widget.favorites);
+          // 发送状态更新事件
+          EventBusService.to.eventBus.fire(BottleEvent(
+            bottleId: widget.id,
+            isFavorited: true,
+            favorites: widget.favorites,
+          ));
+        } else {
+          Get.snackbar('提示', response.message ?? '操作失败');
+          return;
         }
       }
     } catch (e) {
+      print('Favorite error: $e');
+      // 如果操作失败，回滚状态
+      setState(() {
+        if (widget.isFavorited) {
+          widget.favorites++;
+          widget.isFavorited = true;
+        } else {
+          widget.favorites--;
+          widget.isFavorited = false;
+        }
+      });
       Get.snackbar('错误', '操作失败，请稍后重试');
     }
   }
@@ -262,15 +317,14 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
         children: [
           // 背景渐变模糊效果
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.purple.withOpacity(0.1), const Color.fromARGB(255, 253, 211, 86).withOpacity(0.3), Colors.blue.withOpacity(0.5)],
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.purple.withOpacity(0.1), const Color.fromARGB(255, 253, 211, 86).withOpacity(0.3), Colors.blue.withOpacity(0.5)],
+                ),
               ),
-            ),
-            child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100), child: Container(color: Colors.white.withOpacity(0.2))),
-          ),
+              child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100), child: Container(color: Colors.white.withOpacity(0.2)))),
           // 主要内容
           Column(
             children: [
