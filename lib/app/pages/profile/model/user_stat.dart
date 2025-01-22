@@ -1,7 +1,7 @@
 class UserStat {
-  final int bottles;
-  final int follows;
-  final int followers;
+   int bottles;
+   int follows;
+   int followers;
 
   UserStat({
     this.bottles = 0,

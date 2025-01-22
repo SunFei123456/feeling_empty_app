@@ -99,6 +99,22 @@ class ProfileController extends GetxController {
     final response = await _userApi.followUser(userId);
     if (response.success) {
       followStatus.value = 'following';
+      
+      // 更新被关注用户的粉丝数
+      userStat.update((stat) {
+        if (stat != null) stat.followers++;
+      });
+      
+      // 更新当前用户的关注数
+      final currentUserId = TokenService().getUserId();
+      if (currentUserId != null) {
+        final currentUserController = Get.find<ProfileController>(
+          tag: 'current_user'
+        );
+        currentUserController.userStat.update((stat) {
+          if (stat != null) stat.follows++;
+        });
+      }
     }
   }
 
@@ -108,6 +124,22 @@ class ProfileController extends GetxController {
       final response = await _userApi.unfollowUser(userId);
       if (response.success) {
         followStatus.value = 'not_following';
+        
+        // 更新被取关用户的粉丝数
+        userStat.update((stat) {
+          if (stat != null) stat.followers--;
+        });
+        
+        // 更新当前用户的关注数
+        final currentUserId = TokenService().getUserId();
+        if (currentUserId != null) {
+          final currentUserController = Get.find<ProfileController>(
+            tag: 'current_user'
+          );
+          currentUserController.userStat.update((stat) {
+            if (stat != null) stat.follows--;
+          });
+        }
       } else {
         Get.snackbar('提示', response.message ?? '取消关注失败');
       }
