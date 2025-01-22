@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
+import 'package:fangkong_xinsheng/app/widgets/mood_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:fangkong_xinsheng/app/utils/index.dart';
 import 'package:get/get.dart';
@@ -12,17 +13,9 @@ class ShareCardWidget extends StatelessWidget {
   final String createdAt;
   final String? userAvatar;
   final String? userNickname;
+  final String? mood;
 
-  const ShareCardWidget({
-    super.key,
-    required this.title,
-    required this.content,
-    this.imageUrl,
-    this.audioUrl,
-    required this.createdAt,
-    this.userAvatar,
-    this.userNickname,
-  });
+  const ShareCardWidget({super.key, required this.title, required this.content, this.imageUrl, this.audioUrl, required this.createdAt, this.userAvatar, this.userNickname, this.mood});
 
   @override
   Widget build(BuildContext context) {
@@ -35,23 +28,8 @@ class ShareCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-        image: isImageBottle
-            ? DecorationImage(
-                image: NetworkImage(imageUrl!),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.2),
-                  BlendMode.darken,
-                ),
-              )
-            : null,
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, spreadRadius: 1)],
+        image: isImageBottle ? DecorationImage(image: NetworkImage(imageUrl!), fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.darken)) : null,
         gradient: !isImageBottle
             ? LinearGradient(
                 begin: Alignment.topLeft,
@@ -74,29 +52,21 @@ class ShareCardWidget extends StatelessWidget {
         children: [
           if (!isImageBottle) Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 40, color: Colors.white.withOpacity(0.3)),
           const SizedBox(height: 12),
-          Text(
-            title,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isImageBottle ? Colors.white : Colors.black87),
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+            buildMoodChip(mood, size: 16),
+          ]),
           const SizedBox(height: 12),
-          Text(content, style: TextStyle(fontSize: 16, color: isImageBottle ? Colors.white.withOpacity(0.9) : Colors.black87), maxLines: 10, overflow: TextOverflow.ellipsis),
+          Text(content, style: TextStyle(fontSize: 14, letterSpacing: 1.3, color: Colors.white.withOpacity(0.9)), maxLines: 10, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CacheUserAvatar(avatarUrl: userAvatar!, size: 40),
               const SizedBox(width: 8),
-              Text(
-                userNickname ?? '匿名用户',
-                style: TextStyle(fontSize: 14, color: isImageBottle ? Colors.white70 : Colors.grey),
-              ),
+              Text(userNickname ?? '匿名用户', style: const TextStyle(fontSize: 14, color: Colors.white)),
               const Spacer(),
-              Text(
-                formatTime(createdAt),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isImageBottle ? Colors.white70 : Colors.grey,
-                ),
-              ),
+              Text(formatTime(createdAt), style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.6))),
             ],
           ),
         ],
@@ -131,10 +101,7 @@ class ShareBottomSheet extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), shape: BoxShape.circle),
             child: Icon(icon, size: 28),
           ),
           const SizedBox(height: 8),
@@ -150,10 +117,7 @@ class ShareBottomSheet extends StatelessWidget {
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.grey[900],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.grey[900], borderRadius: const BorderRadius.vertical(top: Radius.circular(20))),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

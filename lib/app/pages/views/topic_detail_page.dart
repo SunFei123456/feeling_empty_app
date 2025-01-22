@@ -4,9 +4,7 @@ import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.da
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
-import 'dart:math';
 
-import 'package:fangkong_xinsheng/app/router/index.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicName;
@@ -14,11 +12,11 @@ class TopicDetailPage extends StatefulWidget {
   final int topicId;
 
   const TopicDetailPage({
-    Key? key,
+    super.key,
     required this.topicName,
     required this.bottleCount,
     required this.topicId,
-  }) : super(key: key);
+  });
 
   @override
   State<TopicDetailPage> createState() => _TopicDetailPageState();

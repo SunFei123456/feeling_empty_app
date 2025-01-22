@@ -109,26 +109,12 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'write_a_drift_bottle'.tr,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: Text('write_a_drift_bottle'.tr, style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 18, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
             onPressed: _handleSubmit,
-            child: Text(
-              'publish'.tr,
-              style: TextStyle(
-                color: isDark ? Colors.blue[200] : Colors.blue,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: Text('publish'.tr, style: TextStyle(color: isDark ? Colors.blue[200] : Colors.blue, fontSize: 16, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -138,27 +124,15 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: isDark ? Colors.grey[900] : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!)),
               child: TextField(
                 controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: 'publish_bottle_title'.tr,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
+                decoration: InputDecoration(hintText: 'publish_bottle_title'.tr, hintStyle: TextStyle(color: isDark ? Colors.grey[600] : Colors.grey[400]), border: InputBorder.none, contentPadding: const EdgeInsets.all(16)),
                 maxLength: 30,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -171,26 +145,11 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               ),
               child: Row(
                 children: [
-                  _buildTypeButton(
-                    type: BottleType.text,
-                    icon: Icons.text_fields,
-                    label: 'bottle_type_text',
-                    isDark: isDark,
-                  ),
+                  _buildTypeButton(type: BottleType.text, icon: Icons.text_fields, label: 'bottle_type_text', isDark: isDark),
                   const SizedBox(width: 12),
-                  _buildTypeButton(
-                    type: BottleType.image,
-                    icon: Icons.image,
-                    label: 'bottle_type_image',
-                    isDark: isDark,
-                  ),
+                  _buildTypeButton(type: BottleType.image, icon: Icons.image, label: 'bottle_type_image', isDark: isDark),
                   const SizedBox(width: 12),
-                  _buildTypeButton(
-                    type: BottleType.audio,
-                    icon: Icons.mic,
-                    label: 'bottle_type_voice',
-                    isDark: isDark,
-                  ),
+                  _buildTypeButton(type: BottleType.audio, icon: Icons.mic, label: 'bottle_type_voice', isDark: isDark),
                 ],
               ),
             ),
@@ -201,9 +160,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey[900] : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDark ? Colors.grey[800]! : Colors.grey[200]!,
-                ),
+                border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
               ),
               child: Column(
                 children: [
@@ -259,28 +216,16 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark ? Colors.blue[900] : Colors.blue[50])
-                : Colors.transparent,
+            color: isSelected ? (isDark ? Colors.blue[900] : Colors.blue[50]) : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             children: [
-              Icon(
-                icon,
-                color: isSelected
-                    ? (isDark ? Colors.blue[200] : Colors.blue)
-                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
-              ),
+              Icon(icon, color: isSelected ? (isDark ? Colors.blue[200] : Colors.blue) : (isDark ? Colors.grey[400] : Colors.grey[600])),
               const SizedBox(height: 4),
               Text(
                 label.tr,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected
-                      ? (isDark ? Colors.blue[200] : Colors.blue)
-                      : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                ),
+                style: TextStyle(fontSize: 12, color: isSelected ? (isDark ? Colors.blue[200] : Colors.blue) : (isDark ? Colors.grey[400] : Colors.grey[600])),
               ),
             ],
           ),
@@ -310,25 +255,16 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           decoration: BoxDecoration(
             color: isDark ? Colors.grey[800] : Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-              style: BorderStyle.solid,
-            ),
+            border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!, style: BorderStyle.solid),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.add_photo_alternate_outlined,
-                size: 32,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
+              Icon(Icons.add_photo_alternate_outlined, size: 32, color: isDark ? Colors.grey[400] : Colors.grey[600]),
               const SizedBox(height: 8),
               Text(
                 '添加图片',
-                style: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
+                style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
               ),
             ],
           ),
@@ -340,30 +276,14 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            File(_selectedImage!.path),
-            width: double.infinity,
-            height: 200,
-            fit: BoxFit.cover,
-          ),
+          child: Image.file(File(_selectedImage!.path), width: double.infinity, height: 200, fit: BoxFit.cover),
         ),
         Positioned(
           top: 8,
           right: 8,
           child: InkWell(
             onTap: () => setState(() => _selectedImage = null),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.close,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
+            child: Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.close, color: Colors.white, size: 20)),
           ),
         ),
       ],
@@ -379,34 +299,15 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(color: isDark ? Colors.grey[800] : Colors.grey[100], borderRadius: BorderRadius.circular(12)),
               child: Column(
                 children: [
-                  Icon(
-                    _isRecording ? Icons.stop : Icons.mic,
-                    size: 32,
-                    color: _isRecording
-                        ? Colors.red
-                        : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                  ),
+                  Icon(_isRecording ? Icons.stop : Icons.mic, size: 32, color: _isRecording ? Colors.red : (isDark ? Colors.grey[400] : Colors.grey[600])),
                   const SizedBox(height: 8),
-                  Text(
-                    _isRecording ? '点击停止' : '点击录音',
-                    style: TextStyle(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    ),
-                  ),
+                  Text(_isRecording ? '点击停止' : '点击录音', style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])),
                   if (_isRecording) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      _formatDuration(_recordDuration),
-                      style: TextStyle(
-                        color: isDark ? Colors.red[200] : Colors.red,
-                      ),
-                    ),
+                    Text(_formatDuration(_recordDuration), style: TextStyle(color: isDark ? Colors.red[200] : Colors.red)),
                   ],
                 ],
               ),
@@ -415,38 +316,20 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
         else
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[800] : Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: isDark ? Colors.grey[800] : Colors.grey[100], borderRadius: BorderRadius.circular(12)),
             child: Row(
               children: [
                 IconButton(
                   onPressed: _playRecording,
-                  icon: Icon(
-                    _isPlaying ? Icons.stop : Icons.play_arrow,
-                    color: isDark ? Colors.blue[200] : Colors.blue,
-                  ),
+                  icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow, color: isDark ? Colors.blue[200] : Colors.blue),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '录音完成',
-                        style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        _formatDuration(_recordDuration),
-                        style: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text('录音完成', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500)),
+                      Text(_formatDuration(_recordDuration), style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600], fontSize: 12)),
                     ],
                   ),
                 ),
@@ -457,10 +340,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                       _recordDuration = Duration.zero;
                     });
                   },
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: isDark ? Colors.red[200] : Colors.red,
-                  ),
+                  icon: Icon(Icons.delete_outline, color: isDark ? Colors.red[200] : Colors.red),
                 ),
               ],
             ),
@@ -471,54 +351,14 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
 
   Widget _buildMoodTags(bool isDark) {
     final List<Map<String, dynamic>> moods = [
-      {
-        'emoji': '😊',
-        'label': 'happy',
-        'value': BottleMood.happy.name,
-        'color': Colors.yellow
-      },
-      {
-        'emoji': '😢',
-        'label': 'sad',
-        'value': BottleMood.sad.name,
-        'color': Colors.blue
-      },
-      {
-        'emoji': '🤔',
-        'label': 'thinking',
-        'value': BottleMood.thinking.name,
-        'color': Colors.purple
-      },
-      {
-        'emoji': '😠',
-        'label': 'angry',
-        'value': BottleMood.angry.name,
-        'color': Colors.red
-      },
-      {
-        'emoji': '🥳',
-        'label': 'excited',
-        'value': BottleMood.excited.name,
-        'color': Colors.orange
-      },
-      {
-        'emoji': '😴',
-        'label': 'tired',
-        'value': BottleMood.tired.name,
-        'color': Colors.grey
-      },
-      {
-        'emoji': '🥰',
-        'label': 'love',
-        'value': BottleMood.love.name,
-        'color': Colors.pink
-      },
-      {
-        'emoji': '😮',
-        'label': 'surprised',
-        'value': BottleMood.surprised.name,
-        'color': Colors.green
-      },
+      {'emoji': '😊', 'label': 'happy', 'value': BottleMood.happy.name, 'color': Colors.yellow},
+      {'emoji': '😢', 'label': 'sad', 'value': BottleMood.sad.name, 'color': Colors.blue},
+      {'emoji': '🤔', 'label': 'thinking', 'value': BottleMood.thinking.name, 'color': Colors.purple},
+      {'emoji': '😠', 'label': 'angry', 'value': BottleMood.angry.name, 'color': Colors.red},
+      {'emoji': '🥳', 'label': 'excited', 'value': BottleMood.excited.name, 'color': Colors.orange},
+      {'emoji': '😴', 'label': 'tired', 'value': BottleMood.tired.name, 'color': Colors.grey},
+      {'emoji': '🥰', 'label': 'love', 'value': BottleMood.love.name, 'color': Colors.pink},
+      {'emoji': '😮', 'label': 'surprised', 'value': BottleMood.surprised.name, 'color': Colors.green},
     ];
 
     return Column(
@@ -526,21 +366,13 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       children: [
         Text(
           'choose_mood'.tr,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : Colors.black,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black),
         ),
         const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 1,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, childAspectRatio: 1, crossAxisSpacing: 12, mainAxisSpacing: 12),
           itemCount: moods.length,
           itemBuilder: (context, index) {
             final mood = moods[index];
@@ -557,23 +389,12 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? mood['color'].withOpacity(isDark ? 0.3 : 0.1)
-                      : (isDark ? Colors.grey[900] : Colors.grey[100]),
+                  color: isSelected ? mood['color'].withOpacity(isDark ? 0.3 : 0.1) : (isDark ? Colors.grey[900] : Colors.grey[100]),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
-                        ? mood['color']
-                        : (isDark ? Colors.grey[800]! : Colors.grey[300]!),
-                    width: isSelected ? 2 : 1,
-                  ),
+                  border: Border.all(color: isSelected ? mood['color'] : (isDark ? Colors.grey[800]! : Colors.grey[300]!), width: isSelected ? 2 : 1),
                   boxShadow: isSelected
                       ? [
-                          BoxShadow(
-                            color: mood['color'].withOpacity(0.3),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
+                          BoxShadow(color: mood['color'].withOpacity(0.3), blurRadius: 8, spreadRadius: 1),
                         ]
                       : [],
                 ),
@@ -585,26 +406,13 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                       tween: Tween(begin: 1.0, end: isSelected ? 1.2 : 1.0),
                       duration: const Duration(milliseconds: 200),
                       builder: (context, value, child) {
-                        return Transform.scale(
-                          scale: value,
-                          child: Text(
-                            mood['emoji'],
-                            style: const TextStyle(fontSize: 28),
-                          ),
-                        );
+                        return Transform.scale(scale: value, child: Text(mood['emoji'], style: const TextStyle(fontSize: 28)));
                       },
                     ),
                     const SizedBox(height: 4),
                     Text(
                       mood['label'],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isSelected
-                            ? mood['color']
-                            : (isDark ? Colors.grey[400] : Colors.grey[600]),
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                      ),
+                      style: TextStyle(fontSize: 12, color: isSelected ? mood['color'] : (isDark ? Colors.grey[400] : Colors.grey[600]), fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal),
                     ),
                   ],
                 ),
@@ -630,8 +438,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     ];
 
     if (widget.defaultTopic != null && widget.defaultTopicId != null) {
-      if (!predefinedTopics
-          .any((topic) => topic['id'] == widget.defaultTopicId)) {
+      if (!predefinedTopics.any((topic) => topic['id'] == widget.defaultTopicId)) {
         predefinedTopics.add({
           "id": widget.defaultTopicId!,
           "title": widget.defaultTopic!,
@@ -647,11 +454,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           children: [
             Text(
               'choose_topic'.tr,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black),
             ),
             TextButton.icon(
               onPressed: () {
@@ -664,9 +467,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                     backgroundColor: isDark ? Colors.grey[900] : Colors.white,
                     title: Text(
                       'add_customize_topic'.tr,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black),
                     ),
                     content: TextField(
                       controller: _customTopicController,
@@ -675,33 +476,20 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                       ),
                       decoration: InputDecoration(
                         hintText: 'input_topic_name'.tr,
-                        hintStyle: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color:
-                                isDark ? Colors.grey[700]! : Colors.grey[300]!,
-                          ),
-                        ),
+                        hintStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!)),
                       ),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          'cancel'.tr,
-                          style: TextStyle(
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          ),
-                        ),
+                        child: Text('cancel'.tr, style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])),
                       ),
                       TextButton(
                         onPressed: () async {
                           if (_customTopicController.text.isNotEmpty) {
                             // 调取接口
-                            final res = await TopicApiService()
-                                .createTopic(_customTopicController.text);
+                            final res = await TopicApiService().createTopic(_customTopicController.text);
 
                             if (res.success) {
                               Get.snackbar('成功', '话题添加成功');
@@ -719,27 +507,15 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         },
                         child: Text(
                           'confirm'.tr,
-                          style: TextStyle(
-                            color: isDark ? Colors.blue[200] : Colors.blue,
-                          ),
+                          style: TextStyle(color: isDark ? Colors.blue[200] : Colors.blue),
                         ),
                       ),
                     ],
                   ),
                 );
               },
-              icon: Icon(
-                Icons.add_circle_outline,
-                size: 18,
-                color: isDark ? Colors.blue[200] : Colors.blue,
-              ),
-              label: Text(
-                'customize_topic'.tr,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.blue[200] : Colors.blue,
-                ),
-              ),
+              icon: Icon(Icons.add_circle_outline, size: 18, color: isDark ? Colors.blue[200] : Colors.blue),
+              label: Text('customize_topic'.tr, style: TextStyle(fontSize: 14, color: isDark ? Colors.blue[200] : Colors.blue)),
             ),
           ],
         ),
@@ -749,10 +525,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
           runSpacing: 8,
           children: [
             ...predefinedTopics.map((topic) => _buildTopicChip(topic, isDark)),
-            if (_selectedTopic != null &&
-                !predefinedTopics
-                    .any((topic) => topic['title'] == _selectedTopic))
-              _buildTopicChip(_selectedTopic!, isDark),
+            if (_selectedTopic != null && !predefinedTopics.any((topic) => topic['title'] == _selectedTopic)) _buildTopicChip(_selectedTopic!, isDark),
           ],
         ),
       ],
@@ -760,8 +533,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   }
 
   Widget _buildTopicChip(dynamic topic, bool isDark) {
-    final String topicTitle =
-        topic is Map ? topic['title'] as String : topic as String;
+    final String topicTitle = topic is Map ? topic['title'] as String : topic as String;
     final isSelected = _selectedTopic == topicTitle;
 
     return FilterChip(
@@ -769,25 +541,19 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
       showCheckmark: false,
       label: Text(topicTitle),
       labelStyle: TextStyle(
-        color: isSelected
-            ? (isDark ? Colors.blue[200] : Colors.blue)
-            : (isDark ? Colors.grey[300] : Colors.grey[700]),
+        color: isSelected ? (isDark ? Colors.blue[200] : Colors.blue) : (isDark ? Colors.grey[300] : Colors.grey[700]),
         fontSize: 14,
       ),
       backgroundColor: isDark ? Colors.grey[800] : Colors.grey[100],
-      selectedColor:
-          isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+      selectedColor: isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
       side: BorderSide(
-        color: isSelected
-            ? (isDark ? Colors.blue[700]! : Colors.blue[200]!)
-            : Colors.transparent,
+        color: isSelected ? (isDark ? Colors.blue[700]! : Colors.blue[200]!) : Colors.transparent,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       onSelected: (selected) {
         setState(() {
           _selectedTopic = selected ? topicTitle : null;
-          _selectedTopicId =
-              selected && topic is Map ? topic['id'] as int : null;
+          _selectedTopicId = selected && topic is Map ? topic['id'] as int : null;
         });
         HapticFeedback.lightImpact();
       },
@@ -870,9 +636,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   }
 
   void _handleSubmit() async {
-    if (_contentController.text.isEmpty &&
-        _selectedImage == null &&
-        _recordedFilePath == null) {
+    if (_contentController.text.isEmpty && _selectedImage == null && _recordedFilePath == null) {
       Get.snackbar('提示', '请输入内容或添加媒体文件');
       return;
     }
@@ -1006,9 +770,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected
-                                ? (isDark ? Colors.blue[400]! : Colors.blue)
-                                : Colors.transparent,
+                            color: isSelected ? (isDark ? Colors.blue[400]! : Colors.blue) : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -1021,31 +783,18 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
+                                loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return Center(
-                                    child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null),
+                                    child: CircularProgressIndicator(value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null),
                                   );
                                 },
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
-                                    color: isDark
-                                        ? Colors.grey[800]
-                                        : Colors.grey[200],
+                                    color: isDark ? Colors.grey[800] : Colors.grey[200],
                                     child: Icon(
                                       Icons.broken_image,
-                                      color: isDark
-                                          ? Colors.grey[600]
-                                          : Colors.grey[400],
+                                      color: isDark ? Colors.grey[600] : Colors.grey[400],
                                     ),
                                   );
                                 },
@@ -1073,9 +822,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                 ),
                               ),
                             ),

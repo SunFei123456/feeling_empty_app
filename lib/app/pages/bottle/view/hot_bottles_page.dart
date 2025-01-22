@@ -235,29 +235,17 @@ class HotBottlesPage extends GetView<BottleController> {
                           ),
                           borderRadius: BorderRadius.circular(4),
                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
+                            BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 2)),
                           ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.local_fire_department,
-                              color: Colors.white,
-                              size: 14,
-                            ),
+                            const Icon(Icons.local_fire_department, color: Colors.white, size: 14),
                             const SizedBox(width: 4),
                             Text(
                               '${bottle.resonates}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),

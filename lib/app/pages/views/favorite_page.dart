@@ -58,6 +58,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Get.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -69,9 +70,10 @@ class _FavoritePageState extends State<FavoritePage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
       ),
+      backgroundColor: isDarkMode ? Colors.black87 : Colors.white,
       body: isLoading && favorites.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : favorites.isEmpty
@@ -82,7 +84,7 @@ class _FavoritePageState extends State<FavoritePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode ? Colors.black : Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
@@ -101,16 +103,16 @@ class _FavoritePageState extends State<FavoritePage> {
                             ),
                             child: Icon(
                               Icons.bookmark_rounded,
-                              color: Theme.of(context).primaryColor,
+                              color: isDarkMode ? Colors.white : Colors.black,
                               size: 20,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             '共 ${favorites.length} 条收藏',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
-                              color: Colors.black87,
+                              color: isDarkMode ? Colors.white : Colors.black,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

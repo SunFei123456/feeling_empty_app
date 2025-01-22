@@ -76,6 +76,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
     }
   }
 
+  // 共振/取消共振
   Future<void> _handleResonate() async {
     try {
       if (widget.isResonated) {
@@ -86,11 +87,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.resonates--;
             widget.isResonated = false;
           });
-          squareController.updateBottleResonateStatus(
-            widget.id,
-            isResonated: false,
-            resonates: widget.resonates,
-          );
+          squareController.updateBottleResonateStatus(widget.id, isResonated: false, resonates: widget.resonates);
         }
       } else {
         final response = await _api.resonateBottle(widget.id);
@@ -99,11 +96,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.resonates++;
             widget.isResonated = true;
           });
-          squareController.updateBottleResonateStatus(
-            widget.id,
-            isResonated: true,
-            resonates: widget.resonates,
-          );
+          squareController.updateBottleResonateStatus(widget.id, isResonated: true, resonates: widget.resonates);
         }
       }
     } catch (e) {
@@ -111,6 +104,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
     }
   }
 
+  // 收藏/取消收藏
   Future<void> _handleFavorite() async {
     try {
       if (widget.isFavorited) {
@@ -120,11 +114,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.favorites--;
             widget.isFavorited = false;
           });
-          squareController.updateBottleFavoriteStatus(
-            widget.id,
-            isFavorited: false,
-            favorites: widget.favorites,
-          );
+          squareController.updateBottleFavoriteStatus(widget.id, isFavorited: false, favorites: widget.favorites);
         }
       } else {
         final response = await _api.favoriteBottle(widget.id);
@@ -133,11 +123,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             widget.favorites++;
             widget.isFavorited = true;
           });
-          squareController.updateBottleFavoriteStatus(
-            widget.id,
-            isFavorited: true,
-            favorites: widget.favorites,
-          );
+          squareController.updateBottleFavoriteStatus(widget.id, isFavorited: true, favorites: widget.favorites);
         }
       }
     } catch (e) {
@@ -148,7 +134,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
   Future<void> _saveToLocal() async {
     try {
       // 截取分享卡片
-      final Uint8List? imageBytes = await _screenshotController.captureFromWidget(
+      final Uint8List imageBytes = await _screenshotController.captureFromWidget(
         MediaQuery(
           data: MediaQueryData.fromView(View.of(context)),
           child: ShareCardWidget(
@@ -166,20 +152,18 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
         context: context,
       );
 
-      if (imageBytes != null) {
-        // 保存到相册
-        final result = await ImageGallerySaver.saveImage(
-          imageBytes,
-          quality: 100,
-          name: "bottle_${DateTime.now().millisecondsSinceEpoch}",
-        );
+      // 保存到相册
+      final result = await ImageGallerySaver.saveImage(
+        imageBytes,
+        quality: 100,
+        name: "bottle_${DateTime.now().millisecondsSinceEpoch}",
+      );
 
-        if (result['isSuccess']) {
-          Get.back();
-          Get.snackbar('成功', '图片已保存到相册');
-        } else {
-          Get.snackbar('错误', '保存失败，请重试');
-        }
+      if (result['isSuccess']) {
+        Get.back();
+        Get.snackbar('成功', '图片已保存到相册');
+      } else {
+        Get.snackbar('错误', '保存失败，请重试');
       }
     } catch (e) {
       Get.snackbar('错误', '保存失败：$e');
@@ -187,32 +171,25 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
   }
 
   Widget _buildInteractionButtons() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         InkWell(
           onTap: _handleResonate,
-          child: _buildInteractionButton(
-            widget.isResonated ? Icons.favorite : Icons.favorite_border,
-            widget.resonates,
-            widget.isResonated ? Colors.red : Colors.grey[700],
-          ),
+          child: _buildInteractionButton(widget.isResonated ? Icons.favorite : Icons.favorite_border, widget.resonates, widget.isResonated ? Colors.red : Colors.grey[500]),
         ),
         InkWell(
           onTap: _handleFavorite,
-          child: _buildInteractionButton(
-            widget.isFavorited ? Icons.bookmark : Icons.bookmark_border,
-            widget.favorites,
-            widget.isFavorited ? Colors.blue : Colors.grey[700],
-          ),
+          child: _buildInteractionButton(widget.isFavorited ? Icons.bookmark : Icons.bookmark_border, widget.favorites, widget.isFavorited ? Colors.blue : Colors.grey[500]),
         ),
         InkWell(
           onTap: () {},
-          child: _buildInteractionButton(Icons.remove_red_eye_outlined, widget.views, Colors.grey[700]),
+          child: _buildInteractionButton(Icons.remove_red_eye_outlined, widget.views, Colors.grey[500]),
         ),
         InkWell(
           onTap: _showShareOptions,
-          child: _buildInteractionButton(Icons.share, widget.shares, Colors.grey[700]),
+          child: _buildInteractionButton(Icons.share, widget.shares, Colors.grey[500]),
         ),
       ],
     );
@@ -223,13 +200,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
       children: [
         Icon(icon, size: 24, color: color),
         const SizedBox(width: 4),
-        Text(
-          count.toString(),
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(count.toString(), style: TextStyle(fontSize: 14, color: Colors.grey[500])),
       ],
     );
   }
@@ -248,6 +219,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
           createdAt: widget.createdAt,
           userAvatar: widget.user?.avatar,
           userNickname: widget.user?.nickname,
+          mood: widget.mood,
         ),
         onSaveLocal: _saveToLocal,
         onShareWechat: () {
@@ -264,10 +236,11 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // 判断主题模式
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     // 判断瓶子类型
     bool isImageBottle = widget.imageUrl.isNotEmpty;
     bool isAudioBottle = widget.audioUrl != null && widget.audioUrl!.isNotEmpty;
-    bool isTextBottle = !isImageBottle && !isAudioBottle;
 
     // 定义渐变背景颜色
     List<Color> getGradientColors() {
@@ -293,19 +266,10 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.purple.withOpacity(0.1),
-                  const Color.fromARGB(255, 253, 211, 86).withOpacity(0.3),
-                  Colors.blue.withOpacity(0.5),
-                ],
+                colors: [Colors.purple.withOpacity(0.1), const Color.fromARGB(255, 253, 211, 86).withOpacity(0.3), Colors.blue.withOpacity(0.5)],
               ),
             ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                color: Colors.white.withOpacity(0.2),
-              ),
-            ),
+            child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100), child: Container(color: Colors.white.withOpacity(0.2))),
           ),
           // 主要内容
           Column(
@@ -317,10 +281,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(15),
-                      bottomRight: Radius.circular(15),
-                    ),
+                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
                   ),
                   child: isImageBottle
                       ? Image.network(
@@ -328,26 +289,12 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Container(
                             color: Colors.grey[100],
-                            child: Center(
-                              child: Icon(
-                                Icons.broken_image_rounded,
-                                color: Colors.grey[400],
-                                size: 40,
-                              ),
-                            ),
+                            child: Center(child: Icon(Icons.broken_image_rounded, color: Colors.grey[400], size: 40)),
                           ),
                         )
                       : Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: getGradientColors(),
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 80, color: Colors.white.withOpacity(0.3)),
-                          ),
+                          decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: getGradientColors())),
+                          child: Center(child: Icon(isAudioBottle ? Icons.audiotrack_rounded : Icons.format_quote_rounded, size: 80, color: Colors.white.withOpacity(0.3))),
                         ),
                 ),
               ),
@@ -375,7 +322,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                                         : isAudioBottle
                                             ? Icons.audiotrack
                                             : Icons.text_fields,
-                                    color: Colors.black54,
+                                    color: isDarkMode ? Colors.white70 : Colors.black87,
                                     size: 14),
                                 const SizedBox(width: 4),
                                 Text(
@@ -384,10 +331,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                                       : isAudioBottle
                                           ? '语音'
                                           : '文字',
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 12,
-                                  ),
+                                  style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87, fontSize: 12),
                                 ),
                               ],
                             ),
@@ -400,27 +344,21 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                       const SizedBox(height: 16),
 
                       // 标题
-                      Text(
-                        widget.title,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
+                      Text(widget.title, style: TextStyle(color: isDarkMode ? const Color(0xfffffef9) : Colors.black87, fontSize: 22, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 5),
 
                       // 发布时间
                       Row(
                         children: [
-                          Icon(Icons.date_range_outlined, size: 14, color: Colors.grey[600]),
+                          Icon(Icons.date_range_outlined, size: 14, color: isDarkMode ? const Color(0xfffffef9) : Colors.black87),
                           const SizedBox(width: 4),
-                          Text(formatTime(widget.createdAt), style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.7))),
+                          Text(formatTime(widget.createdAt), style: TextStyle(fontSize: 12, color: isDarkMode ? const Color(0xffd3d7d4) : Colors.black87)),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
 
                       // 正文内容
-                      Text(
-                        widget.content,
-                        style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.5),
-                      ),
+                      Text(widget.content, style: TextStyle(fontSize: 14, color: isDarkMode ? const Color(0xfffffef9) : Colors.black87, height: 1.5)),
                       const SizedBox(height: 20),
                       if (widget.audioUrl != null && widget.audioUrl!.isNotEmpty) AudioPlayerWidget(audioUrl: widget.audioUrl!),
                       // 互动按钮
@@ -459,11 +397,17 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
             ],
           ),
 
-          // 返回按钮
+          // 返回按钮(左边)  右边分享
           SafeArea(
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-              onPressed: () => Get.back(),
+            child: Container(
+              padding: const EdgeInsets.only(top: 5, left: 10, right: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
+                  IconButton(onPressed: () => _showShareOptions(), icon: const Icon(Icons.ios_share_rounded, color: Colors.white)),
+                ],
+              ),
             ),
           ),
 
@@ -478,14 +422,7 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                 filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.55),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.55), borderRadius: BorderRadius.circular(15), border: Border.all(color: Colors.white.withOpacity(0.2), width: 1)),
                   child: Row(
                     children: [
                       // 用户头像
@@ -505,16 +442,12 @@ class _BottleCardDetailState extends State<BottleCardDetail> {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                widget.user?.nickname ?? '',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.9)),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                Icons.verified,
-                                size: 18,
-                                color: Colors.blue[400],
-                              ),
+                              Text(widget.user?.nickname ?? '', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black.withOpacity(0.9))),
+                              const SizedBox(width: 5),
+                              // sex
+                              Icon(widget.user?.sex == 1 ? Icons.male : Icons.female, size: 20, color: widget.user?.sex == 1 ? Colors.blue : Colors.pink),
+                              const SizedBox(width: 5),
+                              Icon(Icons.verified, size: 18, color: Colors.blue[400]),
                             ],
                           ),
                           const SizedBox(height: 4),

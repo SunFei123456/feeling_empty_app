@@ -11,6 +11,7 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Get.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -22,8 +23,8 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
         actions: [
           IconButton(
             icon: Icon(Icons.delete_outline_rounded),
@@ -71,7 +72,7 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? Colors.black : Colors.white,
                 boxShadow: [
                   BoxShadow(color: Colors.black.withOpacity(0.05), offset: const Offset(0, 1), blurRadius: 2),
                 ],
@@ -81,12 +82,12 @@ class ViewHistoryPage extends GetView<ViewHistoryController> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(color: Theme.of(context).primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                    child: Icon(Icons.history_rounded, color: Theme.of(context).primaryColor, size: 20),
+                    child: Icon(Icons.history_rounded, color: isDarkMode ? Colors.white : Colors.black, size: 20),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     '共 ${controller.totalItems} 条记录',
-                    style: const TextStyle(fontSize: 15, color: Colors.black87, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 15, color: isDarkMode ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

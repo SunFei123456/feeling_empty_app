@@ -1,12 +1,10 @@
 import 'dart:math';
 
 import 'package:fangkong_xinsheng/app/core/services/app_service.dart';
-import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/widgets/cache_user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fangkong_xinsheng/app/pages/square/views/bottle_card_detail.dart';
 import 'dart:ui' show lerpDouble;
 
@@ -29,11 +27,7 @@ class _BottlePageState extends State<BottlePage> {
   @override
   void initState() {
     super.initState();
-    _profileController = Get.put(
-      ProfileController(),
-      tag: 'current_user',
-      permanent: true,
-    );
+    _profileController = Get.put(ProfileController(), tag: 'current_user', permanent: true);
 
     if (!Get.isRegistered<TopicController>()) {
       Get.put(TopicController());
@@ -53,10 +47,7 @@ class _BottlePageState extends State<BottlePage> {
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   // 顶部AppBar
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: BottleHeaderDelegate(_profileController),
-                  ),
+                  SliverPersistentHeader(pinned: true, delegate: BottleHeaderDelegate(_profileController)),
 
                   // 内容区域
                   SliverToBoxAdapter(
@@ -247,11 +238,7 @@ class _BottlePageState extends State<BottlePage> {
               ],
             ),
             boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
+              BoxShadow(color: color.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4)),
             ],
           ),
           child: Stack(
@@ -259,14 +246,7 @@ class _BottlePageState extends State<BottlePage> {
               Positioned(
                 right: -10,
                 top: -10,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.1),
-                  ),
-                ),
+                child: Container(width: 50, height: 50, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.1))),
               ),
               Padding(
                 padding: const EdgeInsets.all(15),
@@ -274,20 +254,9 @@ class _BottlePageState extends State<BottlePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                    Icon(icon, color: Colors.white, size: 24),
                     const Spacer(),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -310,30 +279,18 @@ class _BottlePageState extends State<BottlePage> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: actions.map((action) {
         return GestureDetector(
-          onTap: () {
-            AppRoutes.to(action['page_url'] as String);
-          },
+          onTap: () => AppRoutes.to(action['page_url'] as String),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: (action['color'] as Color).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  action['icon'] as IconData,
-                  color: action['color'] as Color,
-                  size: 28,
-                ),
+                decoration: BoxDecoration(color: (action['color'] as Color).withOpacity(0.1), shape: BoxShape.circle),
+                child: Icon(action['icon'] as IconData, color: action['color'] as Color, size: 28),
               ),
               const SizedBox(height: 8),
               Text(
                 (action['label'] as String).tr,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.black : Colors.white,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87, fontSize: 12),
               ),
             ],
           ),
@@ -527,6 +484,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final isDarkMode = Get.find<AppService>().isDarkMode;
     // 计算滚动进度 (0.0 到 1.0)
     final progress = shrinkOffset / maxExtent;
     final fontSize = lerpDouble(28, 20, progress) ?? 28;
@@ -536,12 +494,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
       decoration: BoxDecoration(
         color: shrinkOffset > 0 ? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9) : Colors.transparent,
         boxShadow: [
-          if (shrinkOffset > 0)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
+          if (shrinkOffset > 0) BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Align(
@@ -558,7 +511,7 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[800],
+                    color: isDarkMode ? Colors.white.withOpacity(progress.clamp(0.7, 1.0)) : Colors.black.withOpacity(progress.clamp(0.7, 1.0)),
                   ),
                 ),
               ),
@@ -566,41 +519,23 @@ class BottleHeaderDelegate extends SliverPersistentHeaderDelegate {
                 padding: const EdgeInsets.only(right: 16, bottom: 5),
                 child: Row(
                   children: [
-                    const Text(
-                      "Hi~",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text("Hi~", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 15),
                     GestureDetector(
-                      onTap: () {
-                        AppRoutes.to('/profile');
-                      },
+                      onTap: () => AppRoutes.to('/profile'),
                       child: Container(
-                        width: 46,
-                        height: 46,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.blue[100],
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
+                          border: Border.all(color: Colors.white, width: 2),
                           boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
+                            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2)),
                           ],
                         ),
                         child: Obx(() {
                           final user = profileController.user.value;
-                          return CacheUserAvatar(
-                            avatarUrl: user?.avatar ?? '',
-                          );
+                          // size 随 progress 而缩小
+                          return CacheUserAvatar(avatarUrl: user?.avatar ?? '', size: lerpDouble(40, 30, progress) ?? 40);
                         }),
                       ),
                     ),
