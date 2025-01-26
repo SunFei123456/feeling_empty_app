@@ -5,6 +5,7 @@ class TopicDetail {
   final int contentCount;
   final int participantCount;
   final int views;
+  final String bgImage;
 
   TopicDetail({
     this.id = 0,
@@ -13,6 +14,7 @@ class TopicDetail {
     this.contentCount = 0,
     this.participantCount = 0,
     this.views = 0,
+    this.bgImage = '',
   });
 
   factory TopicDetail.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class TopicDetail {
       contentCount: json['content_count'] as int,
       participantCount: json['participant_count'] as int,
       views: json['views'] as int,
+      bgImage: json['bg_image'] as String,
     );
   }
 }

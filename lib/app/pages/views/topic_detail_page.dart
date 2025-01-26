@@ -8,14 +8,10 @@ import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/bottle_model.dart';
 
 class TopicDetailPage extends StatefulWidget {
-  final String topicName;
-  final int bottleCount;
   final int topicId;
 
   const TopicDetailPage({
     super.key,
-    required this.topicName,
-    required this.bottleCount,
     required this.topicId,
   });
 
@@ -31,10 +27,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
+    _tabController = TabController(length: 2, vsync: this);
     _pageController = PageController();
     _topicController.initTopicDetail(widget.topicId);
     _tabController.addListener(() {
@@ -50,6 +43,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
 
   @override
   void dispose() {
+    // 清理数据
+    _topicController.clearTopicDetail();
+    // 释放资源
     _tabController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -68,139 +64,152 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
               expandedHeight: 200,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
-                background: Container(
+                background: Obx(() => Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.blue[600]!,
-                        Colors.blue[400]!.withOpacity(0.8),
-                      ],
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        // 如果背景图为空，使用默认图片
+                        _topicController.topicDetail.value.bgImage?.isNotEmpty == true 
+                            ? _topicController.topicDetail.value.bgImage!
+                            : 'https://picsum.photos/800/600',
+                      ),
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  child: SafeArea(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        // 话题标题区域
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                                child: Icon(
-                                  Icons.tag,
-                                  size: 40,
-                                  color: Colors.white.withOpacity(0.9),
+                  // 添加一个遮罩层使内容更容易阅读
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.3),
+                          Colors.black.withOpacity(0.5),
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          // 话题标题区域
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                                  child: Icon(
+                                    Icons.tag,
+                                    size: 40,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Obx(
-                                      () => _topicController.isDetailLoading.value
-                                          ? const Center(child: CircularProgressIndicator())
-                                          : Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Obx(() => Text(
-                                                      _topicController.topicDetail.value.title,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 24,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    )),
-                                                const SizedBox(height: 8),
-                                                Obx(() => Text(
-                                                      _topicController.topicDetail.value.desc,
-                                                      style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.9),
-                                                        fontSize: 13,
-                                                      ),
-                                                      maxLines: 2,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    )),
-                                              ],
-                                            ),
-                                    ),
-                                  ],
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Obx(
+                                        () => _topicController.isDetailLoading.value
+                                            ? const Center(child: CircularProgressIndicator())
+                                            : Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Obx(() => Text(
+                                                        _topicController.topicDetail.value.title,
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 24,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                  const SizedBox(height: 8),
+                                                  Obx(() => Text(
+                                                        _topicController.topicDetail.value.desc,
+                                                        style: TextStyle(
+                                                          color: Colors.white.withOpacity(0.9),
+                                                          fontSize: 13,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      )),
+                                                ],
+                                              ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Spacer(),
-                        // 底部数据统计
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.3),
                               ],
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Obx(() => _buildStatItem(
-                                    value: '${_topicController.topicDetail.value.contentCount}',
-                                    label: 'content'.tr,
-                                  )),
-                              const SizedBox(width: 30),
-                              Obx(() => _buildStatItem(
-                                    value: '${_topicController.topicDetail.value.participantCount}',
-                                    label: 'participates'.tr,
-                                  )),
-                              const SizedBox(width: 30),
-                              Obx(() => _buildStatItem(
-                                    value: '${_topicController.topicDetail.value.views}',
-                                    label: 'views'.tr,
-                                  )),
-                              const Spacer(),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Get.to(
-                                    () => WriteBottlePage(
-                                      defaultTopic: _topicController.topicDetail.value.title,
-                                      defaultTopicId: widget.topicId,
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.blue[600],
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 10,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: Text(
-                                  'join_topic'.tr,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
+                          const Spacer(),
+                          // 底部数据统计
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                ],
                               ),
-                            ],
+                            ),
+                            child: Row(
+                              children: [
+                                Obx(() => _buildStatItem(
+                                      value: '${_topicController.topicDetail.value.contentCount}',
+                                      label: 'content'.tr,
+                                    )),
+                                const SizedBox(width: 30),
+                                Obx(() => _buildStatItem(
+                                      value: '${_topicController.topicDetail.value.participantCount}',
+                                      label: 'participates'.tr,
+                                    )),
+                                const SizedBox(width: 30),
+                                Obx(() => _buildStatItem(
+                                      value: '${_topicController.topicDetail.value.views}',
+                                      label: 'views'.tr,
+                                    )),
+                                const Spacer(),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Get.to(
+                                      () => WriteBottlePage(
+                                        defaultTopic: _topicController.topicDetail.value.title,
+                                        defaultTopicId: widget.topicId,
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.blue[600],
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'join_topic'.tr,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                expandedTitleScale: 1.0,
+                )),
               ),
             ),
 
@@ -272,7 +281,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> with TickerProviderSt
   }
 
   Widget _buildBottleCard(BottleModel bottle) {
-    
     // 判断瓶子类型
     bool isImageBottle = bottle.imageUrl.isNotEmpty;
     bool isAudioBottle = bottle.audioUrl.isNotEmpty;

@@ -2,6 +2,7 @@ import 'package:fangkong_xinsheng/app/pages/bottle/api/index.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/model/index.dart';
 import 'package:fangkong_xinsheng/app/pages/views/api/topic_api.dart';
 import 'package:fangkong_xinsheng/app/pages/views/model/ocean.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -48,8 +49,6 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
   Timer? _recordTimer;
   String? _selectedMood;
   String? _selectedTopic;
-  final TextEditingController _customTopicController = TextEditingController();
-  bool _isAddingCustomTopic = false;
   bool _isPublic = true;
   final OceanApiService _oceanApi = OceanApiService();
   List<Ocean> _oceans = [];
@@ -89,7 +88,6 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
     _audioRecorder.dispose();
     _audioPlayer.dispose();
     _recordTimer?.cancel();
-    _customTopicController.dispose();
     super.dispose();
   }
 
@@ -457,63 +455,7 @@ class _WriteBottlePageState extends State<WriteBottlePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black),
             ),
             TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  _isAddingCustomTopic = true;
-                });
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-                    title: Text(
-                      'add_customize_topic'.tr,
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                    ),
-                    content: TextField(
-                      controller: _customTopicController,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'input_topic_name'.tr,
-                        hintStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
-                        enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!)),
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('cancel'.tr, style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          if (_customTopicController.text.isNotEmpty) {
-                            // 调取接口
-                            final res = await TopicApiService().createTopic(_customTopicController.text);
-
-                            if (res.success) {
-                              Get.snackbar('成功', '话题添加成功');
-
-                              setState(() {
-                                _selectedTopic = _customTopicController.text;
-                                _selectedTopicId = res.data['id'];
-                              });
-                            } else {
-                              Get.snackbar('失败', '话题添加失败');
-                            }
-                            _customTopicController.clear();
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: Text(
-                          'confirm'.tr,
-                          style: TextStyle(color: isDark ? Colors.blue[200] : Colors.blue),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              onPressed: () => AppRoutes.to(AppRoutes.CREATE_TOPIC),
               icon: Icon(Icons.add_circle_outline, size: 18, color: isDark ? Colors.blue[200] : Colors.blue),
               label: Text('customize_topic'.tr, style: TextStyle(fontSize: 14, color: isDark ? Colors.blue[200] : Colors.blue)),
             ),

@@ -24,7 +24,7 @@ const Map<String, String> zhCN = {
   'resonance': '共振',
   'favorites': '收藏',
   'history': '历史',
-  'trending_topics': '热门话题',
+  'trending_topics': '推荐话题',
   'recommended_drift_bottles': '推荐的漂流瓶',
   'view_more': '查看更多',
 

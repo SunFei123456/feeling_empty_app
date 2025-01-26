@@ -1,3 +1,5 @@
+import 'package:fangkong_xinsheng/app/pages/views/create_topic_page.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/write_bottle_page.dart';
@@ -53,30 +55,43 @@ class PublishPage extends StatelessWidget {
               const SizedBox(height: 40),
               Row(
                 children: [
-                  _buildTypeButton(
-                    context: context,
-                    icon: Icons.message,
-                    label: 'bottle_title'.tr,
-                    description: 'write_mood_flow'.tr,
-                    color: const Color(0xFF6B4CE6),
-                    onTap: () => Get.to(
-                      () => const WriteBottlePage(),
-                      transition: Transition.rightToLeft,
+                  Expanded(
+                    child: _buildTypeButton(
+                      context: context,
+                      icon: Icons.message,
+                      label: 'bottle_title'.tr,
+                      description: 'write_mood_flow'.tr,
+                      color: const Color(0xFF6B4CE6),
+                      onTap: () => Get.to(
+                        () => const WriteBottlePage(),
+                        transition: Transition.rightToLeft,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  _buildTypeButton(
-                    context: context,
-                    icon: Icons.mail,
-                    label: 'time_letter'.tr,
-                    description: 'write_to_future'.tr,
-                    color: const Color(0xFF4ECDC4),
-                    onTap: () => Get.to(
-                      () => const WriteLetterPage(),
-                      transition: Transition.rightToLeft,
+                  Expanded(
+                    child: _buildTypeButton(
+                      context: context,
+                      icon: Icons.mail,
+                      label: 'time_letter'.tr,
+                      description: 'write_to_future'.tr,
+                      color: const Color(0xFF4ECDC4),
+                      onTap: () => Get.to(
+                        () => const WriteLetterPage(),
+                        transition: Transition.rightToLeft,
+                      ),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              _buildTypeButton(
+                context: context,
+                icon: Icons.tag,
+                label: '创建话题',
+                description: '发起一个新的话题讨论',
+                color: const Color(0xFFFF6B6B),
+                onTap: () => AppRoutes.to(AppRoutes.CREATE_TOPIC),
               ),
             ],
           ),
@@ -95,81 +110,78 @@ class PublishPage extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: isDark ? color.withOpacity(0.15) : color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark ? color.withOpacity(0.4) : color.withOpacity(0.3),
-            ),
-            boxShadow: [
-              if (!isDark) // 暗黑模式下不显示阴影
-                BoxShadow(
-                  color: color.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-            ],
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? color.withOpacity(0.15) : color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? color.withOpacity(0.4) : color.withOpacity(0.3),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      isDark ? color.withOpacity(0.2) : color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  size: 28,
-                  color: isDark ? color.withOpacity(0.9) : color,
-                ),
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: color.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              const SizedBox(height: 16),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? color.withOpacity(0.9) : color,
-                ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? color.withOpacity(0.2) : color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 8),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  height: 1.5,
-                ),
+              child: Icon(
+                icon,
+                size: 28,
+                color: isDark ? color.withOpacity(0.9) : color,
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Text(
-                    'start_creating'.tr,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? color.withOpacity(0.9) : color,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 12,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDark ? color.withOpacity(0.9) : color,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text(
+                  'start_creating'.tr,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                     color: isDark ? color.withOpacity(0.9) : color,
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 12,
+                  color: isDark ? color.withOpacity(0.9) : color,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

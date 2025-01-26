@@ -41,11 +41,22 @@ class TopicController extends GetxController {
     super.onClose();
   }
 
+  // 增加xx话题的浏览量
+  Future<void> addTopicView(int topicId) async {
+    try {
+      final response = await _apiService.increaseTopicViews(topicId);
+      if (response.success) {
+        print('该$topicId话题的浏览量已增加');
+      }
+    } catch (e) {
+      print('Add topic view error: $e');
+    }
+  }
   // 加载热门话题
   Future<void> loadHotTopics() async {
     try {
       isLoading.value = true;
-      final response = await _apiService.getHotTopics();
+      final response = await _apiService.getHotTopics(5);
       if (response.success && response.data != null) {
         hotTopics.value = response.data!;
       }
@@ -86,6 +97,9 @@ class TopicController extends GetxController {
       final response = await _apiService.getBottlesByTopic(topicId, isHot ? 'hot' : 'new');
       if (response.success && response.data != null) {
         bottles.value = response.data!;
+      }else{
+        print('Load topic bottles error: ${response.message}');
+        bottles.value = [];
       }
     } catch (e) {
       print('Load topic bottles error: $e');
@@ -119,5 +133,12 @@ class TopicController extends GetxController {
       isFavorited: isFavorited,
       favorites: favorites,
     ));
+  }
+
+  // 清理话题详情数据
+  void clearTopicDetail() {
+    topicDetail.value = TopicDetail(); // 重置为空的话题模型
+    bottles.clear(); // 清空瓶子列表
+    isDetailLoading.value = true; // 重置加载状态
   }
 }

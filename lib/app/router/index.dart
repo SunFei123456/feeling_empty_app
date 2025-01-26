@@ -2,10 +2,13 @@ import 'package:fangkong_xinsheng/app/core/services/token_service.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/controller/bottle_controller.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view/hot_bottles_page.dart';
 import 'package:fangkong_xinsheng/app/pages/profile/controller/profile_controller.dart';
+import 'package:fangkong_xinsheng/app/pages/views/create_topic_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/favorite_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/follow_list_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/ocean_square_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/resonated_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/search_topic_page.dart';
+import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
 import 'package:fangkong_xinsheng/app/pages/views/view_history_page.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/bottle/view.dart';
@@ -86,6 +89,9 @@ class AppRoutes {
   static const FOLLOWERS = '/followers';
   static const FOLLOWING = '/following';
 
+  static const CREATE_TOPIC = '/create_topic';
+  static const SEARCH_TOPIC = '/search_topic';
+
   /// 路由
   static final routes = <AppRoute>[
     AppRoute(
@@ -137,6 +143,11 @@ class AppRoutes {
     AppRoute(
       name: WRITE_LETTER,
       page: () => const WriteLetterPage(),
+    ),
+    // 写话题
+    AppRoute(
+      name: CREATE_TOPIC,
+      page: () => const CreateTopicPage(),
     ),
 
     AppRoute(
@@ -205,6 +216,18 @@ class AppRoutes {
         userId: Get.arguments['userId'] as int,
       ),
       middlewares: [AuthMiddleware()],
+    ),
+
+    // 话题
+    AppRoute(
+      name: TOPIC_DETAIL,
+      page: () => TopicDetailPage(topicId: Get.arguments as int),
+    ),
+
+    // 搜索话题页
+    AppRoute(
+      name: SEARCH_TOPIC,
+      page: () => const SearchTopicPage(),
     ),
   ];
 

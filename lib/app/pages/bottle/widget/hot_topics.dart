@@ -1,5 +1,5 @@
-
 import 'package:fangkong_xinsheng/app/pages/views/topic_detail_page.dart';
+import 'package:fangkong_xinsheng/app/router/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.dart';
@@ -7,20 +7,24 @@ import 'package:fangkong_xinsheng/app/pages/views/controller/topic_controller.da
 class HotTopicsWidget extends StatelessWidget {
   final TopicController controller = Get.find<TopicController>();
 
-  HotTopicsWidget({Key? key}) : super(key: key);
+  HotTopicsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'trending_topics'.tr,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 标题 推荐话题
+            Text('trending_topics'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800])),
+            // 查看更多
+            GestureDetector(
+              onTap: () => AppRoutes.to(AppRoutes.SEARCH_TOPIC),
+              child: Text('view_more'.tr, style: TextStyle(fontSize: 14, color: Colors.blue[800])),
+            ),
+          ],
         ),
         const SizedBox(height: 15),
         SizedBox(
@@ -36,28 +40,15 @@ class HotTopicsWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final topic = controller.hotTopics[index];
                 return GestureDetector(
-                  onTap: () {
-                    Get.to(
-                      () => TopicDetailPage(
-                        topicId: topic.id,
-                        topicName: "1",
-                        bottleCount:1
-                      ),
-                      transition: Transition.rightToLeft,
-                    );
+                  onTap: () => {
+                    AppRoutes.to(AppRoutes.TOPIC_DETAIL, arguments: topic.id),
+                    // ZEN: 增加话题浏览量
+                    controller.addTopicView(topic.id),
                   },
                   child: Container(
                     width: 200,
                     margin: const EdgeInsets.only(right: 15),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.blue[400]!.withOpacity(0.8),
-                          Colors.purple[300]!.withOpacity(0.6),
-                        ],
-                      ),
-                    ),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), image: DecorationImage(image: NetworkImage(topic.bgImage), fit: BoxFit.cover)),
                     child: Stack(
                       children: [
                         Positioned(
@@ -66,21 +57,8 @@ class HotTopicsWidget extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '#${topic.title}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '${topic.contentCount}条内容',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontSize: 14,
-                                ),
-                              ),
+                              Text('#${topic.title}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                              Text('共${topic.views}人围观', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
                             ],
                           ),
                         ),

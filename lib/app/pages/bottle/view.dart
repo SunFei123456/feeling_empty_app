@@ -328,10 +328,7 @@ class _BottlePageState extends State<BottlePage> {
             Text('recommended_drift_bottles'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800])),
             TextButton(
               onPressed: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
-              child: Text(
-                'view_more'.tr,
-                style: TextStyle(color: Colors.blue[400], fontSize: 14),
-              ),
+              child: Text('view_more'.tr, style: TextStyle(color: Colors.blue[400], fontSize: 14)),
             ),
           ],
         ),
@@ -349,15 +346,7 @@ class _BottlePageState extends State<BottlePage> {
               onTap: () {
                 Get.to(
                   () => BottleCardDetail(
-                    id: bottle['id'],
-                    imageUrl: bottle['imageUrl'].isNotEmpty ? bottle['imageUrl'] : 'https://picsum.photos/500/800',
-                    title: bottle['title'],
-                    content: bottle['content'],
-                    createdAt: bottle['createdAt'],
-                    audioUrl: bottle['audioUrl'],
-                    user: bottle['user'],
-                    mood: bottle['mood'],
-                  ),
+                      id: bottle['id'], imageUrl: bottle['imageUrl'].isNotEmpty ? bottle['imageUrl'] : 'https://picsum.photos/500/800', title: bottle['title'], content: bottle['content'], createdAt: bottle['createdAt'], audioUrl: bottle['audioUrl'], user: bottle['user'], mood: bottle['mood']),
                   transition: Transition.fadeIn,
                 );
               },
@@ -367,78 +356,34 @@ class _BottlePageState extends State<BottlePage> {
                   decoration: BoxDecoration(
                     color: _appService.isDarkMode ? Colors.black.withAlpha(200) : Colors.white.withAlpha(200),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
+                      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (bottle['imageUrl'].isNotEmpty)
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: Image.network(
-                            bottle['imageUrl'],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      if (bottle['imageUrl'].isNotEmpty) AspectRatio(aspectRatio: 1, child: Image.network(bottle['imageUrl'], fit: BoxFit.cover)),
                       Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              bottle['title'],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            Text(bottle['title'], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                             const SizedBox(height: 8),
-                            Text(
-                              bottle['content'],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                                height: 1.2,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            Text(bottle['content'], style: TextStyle(fontSize: 12, color: Colors.grey[600], height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
                             const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.remove_red_eye,
-                                      size: 12,
-                                      color: Colors.grey[400],
-                                    ),
+                                    Icon(Icons.remove_red_eye, size: 12, color: Colors.grey[400]),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      '${bottle['views']}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[400],
-                                      ),
-                                    ),
+                                    Text('${bottle['views']}', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
                                   ],
                                 ),
-                                Text(
-                                  bottle['createdAt'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[400],
-                                  ),
-                                ),
+                                Text(bottle['createdAt'], style: TextStyle(fontSize: 12, color: Colors.grey[400])),
                               ],
                             ),
                           ],
