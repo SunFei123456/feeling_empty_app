@@ -11,6 +11,7 @@ class HotTopicsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Get.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -18,11 +19,16 @@ class HotTopicsWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // 标题 推荐话题
-            Text('trending_topics'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800])),
+            Text('trending_topics'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white70 : Colors.black87)),
             // 查看更多
             GestureDetector(
               onTap: () => AppRoutes.to(AppRoutes.SEARCH_TOPIC),
-              child: Text('view_more'.tr, style: TextStyle(fontSize: 14, color: Colors.blue[800])),
+              child: Row(
+                children: [
+                  Text('view_more'.tr, style: TextStyle(fontSize: 14, color: isDarkMode ? Colors.white70 : Colors.black87)),
+                  Icon(Icons.arrow_forward_ios, size: 12, color: isDarkMode ? Colors.white70 : Colors.black87),
+                ],
+              ),
             ),
           ],
         ),

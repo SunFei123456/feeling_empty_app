@@ -37,10 +37,11 @@ class _BottlePageState extends State<BottlePage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
+          backgroundColor: _appService.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
           body: Stack(
             children: [
               // 海洋动态背景
-              _buildOceanBackground(),
+              // _buildOceanBackground(),
 
               // 主要内容
               CustomScrollView(
@@ -57,7 +58,6 @@ class _BottlePageState extends State<BottlePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 20),
-
                           // 漂流瓶动画展示区
                           _buildBottleShowcase(),
                           const SizedBox(height: 30),
@@ -81,31 +81,6 @@ class _BottlePageState extends State<BottlePage> {
             ],
           ),
         ));
-  }
-
-  Widget _buildOceanBackground() {
-    return Stack(
-      children: [
-        // 渐变背景
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.blue[200]!.withOpacity(0.4), Colors.blue[400]!.withOpacity(0.3), Colors.purple[200]!.withOpacity(0.2)],
-            ),
-          ),
-        ),
-
-        // 波浪动画效果
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: WaveAnimation(),
-        ),
-      ],
-    );
   }
 
   Widget _buildBottleShowcase() {
@@ -320,15 +295,22 @@ class _BottlePageState extends State<BottlePage> {
     );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('recommended_drift_bottles'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue[800])),
+            Text('recommended_drift_bottles'.tr, style:  TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color:  _appService.isDarkMode ? Colors.white70 : Colors.black87)),
             TextButton(
               onPressed: () => AppRoutes.to(AppRoutes.OCEANSQUARE),
-              child: Text('view_more'.tr, style: TextStyle(color: Colors.blue[400], fontSize: 14)),
+              child: Row(
+                children: [
+                  Text('view_more'.tr, style:  TextStyle(color: _appService.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 14)),
+                  // icon
+                   Icon(Icons.arrow_forward_ios, size: 12, color:  _appService.isDarkMode ? Colors.white70 : Colors.black87),
+                ],
+              ),
             ),
           ],
         ),
@@ -398,27 +380,6 @@ class _BottlePageState extends State<BottlePage> {
         ),
       ],
     );
-  }
-}
-
-// 波浪动画组件
-class WaveAnimation extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 100,
-      // 实现波浪动画效果
-    );
-  }
-}
-
-// 漂流瓶3D动画组件
-class BottleAnimation extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        // 实现漂流瓶3D动画效果
-        );
   }
 }
 
